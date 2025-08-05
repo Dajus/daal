@@ -13,7 +13,9 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/*" component={AdminDashboard} />
+      <Route path="/student" component={StudentDashboard} />
       <Route path="/student/*" component={StudentDashboard} />
       <Route component={NotFound} />
     </Switch>
