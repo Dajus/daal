@@ -9,6 +9,7 @@ import ProgressCard from "@/components/student/progress-card";
 import TheoryViewer from "@/components/student/theory-viewer";
 import TestInterface from "@/components/student/test-interface";
 import CertificateViewer from "@/components/student/certificate-viewer";
+import { t } from "@/lib/translations";
 
 interface StudentProgress {
   session: {
@@ -72,7 +73,7 @@ export default function StudentDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your course...</p>
+          <p className="text-gray-600">{t('loading')}</p>
         </div>
       </div>
     );
@@ -82,8 +83,8 @@ export default function StudentDashboard() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">Failed to load course progress</p>
-          <Button onClick={() => setLocation('/')}>Return to Home</Button>
+          <p className="text-red-600 mb-4">{t('error')}</p>
+          <Button onClick={() => setLocation('/')}>{t('back')}</Button>
         </div>
       </div>
     );
@@ -101,7 +102,7 @@ export default function StudentDashboard() {
                 src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=80" 
                 alt="DAAL Logo" 
               />
-              <Badge className="ml-4 bg-primary text-white">Student</Badge>
+              <Badge className="ml-4 bg-primary text-white">{t('student')}</Badge>
             </div>
             <Button 
               onClick={handleLogout}
@@ -109,7 +110,7 @@ export default function StudentDashboard() {
               className="flex items-center gap-2"
             >
               <LogOut className="h-4 w-4" />
-              Exit Course
+              {t('logout')}
             </Button>
           </div>
         </div>
@@ -132,7 +133,7 @@ export default function StudentDashboard() {
               {/* Header */}
               <div className="mb-8">
                 <h1 className="text-2xl font-bold text-gray-900">
-                  Welcome, {progress.session.studentName}
+                  {t('welcomeBack')}, {progress.session.studentName}
                 </h1>
                 <p className="text-gray-600 mt-1">{progress.course.name}</p>
               </div>

@@ -10,6 +10,7 @@ import { getAuthHeaders } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { Clock, ChevronLeft, ChevronRight, Flag, CheckCircle, AlertTriangle } from "lucide-react";
 import type { TestQuestion } from "@/types";
+import { t } from "@/lib/translations";
 
 interface TestResult {
   attempt: {
@@ -19,6 +20,13 @@ interface TestResult {
     percentage: string;
     passed: boolean;
     timeTakenSeconds: number;
+    answers: Array<{
+      questionId: number;
+      selectedAnswer: string;
+      isCorrect: boolean;
+      correctAnswer: string;
+      explanation?: string;
+    }>;
   };
   certificate: any;
   attemptsRemaining: number;
@@ -33,6 +41,7 @@ export default function TestInterface({ progress }: { progress?: any }) {
   const [testStarted, setTestStarted] = useState(false);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [startTime, setStartTime] = useState<number>(0);
+  const [showResultsReview, setShowResultsReview] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -65,13 +74,13 @@ export default function TestInterface({ progress }: { progress?: any }) {
       
       if (result.attempt.passed) {
         toast({
-          title: "Congratulations!",
-          description: `You passed with ${result.attempt.percentage}%`
+          title: t('congratulations'),
+          description: `${t('testPassed')} ${result.attempt.percentage}%`
         });
       } else {
         toast({
-          title: "Test Not Passed",
-          description: `Score: ${result.attempt.percentage}%. ${result.attemptsRemaining} attempts remaining.`,
+          title: t('testNotPassed'),
+          description: `${t('score')}: ${result.attempt.percentage}%. ${result.attemptsRemaining} ${t('attemptsRemaining')}.`,
           variant: "destructive"
         });
       }
@@ -168,7 +177,7 @@ export default function TestInterface({ progress }: { progress?: any }) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 max-w-4xl mx-auto">
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-3xl font-bold text-primary mb-2">{testResult.attempt.percentage}%</div>
-              <div className="text-sm text-gray-600">Final Score</div>
+              <div className="text-sm text-gray-600">{t('score')}</div>
             </div>
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-3xl font-bold text-blue-600 mb-2">
@@ -241,12 +250,72 @@ export default function TestInterface({ progress }: { progress?: any }) {
             </div>
           </div>
 
+          {/* Review Answers Button */}
+          <div className="flex justify-center mb-6">
+            <Button 
+              onClick={() => setShowResultsReview(!showResultsReview)}
+              variant="outline"
+              className="border-blue-500 text-blue-600 hover:bg-blue-50"
+            >
+              {showResultsReview ? 'Skrýt detaily' : t('reviewAnswers')}
+            </Button>
+          </div>
+
+          {/* Results Review Section */}
+          {showResultsReview && testResult.attempt.answers && (
+            <div className="bg-white border rounded-lg p-6 mb-8 max-w-4xl mx-auto">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('testResults')} - {t('reviewAnswers')}</h3>
+              <div className="space-y-4">
+                {testResult.attempt.answers.map((answer, index) => {
+                  const question = questions.find(q => q.id === answer.questionId);
+                  return (
+                    <div key={answer.questionId} className="border rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <h4 className="font-medium text-gray-900">
+                          {t('questionNumber')} {index + 1}: {question?.questionText}
+                        </h4>
+                        <span className={`text-sm px-2 py-1 rounded ${
+                          answer.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {answer.isCorrect ? 'Správně' : 'Nesprávně'}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <span className="font-medium text-gray-700">{t('yourAnswer')}: </span>
+                          <span className={answer.isCorrect ? 'text-green-700' : 'text-red-700'}>
+                            {answer.selectedAnswer}
+                          </span>
+                        </div>
+                        
+                        {!answer.isCorrect && (
+                          <div>
+                            <span className="font-medium text-gray-700">{t('correctAnswer')}: </span>
+                            <span className="text-green-700">{answer.correctAnswer}</span>
+                          </div>
+                        )}
+                        
+                        {answer.explanation && (
+                          <div className="bg-blue-50 p-3 rounded">
+                            <span className="font-medium text-blue-900">{t('explanation')}: </span>
+                            <span className="text-blue-800">{answer.explanation}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
             <Button 
               onClick={() => setLocation('/student')}
               className="bg-primary hover:bg-primary-dark"
             >
-              Return to Dashboard
+              {t('backToDashboard')}
             </Button>
             
             {testResult.attempt.passed && testResult.certificate && (
@@ -255,7 +324,7 @@ export default function TestInterface({ progress }: { progress?: any }) {
                 variant="outline"
                 className="border-primary text-primary hover:bg-primary-light"
               >
-                View Certificate
+                {t('viewCertificate')}
               </Button>
             )}
             
@@ -270,7 +339,7 @@ export default function TestInterface({ progress }: { progress?: any }) {
                 }}
                 variant="outline"
               >
-                Try Again ({testResult.attemptsRemaining} attempts left)
+                {t('retakeTest')} ({testResult.attemptsRemaining} {t('attemptsRemaining')})
               </Button>
             )}
           </div>

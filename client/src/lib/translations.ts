@@ -181,8 +181,58 @@ export const translations = {
   saving: "Ukládání...",
   loading: "Načítání...",
   
-  // Status Messages
-  success: "Úspěch",
+  // Login Modal
+  accessPlatform: "Přístup na platformu",
+  adminLogin: "Přihlášení administrátora",
+  studentAccess: "Přístup studenta",
+  selectLoginType: "Vyberte typ přihlášení",
+  administratorPanel: "Panel administrátora",
+  manageCoursesAndCodes: "Spravujte kurzy a přístupové kódy",
+  continueAsAdmin: "Pokračovat jako administrátor",
+  courseAccess: "Přístup ke kurzu",
+  accessTrainingCourses: "Přístup k výukovým kurzům",
+  continueAsStudent: "Pokračovat jako student",
+  signIn: "Přihlásit se",
+  accessCourse: "Přístup ke kurzu",
+  backToSelection: "Zpět na výběr",
+  
+  // Student Dashboard
+  welcomeBack: "Vítejte zpět",
+  progressOverview: "Přehled pokroku",
+  theoryProgress: "Pokrok v teorii",
+  testStatus: "Stav testu",
+  overallProgress: "Celkový pokrok",
+  notStarted: "Nezačato",
+  inProgress: "Probíhá",
+  
+  // Test Results & Review
+  testResults: "Výsledky testu",
+  reviewAnswers: "Zkontrolovat odpovědi",
+  yourAnswer: "Vaše odpověď",
+  
+  // Notes System
+  saveNote: "Uložit poznámku",
+  noteAdded: "Poznámka byla přidána",
+  notes: "Poznámky",
+  noNotes: "Žádné poznámky",
+  bookmark: "Záložka",
+  bookmarked: "Označeno záložkou",
+  completeTheory: "Dokončit teorii",
+  editNote: "Upravit poznámku",
+  correctAnswer: "Správná odpověď",
+  explanation: "Vysvětlení",
+  
+  // Test Interface New
+  submitTest: "Odeslat test",
+  previousQuestion: "Předchozí otázka",
+  flagQuestion: "Označit otázku",
+  reviewTest: "Zkontrolovat test",
+  questionNumber: "Otázka",
+  congratulations: "Gratulujeme!",
+  testPassed: "Test úspěšně dokončen s",
+  testNotPassed: "Test nebyl úspěšný",
+  attemptsRemaining: "zbývá pokusů",
+  backToDashboard: "Zpět na nástěnku",
   error: "Chyba",
   warning: "Varování",
   info: "Informace",

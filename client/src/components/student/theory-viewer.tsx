@@ -6,13 +6,19 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { getAuthHeaders } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
-import { ChevronLeft, ChevronRight, Bookmark, StickyNote, Clock, CheckCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Bookmark, StickyNote, Clock, CheckCircle, X } from "lucide-react";
 import type { TheorySlide } from "@/types";
 import { t } from "@/lib/translations";
+import { Modal, ModalContent, ModalHeader, ModalTitle } from "@/components/ui/modal";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 export default function TheoryViewer({ progress }: { progress?: any }) {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [bookmarkedSlides, setBookmarkedSlides] = useState<Set<number>>(new Set());
+  const [slideNotes, setSlideNotes] = useState<Record<number, string>>({});
+  const [showNoteModal, setShowNoteModal] = useState(false);
+  const [currentNoteText, setCurrentNoteText] = useState('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -49,7 +55,7 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t('error'),
         description: error.message,
         variant: "destructive"
       });
@@ -109,6 +115,23 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
     setBookmarkedSlides(newBookmarks);
   };
 
+  const openNoteModal = () => {
+    setCurrentNoteText(slideNotes[currentSlide.id] || '');
+    setShowNoteModal(true);
+  };
+
+  const saveNote = () => {
+    setSlideNotes(prev => ({
+      ...prev,
+      [currentSlide.id]: currentNoteText
+    }));
+    setShowNoteModal(false);
+    toast({
+      title: t('success'),
+      description: t('noteAdded')
+    });
+  };
+
   return (
     <Card className="shadow-lg">
       <CardContent className="p-8">
@@ -121,11 +144,11 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
             className="flex items-center gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
-            Previous
+            {t('previousQuestion')}
           </Button>
           <div className="flex items-center space-x-4 flex-1 mx-6">
             <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
-              Slide {currentSlideIndex + 1} of {slides.length}
+              Slide {currentSlideIndex + 1} {t('of')} {slides.length}
             </span>
             <Progress value={progressPercentage} className="flex-1 h-2" />
           </div>
@@ -138,17 +161,17 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
               progress?.theoryCompleted ? (
                 <>
                   <CheckCircle className="h-4 w-4" />
-                  Completed
+                  {t('completed')}
                 </>
               ) : (
                 <>
-                  {completeTheoryMutation.isPending ? "Completing..." : "Complete Theory"}
+                  {completeTheoryMutation.isPending ? t('loading') : t('completeTheory')}
                   <CheckCircle className="h-4 w-4" />
                 </>
               )
             ) : (
               <>
-                Next
+                {t('nextQuestion')}
                 <ChevronRight className="h-4 w-4" />
               </>
             )}
@@ -210,11 +233,15 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
               className={`text-sm ${bookmarkedSlides.has(currentSlide.id) ? 'text-primary' : 'text-gray-600'} hover:text-primary`}
             >
               <Bookmark className={`h-4 w-4 mr-2 ${bookmarkedSlides.has(currentSlide.id) ? 'fill-current' : ''}`} />
-              {bookmarkedSlides.has(currentSlide.id) ? 'Bookmarked' : 'Bookmark'}
+              {bookmarkedSlides.has(currentSlide.id) ? t('bookmarked') : t('bookmark')}
             </Button>
-            <Button variant="ghost" className="text-gray-600 hover:text-primary text-sm">
-              <StickyNote className="h-4 w-4 mr-2" />
-              Add Note
+            <Button 
+              onClick={openNoteModal}
+              variant="ghost" 
+              className={`text-sm ${slideNotes[currentSlide.id] ? 'text-primary' : 'text-gray-600'} hover:text-primary`}
+            >
+              <StickyNote className={`h-4 w-4 mr-2 ${slideNotes[currentSlide.id] ? 'fill-current' : ''}`} />
+              {slideNotes[currentSlide.id] ? t('editNote') : t('addNote')}
             </Button>
           </div>
           <div className="text-sm text-gray-500 flex items-center">
@@ -223,6 +250,51 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
           </div>
         </div>
       </CardContent>
+      
+      {/* Note Modal */}
+      {showNoteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">{t('addNote')}</h3>
+              <Button
+                onClick={() => setShowNoteModal(false)}
+                variant="ghost"
+                size="sm"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="p-4">
+              <Label htmlFor="note" className="text-sm font-medium">
+                {t('notes')} pro slide {currentSlideIndex + 1}:
+              </Label>
+              <Textarea
+                id="note"
+                value={currentNoteText}
+                onChange={(e) => setCurrentNoteText(e.target.value)}
+                placeholder={`${t('addNote')}...`}
+                className="mt-2"
+                rows={4}
+              />
+            </div>
+            <div className="flex justify-end gap-2 p-4 border-t">
+              <Button
+                onClick={() => setShowNoteModal(false)}
+                variant="outline"
+              >
+                {t('cancel')}
+              </Button>
+              <Button
+                onClick={saveNote}
+                className="bg-primary hover:bg-primary-dark"
+              >
+                {t('saveNote')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }

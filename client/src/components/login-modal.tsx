@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { t } from "@/lib/translations";
 import { setAuthToken } from "@/lib/auth";
 import { Shield, GraduationCap, X } from "lucide-react";
 import type { LoginResponse } from "@/types";
@@ -45,8 +46,8 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
     onSuccess: (data) => {
       setAuthToken(data.token);
       toast({
-        title: "Success",
-        description: "Logged in successfully"
+        title: t('success'),
+        description: t('loginSuccess')
       });
       onOpenChange(false);
       setLocation('/admin');
@@ -72,8 +73,8 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
     onSuccess: (data) => {
       setAuthToken(data.token);
       toast({
-        title: "Success",
-        description: "Access granted successfully"
+        title: t('success'),
+        description: t('accessGranted')
       });
       onOpenChange(false);
       setLocation('/student');
@@ -111,7 +112,7 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
       <ModalContent className="max-w-md">
         <ModalHeader>
           <ModalTitle className="flex items-center gap-2">
-            {mode === 'select' && "Access Platform"}
+            {mode === 'select' && t('accessPlatform')}
             {mode === 'admin' && (
               <>
                 <Shield className="h-5 w-5 text-gray-900" />

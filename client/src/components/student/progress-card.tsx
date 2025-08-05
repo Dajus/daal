@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { t } from "@/lib/translations";
 import { CheckCircle, Clock, Play, RotateCcw, Award } from "lucide-react";
 
 interface ProgressCardProps {
@@ -62,7 +63,7 @@ export default function ProgressCard({ progress }: ProgressCardProps) {
         {/* Progress Bar */}
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">Overall Progress</span>
+            <span className="text-sm font-medium text-gray-700">{t('overallProgress')}</span>
             <span className="text-sm font-medium text-primary">{overallProgress}%</span>
           </div>
           <Progress value={overallProgress} className="h-3" />
