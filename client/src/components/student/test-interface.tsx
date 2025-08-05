@@ -262,7 +262,7 @@ export default function TestInterface({ progress }: { progress?: any }) {
           </div>
 
           {/* Results Review Section */}
-          {showResultsReview && testResult.attempt.answers && (
+          {showResultsReview && Array.isArray(testResult.attempt.answers) && (
             <div className="bg-white border rounded-lg p-6 mb-8 max-w-4xl mx-auto">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('testResults')} - {t('reviewAnswers')}</h3>
               <div className="space-y-4">
@@ -307,6 +307,14 @@ export default function TestInterface({ progress }: { progress?: any }) {
                   );
                 })}
               </div>
+            </div>
+          )}
+          
+          {/* Fallback if answers array is not available */}
+          {showResultsReview && !Array.isArray(testResult.attempt.answers) && (
+            <div className="bg-white border rounded-lg p-6 mb-8 max-w-4xl mx-auto">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('testResults')}</h3>
+              <p className="text-gray-600">Detaily odpovědí nejsou k dispozici pro tento pokus.</p>
             </div>
           )}
 

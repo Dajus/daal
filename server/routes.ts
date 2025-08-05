@@ -466,9 +466,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const questions = await storage.getTestQuestionsByCourse(accessCode!.courseId!);
       const course = await storage.getCourse(accessCode!.courseId!);
       
-      // Calculate score
+      // Calculate score and track answer details
       let score = 0;
       let maxScore = 0;
+      const answerDetails = [];
       
       questions.forEach(question => {
         const questionPoints = question.points || 1;
@@ -476,17 +477,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const userAnswer = answers[question.id];
         const correctAnswers = question.correctAnswers;
         
+        let isCorrect = false;
         if (Array.isArray(correctAnswers)) {
           if (Array.isArray(userAnswer) && 
               userAnswer.length === correctAnswers.length &&
               userAnswer.every(a => correctAnswers.includes(a))) {
             score += questionPoints;
+            isCorrect = true;
           }
         } else {
           if (userAnswer === correctAnswers) {
             score += questionPoints;
+            isCorrect = true;
           }
         }
+        
+        answerDetails.push({
+          questionId: question.id,
+          selectedAnswer: Array.isArray(userAnswer) ? userAnswer.join(', ') : userAnswer,
+          correctAnswer: Array.isArray(correctAnswers) ? correctAnswers.join(', ') : correctAnswers,
+          isCorrect,
+          explanation: question.explanation || null
+        });
       });
       
       const percentage = (score / maxScore) * 100;
@@ -529,7 +541,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       res.json({
-        attempt,
+        attempt: {
+          ...attempt,
+          answers: answerDetails
+        },
         certificate,
         passed,
         score,

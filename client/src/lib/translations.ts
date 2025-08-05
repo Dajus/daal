@@ -219,8 +219,6 @@ export const translations = {
   bookmarked: "Označeno záložkou",
   completeTheory: "Dokončit teorii",
   editNote: "Upravit poznámku",
-  correctAnswer: "Správná odpověď",
-  explanation: "Vysvětlení",
   
   // Test Interface New
   submitTest: "Odeslat test",
