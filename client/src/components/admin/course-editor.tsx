@@ -15,6 +15,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Book, HelpCircle, Plus, Edit, Trash2, Clock } from "lucide-react";
 import type { Course, TheorySlide, TestQuestion } from "@/types";
 import SlideFormDialog from "./slide-form-dialog";
+import { t } from "@/lib/translations";
 
 export default function CourseEditor() {
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
@@ -183,7 +184,7 @@ export default function CourseEditor() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Course List */}
       <div className="lg:col-span-1">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Courses</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('courses')}</h3>
         <div className="space-y-2">
           {courses.map(course => (
             <Button
@@ -214,7 +215,7 @@ export default function CourseEditor() {
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">
-                  {selectedCourse.name} - Content Editor
+                  {selectedCourse.name} - {t('courseEditor')}
                 </h3>
                 <Badge variant="secondary" className="mt-1">
                   {selectedCourse.abbreviation}
@@ -231,14 +232,14 @@ export default function CourseEditor() {
                       className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
                     >
                       <Book className="h-4 w-4" />
-                      Theory
+                      {t('theory')}
                     </TabsTrigger>
                     <TabsTrigger 
                       value="test"
                       className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
                     >
                       <HelpCircle className="h-4 w-4" />
-                      Test
+                      {t('test')}
                     </TabsTrigger>
                   </TabsList>
                 </div>
@@ -247,7 +248,7 @@ export default function CourseEditor() {
                 <TabsContent value="theory" className="p-6">
                   <div className="space-y-6">
                     <div className="flex justify-between items-center">
-                      <h4 className="font-semibold text-gray-900">Theory Slides</h4>
+                      <h4 className="font-semibold text-gray-900">{t('theory')} - Snímky</h4>
                       <Dialog open={slideDialogOpen} onOpenChange={setSlideDialogOpen}>
                         <DialogTrigger asChild>
                           <Button className="flex items-center gap-2" onClick={() => {
@@ -255,7 +256,7 @@ export default function CourseEditor() {
                             setSlideDialogOpen(true);
                           }}>
                             <Plus className="h-4 w-4" />
-                            Add Slide
+                            {t('addSlide')}
                           </Button>
                         </DialogTrigger>
                         <SlideFormDialog 
@@ -492,7 +493,7 @@ function QuestionFormDialog({ question, onSave, isLoading }: {
   });
 
   const handleSave = () => {
-    const cleanOptions = formData.options.filter(opt => opt.trim() !== '');
+    const cleanOptions = formData.options.filter((opt: string) => opt.trim() !== '');
     onSave({
       ...formData,
       options: cleanOptions,
@@ -513,7 +514,7 @@ function QuestionFormDialog({ question, onSave, isLoading }: {
       setFormData({ ...formData, correctAnswers: [option] });
     } else {
       const newCorrectAnswers = formData.correctAnswers.includes(option)
-        ? formData.correctAnswers.filter(ans => ans !== option)
+        ? formData.correctAnswers.filter((ans: string) => ans !== option)
         : [...formData.correctAnswers, option];
       setFormData({ ...formData, correctAnswers: newCorrectAnswers });
     }
@@ -522,16 +523,16 @@ function QuestionFormDialog({ question, onSave, isLoading }: {
   return (
     <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>{question ? 'Edit Test Question' : 'Add New Test Question'}</DialogTitle>
+        <DialogTitle>{question ? t('editQuestion') : t('addQuestion')}</DialogTitle>
       </DialogHeader>
       <div className="space-y-4">
         <div>
-          <Label htmlFor="questionText">Question Text</Label>
+          <Label htmlFor="questionText">{t('questionText')}</Label>
           <Textarea
             id="questionText"
             value={formData.questionText}
             onChange={(e) => setFormData({ ...formData, questionText: e.target.value })}
-            placeholder="Enter your question..."
+            placeholder={t('questionText')}
             rows={3}
             className="mt-1"
           />
@@ -580,7 +581,7 @@ function QuestionFormDialog({ question, onSave, isLoading }: {
         <div>
           <Label>Answer Options</Label>
           <div className="space-y-2 mt-2">
-            {formData.options.map((option, index) => (
+            {formData.options.map((option: string, index: number) => (
               <div key={index} className="flex items-center space-x-2">
                 <input
                   type={formData.questionType === 'single_choice' ? 'radio' : 'checkbox'}
@@ -607,7 +608,7 @@ function QuestionFormDialog({ question, onSave, isLoading }: {
             onClick={handleSave} 
             disabled={isLoading || !formData.questionText.trim() || formData.correctAnswers.length === 0}
           >
-            {isLoading ? 'Saving...' : (question ? 'Update Question' : 'Create Question')}
+            {isLoading ? t('saving') : (question ? t('updateQuestion') : t('createQuestion'))}
           </Button>
         </div>
       </div>

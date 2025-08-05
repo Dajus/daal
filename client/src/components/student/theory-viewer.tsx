@@ -8,6 +8,7 @@ import { getAuthHeaders } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { ChevronLeft, ChevronRight, Bookmark, StickyNote, Clock, CheckCircle } from "lucide-react";
 import type { TheorySlide } from "@/types";
+import { t } from "@/lib/translations";
 
 export default function TheoryViewer({ progress }: { progress?: any }) {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -37,8 +38,8 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
     },
     onSuccess: () => {
       toast({
-        title: "Theory Completed!",
-        description: "Redirecting to test..."
+        title: t('theoryCompleted'),
+        description: t('redirectingToTest') + "..."
       });
       queryClient.invalidateQueries({ queryKey: ['/api/student/progress'] });
       // Auto-redirect to test after 2 seconds

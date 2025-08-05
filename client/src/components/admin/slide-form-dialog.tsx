@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import RichTextEditor from "./rich-text-editor";
 import type { TheorySlide } from "@/types";
+import { t } from "@/lib/translations";
 
 interface SlideFormDialogProps {
   slide?: TheorySlide | null;
@@ -48,22 +49,22 @@ export default function SlideFormDialog({ slide, onSave, isLoading }: SlideFormD
     <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="slide-form-description">
       <DialogHeader>
         <DialogTitle>
-          {slide ? 'Edit Slide' : 'Add New Slide'}
+          {slide ? t('editSlide') : t('addSlide')}
         </DialogTitle>
         <div id="slide-form-description" className="text-sm text-gray-600">
-          Use the rich text editor below to create content with formatting and images.
+          {t('richTextEditorDescription')}
         </div>
       </DialogHeader>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="title">Slide Title</Label>
+            <Label htmlFor="title">{t('slideTitle')}</Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Enter slide title"
+              placeholder={t('slideTitle')}
               required
             />
           </div>

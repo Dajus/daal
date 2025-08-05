@@ -5,6 +5,7 @@ DAAL Web Application is a comprehensive workplace safety training platform desig
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
+Language preference: Czech language for all user-facing text and interface elements throughout the entire application.
 
 # System Architecture
 

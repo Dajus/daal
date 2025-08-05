@@ -20,6 +20,7 @@ import {
   Globe,
   Award
 } from "lucide-react";
+import { t } from "@/lib/translations";
 
 export default function Landing() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -27,47 +28,47 @@ export default function Landing() {
   const courses = [
     {
       icon: Car,
-      title: "Driver Training",
-      description: "Professional driving training for company vehicle operators",
+      title: "Školení řidičů",
+      description: "Profesionální školení řidičů pro operátory firemních vozidel",
       code: "DRIV"
     },
     {
       icon: HardHat,
-      title: "BOZP & Fire Protection",
-      description: "Occupational health and safety with fire protection training",
+      title: "BOZP a požární ochrana",
+      description: "Školení bezpečnosti a ochrany zdraví při práci včetně požární ochrany",
       code: "BOZP"
     },
     {
       icon: Mountain,
-      title: "Work at Height",
-      description: "Specialized training for working at elevated positions",
+      title: "Práce ve výškách",
+      description: "Specializované školení pro práci ve zvýšených polohách",
       code: "HEIG"
     },
     {
       icon: Heart,
-      title: "First Aid & Hygiene",
-      description: "Essential first aid and workplace hygiene protocols",
+      title: "První pomoc a hygiena",
+      description: "Základní první pomoc a pracovní hygienické protokoly",
       code: "HYGI"
     },
     {
       icon: Recycle,
-      title: "Waste Management",
-      description: "Proper handling and disposal of workplace waste",
+      title: "Nakládání s odpady",
+      description: "Správné zacházení a likvidace pracovních odpadů",
       code: "WAST"
     },
     {
       icon: Truck,
-      title: "Hazardous Transport",
-      description: "ADR training for dangerous goods transportation",
+      title: "Nebezpečný transport",
+      description: "ADR školení pro přepravu nebezpečného zboží",
       code: "HADR"
     }
   ];
 
   const stats = [
-    { value: "2,500+", label: "Graduates" },
-    { value: "13", label: "Course Types" },
-    { value: "15+", label: "Years Experience" },
-    { value: "98%", label: "Success Rate" }
+    { value: "2,500+", label: "Absolventů" },
+    { value: "13", label: "Typů kurzů" },
+    { value: "15+", label: "Let zkušeností" },
+    { value: "98%", label: "Úspěšnost" }
   ];
 
   return (
@@ -86,10 +87,10 @@ export default function Landing() {
               </div>
               <div className="hidden md:block ml-8">
                 <div className="flex items-baseline space-x-4">
-                  <a href="#hero" className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Home</a>
-                  <a href="#about" className="text-gray-500 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">About</a>
-                  <a href="#services" className="text-gray-500 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Services</a>
-                  <a href="#contact" className="text-gray-500 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Contact</a>
+                  <a href="#hero" className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Domů</a>
+                  <a href="#about" className="text-gray-500 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">O nás</a>
+                  <a href="#services" className="text-gray-500 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Služby</a>
+                  <a href="#contact" className="text-gray-500 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Kontakt</a>
                 </div>
               </div>
             </div>
@@ -98,7 +99,7 @@ export default function Landing() {
                 onClick={() => setLoginModalOpen(true)}
                 className="bg-primary text-white hover:bg-primary-dark"
               >
-                Access Courses
+                Přístup ke kurzům
               </Button>
             </div>
           </div>
@@ -110,16 +111,16 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Workplace Safety is Our Priority
+              Bezpečnost práce je naší prioritou
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Professional safety training and certification programs designed to keep your workforce protected and compliant with the latest regulations.
+              Profesionální bezpečnostní školení a certifikační programy navržené k ochraně vaší pracovní síly a dodržování nejnovějších předpisů.
             </p>
             <Button 
               onClick={() => setLoginModalOpen(true)}
               className="bg-primary text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-dark shadow-lg"
             >
-              Access Courses
+              Přístup ke kurzům
             </Button>
           </div>
         </div>
@@ -129,8 +130,8 @@ export default function Landing() {
       <section id="services" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Training Courses</h2>
-            <p className="text-xl text-gray-600">Comprehensive safety training programs tailored to your industry needs</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Naše výukové kurzy</h2>
+            <p className="text-xl text-gray-600">Komplexní bezpečnostní školící programy přizpůsobené potřebám vašeho odvětví</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {courses.map((course, index) => (
