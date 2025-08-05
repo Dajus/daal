@@ -230,6 +230,7 @@ export const insertCompanySchema = createInsertSchema(companies).omit({
 
 export const insertAccessCodeSchema = createInsertSchema(accessCodes).omit({
   id: true,
+  code: true,
   createdAt: true,
   usageCount: true
 });
