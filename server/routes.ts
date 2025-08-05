@@ -4,6 +4,8 @@ import { storage } from "./storage";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
+import multer from "multer";
+import path from "path";
 import { 
   insertAdminSchema, 
   insertAccessCodeSchema, 
@@ -62,6 +64,21 @@ function generateCourseCode(courseName: string): string {
   
   return `${prefix}${timestamp}${random}`.toUpperCase();
 }
+
+// Configure multer for image uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+    }
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -242,6 +259,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get theory slides error:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Image upload endpoint
+  app.post("/api/admin/upload-image", authenticateAdmin, upload.single('image'), async (req: any, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+
+      // Convert buffer to base64 data URL for simplicity
+      // In production, you'd want to upload to actual object storage
+      const imageBase64 = req.file.buffer.toString('base64');
+      const mimeType = req.file.mimetype;
+      const imageUrl = `data:${mimeType};base64,${imageBase64}`;
+
+      res.json({ imageUrl });
+    } catch (error) {
+      console.error("Image upload error:", error);
+      res.status(500).json({ message: "Failed to upload image" });
     }
   });
 

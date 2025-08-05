@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Quill.js styles are imported automatically by react-quill */
+
+/* Override Quill styles to match our theme */
+.ql-editor {
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.ql-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 12px 0;
+}
+
+.ql-editor p {
+  margin-bottom: 12px;
+}
+
+.ql-editor h1, .ql-editor h2, .ql-editor h3 {
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.ql-toolbar {
+  border-top: 1px solid #e5e7eb;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+}
+
+.ql-container {
+  border-bottom: 1px solid #e5e7eb;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+}
+
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(20, 14.3%, 4.1%);

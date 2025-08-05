@@ -14,6 +14,7 @@ import { getAuthHeaders } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { Book, HelpCircle, Plus, Edit, Trash2, Clock } from "lucide-react";
 import type { Course, TheorySlide, TestQuestion } from "@/types";
+import SlideFormDialog from "./slide-form-dialog";
 
 export default function CourseEditor() {
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
@@ -473,89 +474,7 @@ export default function CourseEditor() {
   );
 }
 
-// Slide Form Dialog Component
-function SlideFormDialog({ slide, onSave, isLoading }: {
-  slide: TheorySlide | null;
-  onSave: (data: any) => void;
-  isLoading: boolean;
-}) {
-  const [formData, setFormData] = useState({
-    title: slide?.title || '',
-    content: slide?.content || '',
-    slideOrder: slide?.slideOrder || 1,
-    estimatedReadTime: slide?.estimatedReadTime || 5
-  });
 
-  const handleSave = () => {
-    onSave(formData);
-  };
-
-  return (
-    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-      <DialogHeader>
-        <DialogTitle>{slide ? 'Edit Theory Slide' : 'Add New Theory Slide'}</DialogTitle>
-      </DialogHeader>
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="title">Title</Label>
-          <Input
-            id="title"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Enter slide title"
-            className="mt-1"
-          />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="slideOrder">Slide Order</Label>
-            <Input
-              id="slideOrder"
-              type="number"
-              value={formData.slideOrder}
-              onChange={(e) => setFormData({ ...formData, slideOrder: parseInt(e.target.value) || 1 })}
-              min="1"
-              className="mt-1"
-            />
-          </div>
-          <div>
-            <Label htmlFor="estimatedReadTime">Read Time (minutes)</Label>
-            <Input
-              id="estimatedReadTime"
-              type="number"
-              value={formData.estimatedReadTime}
-              onChange={(e) => setFormData({ ...formData, estimatedReadTime: parseInt(e.target.value) || 5 })}
-              min="1"
-              className="mt-1"
-            />
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="content">Content</Label>
-          <Textarea
-            id="content"
-            value={formData.content}
-            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-            placeholder="Enter slide content..."
-            rows={8}
-            className="mt-1"
-          />
-        </div>
-
-        <div className="flex justify-end space-x-2 pt-4">
-          <Button variant="outline" disabled={isLoading}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={isLoading || !formData.title.trim()}>
-            {isLoading ? 'Saving...' : (slide ? 'Update Slide' : 'Create Slide')}
-          </Button>
-        </div>
-      </div>
-    </DialogContent>
-  );
-}
 
 // Question Form Dialog Component
 function QuestionFormDialog({ question, onSave, isLoading }: {
