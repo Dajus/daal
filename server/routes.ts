@@ -202,7 +202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ...data,
           code,
           createdBy: req.admin.id
-        });
+        } as any);
         codes.push(accessCode);
       }
 
@@ -497,7 +497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const session = await storage.getStudentSession(certificate.studentSessionId || 0);
-      const accessCode = await storage.getAccessCode(session!.accessCodeId);
+      const accessCode = await storage.getAccessCode(session!.accessCodeId || 0);
       const course = await storage.getCourse(accessCode!.courseId!);
       const company = accessCode!.companyId ? await storage.getCompany(accessCode!.companyId) : null;
       

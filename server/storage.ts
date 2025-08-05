@@ -172,7 +172,7 @@ export class DatabaseStorage implements IStorage {
     return accessCode || undefined;
   }
 
-  async createAccessCode(accessCode: InsertAccessCode): Promise<AccessCode> {
+  async createAccessCode(accessCode: any): Promise<AccessCode> {
     const [newAccessCode] = await db.insert(accessCodes).values(accessCode).returning();
     return newAccessCode;
   }
