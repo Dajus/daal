@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { getAuthHeaders } from "@/lib/auth";
+import { t } from "@/lib/translations";
 import { apiRequest } from "@/lib/queryClient";
 import { Download, Copy, Calendar } from "lucide-react";
 import type { Course, Company, AccessCode } from "@/types";
@@ -75,8 +76,8 @@ export default function CodeGenerator() {
     },
     onSuccess: () => {
       toast({
-        title: "Success",
-        description: "Access codes generated successfully"
+        title: t('success'),
+        description: t('codeGenerated')
       });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/access-codes'] });
       // Reset form
@@ -91,7 +92,7 @@ export default function CodeGenerator() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t('error'),
         description: error.message,
         variant: "destructive"
       });
@@ -103,8 +104,8 @@ export default function CodeGenerator() {
     
     if (!formData.courseId || !formData.companyId) {
       toast({
-        title: "Error",
-        description: "Please select both course and company",
+        title: t('error'),
+        description: "Vyberte prosím kurz i společnost",
         variant: "destructive"
       });
       return;
@@ -123,8 +124,8 @@ export default function CodeGenerator() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: "Copied",
-      description: "Code copied to clipboard"
+      title: t('copied'),
+      description: t('codeCopied')
     });
   };
 
@@ -154,18 +155,18 @@ export default function CodeGenerator() {
       {/* Code Generation Form */}
       <Card className="bg-gray-50">
         <CardHeader>
-          <CardTitle>Generate Access Codes</CardTitle>
+          <CardTitle>{t('generateAccessCode')}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="course">Course</Label>
+              <Label htmlFor="course">{t('course')}</Label>
               <Select 
                 value={formData.courseId} 
                 onValueChange={(value) => setFormData(prev => ({ ...prev, courseId: value }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a course" />
+                  <SelectValue placeholder={t('selectCourse')} />
                 </SelectTrigger>
                 <SelectContent>
                   {courses.map(course => (
@@ -178,13 +179,13 @@ export default function CodeGenerator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="company">Company</Label>
+              <Label htmlFor="company">{t('company')}</Label>
               <Select 
                 value={formData.companyId} 
                 onValueChange={(value) => setFormData(prev => ({ ...prev, companyId: value }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a company" />
+                  <SelectValue placeholder={t('selectCompany')} />
                 </SelectTrigger>
                 <SelectContent>
                   {companies.map(company => (
@@ -197,7 +198,7 @@ export default function CodeGenerator() {
             </div>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="unlimited">Unlimited Participants</Label>
+              <Label htmlFor="unlimited">{t('unlimitedParticipants')}</Label>
               <Switch
                 id="unlimited"
                 checked={formData.unlimitedParticipants}
@@ -209,7 +210,7 @@ export default function CodeGenerator() {
 
             {!formData.unlimitedParticipants && (
               <div className="space-y-2">
-                <Label htmlFor="participants">Participant Count</Label>
+                <Label htmlFor="participants">Počet účastníků</Label>
                 <Input
                   id="participants"
                   type="number"
@@ -223,7 +224,7 @@ export default function CodeGenerator() {
             )}
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="includeTest">Include Test After Theory</Label>
+              <Label htmlFor="includeTest">{t('theoryToTest')}</Label>
               <Switch
                 id="includeTest"
                 checked={formData.theoryToTest}
@@ -234,7 +235,7 @@ export default function CodeGenerator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="validUntil">Code Validity</Label>
+              <Label htmlFor="validUntil">{t('validUntil')}</Label>
               <Input
                 id="validUntil"
                 type="date"
@@ -250,7 +251,7 @@ export default function CodeGenerator() {
               disabled={createCodesMutation.isPending}
               className="w-full bg-primary hover:bg-primary-dark"
             >
-              {createCodesMutation.isPending ? "Generating..." : "Generate Codes"}
+              {createCodesMutation.isPending ? "Generování..." : t('generateCode')}
             </Button>
           </form>
         </CardContent>
@@ -259,7 +260,7 @@ export default function CodeGenerator() {
       {/* Generated Codes Display */}
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Generated Codes</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Vygenerované kódy</h3>
           <div className="flex space-x-2">
             <Button 
               onClick={exportToCSV}
@@ -268,7 +269,7 @@ export default function CodeGenerator() {
               className="flex items-center gap-2"
             >
               <Download className="h-4 w-4" />
-              Export CSV
+              {t('exportCsv')}
             </Button>
           </div>
         </div>
@@ -279,11 +280,11 @@ export default function CodeGenerator() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Course</TableHead>
-                    <TableHead>Usage</TableHead>
-                    <TableHead>Valid Until</TableHead>
-                    <TableHead>Action</TableHead>
+                    <TableHead>{t('code')}</TableHead>
+                    <TableHead>{t('course')}</TableHead>
+                    <TableHead>{t('usage')}</TableHead>
+                    <TableHead>{t('validUntil')}</TableHead>
+                    <TableHead>Akce</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -334,7 +335,7 @@ export default function CodeGenerator() {
             
             {accessCodes.length === 0 && (
               <div className="p-8 text-center text-gray-500">
-                No access codes generated yet
+                Zatím nebyly vygenerovány žádné přístupové kódy
               </div>
             )}
           </CardContent>

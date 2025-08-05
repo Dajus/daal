@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Key, Book, BarChart3, LogOut } from "lucide-react";
 import { logout, isAuthenticated } from "@/lib/auth";
+import { t } from "@/lib/translations";
 
 import CodeGenerator from "@/components/admin/code-generator";
 import CourseEditor from "@/components/admin/course-editor";
@@ -36,7 +37,7 @@ export default function AdminDashboard() {
                 src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=80" 
                 alt="DAAL Logo" 
               />
-              <Badge className="ml-4 bg-gray-900 text-white">Admin</Badge>
+              <Badge className="ml-4 bg-gray-900 text-white">{t('admin')}</Badge>
             </div>
             <Button 
               onClick={handleLogout}
@@ -44,7 +45,7 @@ export default function AdminDashboard() {
               className="flex items-center gap-2"
             >
               <LogOut className="h-4 w-4" />
-              Logout
+              {t('logout')}
             </Button>
           </div>
         </div>
@@ -55,8 +56,8 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p className="text-gray-600 mt-1">Manage courses, codes, and analytics</p>
+            <h1 className="text-3xl font-bold text-gray-900">{t('adminDashboard')}</h1>
+            <p className="text-gray-600 mt-1">Správa kurzů, přístupových kódů a analytiky</p>
           </div>
 
           {/* Main Content */}
@@ -69,21 +70,21 @@ export default function AdminDashboard() {
                     className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
                   >
                     <Key className="h-4 w-4" />
-                    Access Codes
+                    {t('accessCodes')}
                   </TabsTrigger>
                   <TabsTrigger 
                     value="courses"
                     className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
                   >
                     <Book className="h-4 w-4" />
-                    Course Management
+                    {t('courseManagement')}
                   </TabsTrigger>
                   <TabsTrigger 
                     value="analytics"
                     className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
                   >
                     <BarChart3 className="h-4 w-4" />
-                    Analytics
+                    {t('analytics')}
                   </TabsTrigger>
                 </TabsList>
               </div>

@@ -23,6 +23,28 @@ export const translations = {
   // Admin Interface
   adminDashboard: "Administrátorský přehled",
   courseManagement: "Správa kurzů",
+  
+  // Code Generator
+  generateAccessCode: "Generovat přístupové kódy",
+  codeGenerated: "Přístupové kódy byly úspěšně vygenerovány",
+  selectCourse: "Vyberte kurz",
+  selectCompany: "Vyberte společnost",
+  company: "Společnost",
+  course: "Kurz",
+  unlimitedParticipants: "Neomezený počet účastníků",
+  maxParticipants: "Maximální počet účastníků",
+  theoryToTest: "Přejít z teorie na test",
+  validUntil: "Platné do",
+  generateCode: "Generovat kód",
+  
+  // Access Codes Table
+  code: "Kód",
+  usage: "Využití",
+  unlimited: "Neomezeno",
+  copy: "Kopírovat",
+  copied: "Zkopírováno",
+  codeCopied: "Kód byl zkopírován do schránky",
+  exportCsv: "Exportovat CSV",
   courseEditor: "Editor kurzů",
   accessCodeGenerator: "Generátor přístupových kódů",
   analytics: "Analytika",
@@ -30,7 +52,6 @@ export const translations = {
   
   // Course Management
   courses: "Kurzy",
-  selectCourse: "Vyberte kurz",
   selectCourseToEdit: "Vyberte kurz pro úpravu obsahu",
   courseContent: "Obsah kurzu",
   theory: "Teorie",
@@ -76,18 +97,7 @@ export const translations = {
   questionDeleted: "Otázka byla smazána",
   confirmDeleteQuestion: "Opravdu chcete smazat tuto otázku?",
   
-  // Access Codes
-  generateAccessCode: "Generovat přístupový kód",
-  accessCodes: "Přístupové kódy",
-  code: "Kód",
-  company: "Společnost",
-  expiryDate: "Datum vypršení",
-  maxParticipants: "Maximum účastníků",
-  unlimited: "Neomezené",
-  used: "Použito",
-  active: "Aktivní",
-  expired: "Vypršelo",
-  codeGenerated: "Přístupový kód byl vygenerován",
+
   
   // Student Interface
   studentDashboard: "Studentský přehled",
