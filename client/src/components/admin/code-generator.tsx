@@ -66,7 +66,11 @@ export default function CodeGenerator() {
   // Create access codes mutation
   const createCodesMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', '/api/admin/access-codes', data);
+      const response = await apiRequest('/api/admin/access-codes', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' }
+      });
       return response.json();
     },
     onSuccess: () => {

@@ -52,7 +52,11 @@ export default function TestInterface({ progress }: { progress?: any }) {
 
   const submitTestMutation = useMutation({
     mutationFn: async (testData: { answers: Record<number, any>; timeTakenSeconds: number }) => {
-      const response = await apiRequest('POST', '/api/student/test/submit', testData);
+      const response = await apiRequest('/api/student/test/submit', {
+        method: 'POST',
+        body: JSON.stringify(testData),
+        headers: { 'Content-Type': 'application/json' }
+      });
       return response.json() as Promise<TestResult>;
     },
     onSuccess: (result) => {

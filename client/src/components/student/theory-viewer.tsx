@@ -28,7 +28,11 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
 
   const completeTheoryMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/student/theory/complete', {});
+      const response = await apiRequest('/api/student/theory/complete', {
+        method: 'POST',
+        body: JSON.stringify({}),
+        headers: { 'Content-Type': 'application/json' }
+      });
       return response.json();
     },
     onSuccess: () => {
