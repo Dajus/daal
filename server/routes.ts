@@ -125,7 +125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check usage limits
-      if (!code.unlimitedParticipants && code.maxParticipants && code.usageCount >= code.maxParticipants) {
+      if (!code.unlimitedParticipants && code.maxParticipants && (code.usageCount || 0) >= code.maxParticipants) {
         return res.status(401).json({ message: "Access code usage limit reached" });
       }
 
@@ -386,7 +386,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let maxScore = 0;
       
       questions.forEach(question => {
-        maxScore += question.points;
+        const questionPoints = question.points || 1;
+        maxScore += questionPoints;
         const userAnswer = answers[question.id];
         const correctAnswers = question.correctAnswers;
         
@@ -394,11 +395,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (Array.isArray(userAnswer) && 
               userAnswer.length === correctAnswers.length &&
               userAnswer.every(a => correctAnswers.includes(a))) {
-            score += question.points;
+            score += questionPoints;
           }
         } else {
           if (userAnswer === correctAnswers) {
-            score += question.points;
+            score += questionPoints;
           }
         }
       });
@@ -495,7 +496,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Certificate not found or invalid" });
       }
       
-      const session = await storage.getStudentSession(certificate.studentSessionId!);
+      const session = await storage.getStudentSession(certificate.studentSessionId || 0);
       const accessCode = await storage.getAccessCode(session!.accessCodeId);
       const course = await storage.getCourse(accessCode!.courseId!);
       const company = accessCode!.companyId ? await storage.getCompany(accessCode!.companyId) : null;
