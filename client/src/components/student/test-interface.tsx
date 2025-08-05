@@ -165,13 +165,19 @@ export default function TestInterface({ progress }: { progress?: any }) {
             {testResult.attempt.passed ? 'Test Passed!' : 'Test Not Passed'}
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 max-w-4xl mx-auto">
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-3xl font-bold text-primary mb-2">{testResult.attempt.percentage}%</div>
               <div className="text-sm text-gray-600">Final Score</div>
             </div>
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-3xl font-bold text-blue-600 mb-2">
+                {testResult.attempt.score}/{testResult.attempt.maxScore}
+              </div>
+              <div className="text-sm text-gray-600">Points Earned</div>
+            </div>
+            <div className="text-center p-4 bg-gray-50 rounded-lg">
+              <div className="text-3xl font-bold text-purple-600 mb-2">
                 {formatTime(testResult.attempt.timeTakenSeconds)}
               </div>
               <div className="text-sm text-gray-600">Time Taken</div>
@@ -181,6 +187,57 @@ export default function TestInterface({ progress }: { progress?: any }) {
                 {testResult.attempt.passed ? 'PASSED' : 'FAILED'}
               </div>
               <div className="text-sm text-gray-600">Status</div>
+            </div>
+          </div>
+          
+          {/* Detailed Analytics */}
+          <div className="bg-gray-50 p-6 rounded-lg mb-8 max-w-3xl mx-auto">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Analysis</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">Test Information</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Course:</span>
+                    <span className="font-medium">{progress?.course?.name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Questions:</span>
+                    <span className="font-medium">{questions.length} total</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Passing Score:</span>
+                    <span className="font-medium">{progress?.course?.passingScore || 70}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Attempt Number:</span>
+                    <span className="font-medium">#{testResult.attempt.attemptNumber}</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">Your Results</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Correct Answers:</span>
+                    <span className="font-medium text-green-600">{testResult.attempt.score}/{testResult.attempt.maxScore}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Accuracy:</span>
+                    <span className="font-medium">{testResult.attempt.percentage}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Time Per Question:</span>
+                    <span className="font-medium">{Math.round(testResult.attempt.timeTakenSeconds / questions.length)}s avg</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Grade:</span>
+                    <span className={`font-medium ${testResult.attempt.passed ? 'text-green-600' : 'text-red-600'}`}>
+                      {testResult.attempt.passed ? 'PASS' : 'FAIL'}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

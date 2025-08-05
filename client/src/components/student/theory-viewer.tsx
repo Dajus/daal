@@ -38,9 +38,13 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
     onSuccess: () => {
       toast({
         title: "Theory Completed!",
-        description: "You can now proceed to the test"
+        description: "Redirecting to test..."
       });
       queryClient.invalidateQueries({ queryKey: ['/api/student/progress'] });
+      // Auto-redirect to test after 2 seconds
+      setTimeout(() => {
+        window.location.href = '/student/test';
+      }, 2000);
     },
     onError: (error: Error) => {
       toast({
