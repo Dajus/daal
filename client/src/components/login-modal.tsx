@@ -35,7 +35,11 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
   const adminLogin = useMutation({
     mutationFn: async (data: { username: string; password: string }) => {
-      const response = await apiRequest('POST', '/api/auth/admin/login', data);
+      const response = await apiRequest('/api/auth/admin/login', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' }
+      });
       return response.json() as Promise<LoginResponse>;
     },
     onSuccess: (data) => {
@@ -58,7 +62,11 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
   const studentLogin = useMutation({
     mutationFn: async (data: { studentName: string; studentEmail: string; accessCode: string }) => {
-      const response = await apiRequest('POST', '/api/auth/student/login', data);
+      const response = await apiRequest('/api/auth/student/login', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' }
+      });
       return response.json() as Promise<LoginResponse>;
     },
     onSuccess: (data) => {
