@@ -1,15 +1,28 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import { getAuthHeaders } from "@/lib/auth";
+import { apiRequest } from "@/lib/queryClient";
 import { Book, HelpCircle, Plus, Edit, Trash2, Clock } from "lucide-react";
 import type { Course, TheorySlide, TestQuestion } from "@/types";
 
 export default function CourseEditor() {
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const [slideDialogOpen, setSlideDialogOpen] = useState(false);
+  const [questionDialogOpen, setQuestionDialogOpen] = useState(false);
+  const [editingSlide, setEditingSlide] = useState<TheorySlide | null>(null);
+  const [editingQuestion, setEditingQuestion] = useState<TestQuestion | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch courses
   const { data: courses = [] } = useQuery<Course[]>({
@@ -52,6 +65,118 @@ export default function CourseEditor() {
   });
 
   const selectedCourse = courses.find(c => c.id === selectedCourseId);
+
+  // Mutation for creating theory slide
+  const createSlideMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest(`/api/admin/courses/${selectedCourseId}/theory`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
+      toast({ title: "Success", description: "Theory slide created successfully" });
+      setSlideDialogOpen(false);
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to create theory slide", variant: "destructive" });
+    }
+  });
+
+  // Mutation for updating theory slide
+  const updateSlideMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number, data: any }) => {
+      return apiRequest(`/api/admin/theory/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
+      toast({ title: "Success", description: "Theory slide updated successfully" });
+      setSlideDialogOpen(false);
+      setEditingSlide(null);
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update theory slide", variant: "destructive" });
+    }
+  });
+
+  // Mutation for deleting theory slide
+  const deleteSlideMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest(`/api/admin/theory/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
+      toast({ title: "Success", description: "Theory slide deleted successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to delete theory slide", variant: "destructive" });
+    }
+  });
+
+  // Mutation for creating test question
+  const createQuestionMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest(`/api/admin/courses/${selectedCourseId}/questions`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
+      toast({ title: "Success", description: "Test question created successfully" });
+      setQuestionDialogOpen(false);
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to create test question", variant: "destructive" });
+    }
+  });
+
+  // Mutation for updating test question
+  const updateQuestionMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number, data: any }) => {
+      return apiRequest(`/api/admin/questions/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
+      toast({ title: "Success", description: "Test question updated successfully" });
+      setQuestionDialogOpen(false);
+      setEditingQuestion(null);
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update test question", variant: "destructive" });
+    }
+  });
+
+  // Mutation for deleting test question
+  const deleteQuestionMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest(`/api/admin/questions/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
+      toast({ title: "Success", description: "Test question deleted successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to delete test question", variant: "destructive" });
+    }
+  });
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -122,10 +247,28 @@ export default function CourseEditor() {
                   <div className="space-y-6">
                     <div className="flex justify-between items-center">
                       <h4 className="font-semibold text-gray-900">Theory Slides</h4>
-                      <Button className="flex items-center gap-2">
-                        <Plus className="h-4 w-4" />
-                        Add Slide
-                      </Button>
+                      <Dialog open={slideDialogOpen} onOpenChange={setSlideDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button className="flex items-center gap-2" onClick={() => {
+                            setEditingSlide(null);
+                            setSlideDialogOpen(true);
+                          }}>
+                            <Plus className="h-4 w-4" />
+                            Add Slide
+                          </Button>
+                        </DialogTrigger>
+                        <SlideFormDialog 
+                          slide={editingSlide}
+                          onSave={(data) => {
+                            if (editingSlide) {
+                              updateSlideMutation.mutate({ id: editingSlide.id, data });
+                            } else {
+                              createSlideMutation.mutate(data);
+                            }
+                          }}
+                          isLoading={createSlideMutation.isPending || updateSlideMutation.isPending}
+                        />
+                      </Dialog>
                     </div>
 
                     <div className="space-y-3">
@@ -152,10 +295,17 @@ export default function CourseEditor() {
                                 </div>
                               </div>
                               <div className="flex space-x-2 ml-4">
-                                <Button variant="ghost" size="sm">
+                                <Button variant="ghost" size="sm" onClick={() => {
+                                  setEditingSlide(slide);
+                                  setSlideDialogOpen(true);
+                                }}>
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm">
+                                <Button variant="ghost" size="sm" onClick={() => {
+                                  if (confirm('Are you sure you want to delete this slide?')) {
+                                    deleteSlideMutation.mutate(slide.id);
+                                  }
+                                }}>
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -224,10 +374,28 @@ export default function CourseEditor() {
                   <div className="space-y-6">
                     <div className="flex justify-between items-center">
                       <h4 className="font-semibold text-gray-900">Test Questions</h4>
-                      <Button className="flex items-center gap-2">
-                        <Plus className="h-4 w-4" />
-                        Add Question
-                      </Button>
+                      <Dialog open={questionDialogOpen} onOpenChange={setQuestionDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button className="flex items-center gap-2" onClick={() => {
+                            setEditingQuestion(null);
+                            setQuestionDialogOpen(true);
+                          }}>
+                            <Plus className="h-4 w-4" />
+                            Add Question
+                          </Button>
+                        </DialogTrigger>
+                        <QuestionFormDialog 
+                          question={editingQuestion}
+                          onSave={(data) => {
+                            if (editingQuestion) {
+                              updateQuestionMutation.mutate({ id: editingQuestion.id, data });
+                            } else {
+                              createQuestionMutation.mutate(data);
+                            }
+                          }}
+                          isLoading={createQuestionMutation.isPending || updateQuestionMutation.isPending}
+                        />
+                      </Dialog>
                     </div>
 
                     <div className="space-y-4">
@@ -239,10 +407,17 @@ export default function CourseEditor() {
                                 Question {index + 1} • {question.questionType.replace('_', ' ')} • {question.points} points
                               </span>
                               <div className="flex space-x-2">
-                                <Button variant="ghost" size="sm">
+                                <Button variant="ghost" size="sm" onClick={() => {
+                                  setEditingQuestion(question);
+                                  setQuestionDialogOpen(true);
+                                }}>
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm">
+                                <Button variant="ghost" size="sm" onClick={() => {
+                                  if (confirm('Are you sure you want to delete this question?')) {
+                                    deleteQuestionMutation.mutate(question.id);
+                                  }
+                                }}>
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -295,5 +470,228 @@ export default function CourseEditor() {
         )}
       </div>
     </div>
+  );
+}
+
+// Slide Form Dialog Component
+function SlideFormDialog({ slide, onSave, isLoading }: {
+  slide: TheorySlide | null;
+  onSave: (data: any) => void;
+  isLoading: boolean;
+}) {
+  const [formData, setFormData] = useState({
+    title: slide?.title || '',
+    content: slide?.content || '',
+    slideOrder: slide?.slideOrder || 1,
+    estimatedReadTime: slide?.estimatedReadTime || 5
+  });
+
+  const handleSave = () => {
+    onSave(formData);
+  };
+
+  return (
+    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>{slide ? 'Edit Theory Slide' : 'Add New Theory Slide'}</DialogTitle>
+      </DialogHeader>
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="title">Title</Label>
+          <Input
+            id="title"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="Enter slide title"
+            className="mt-1"
+          />
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="slideOrder">Slide Order</Label>
+            <Input
+              id="slideOrder"
+              type="number"
+              value={formData.slideOrder}
+              onChange={(e) => setFormData({ ...formData, slideOrder: parseInt(e.target.value) || 1 })}
+              min="1"
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label htmlFor="estimatedReadTime">Read Time (minutes)</Label>
+            <Input
+              id="estimatedReadTime"
+              type="number"
+              value={formData.estimatedReadTime}
+              onChange={(e) => setFormData({ ...formData, estimatedReadTime: parseInt(e.target.value) || 5 })}
+              min="1"
+              className="mt-1"
+            />
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="content">Content</Label>
+          <Textarea
+            id="content"
+            value={formData.content}
+            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+            placeholder="Enter slide content..."
+            rows={8}
+            className="mt-1"
+          />
+        </div>
+
+        <div className="flex justify-end space-x-2 pt-4">
+          <Button variant="outline" disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave} disabled={isLoading || !formData.title.trim()}>
+            {isLoading ? 'Saving...' : (slide ? 'Update Slide' : 'Create Slide')}
+          </Button>
+        </div>
+      </div>
+    </DialogContent>
+  );
+}
+
+// Question Form Dialog Component
+function QuestionFormDialog({ question, onSave, isLoading }: {
+  question: TestQuestion | null;
+  onSave: (data: any) => void;
+  isLoading: boolean;
+}) {
+  const [formData, setFormData] = useState({
+    questionText: question?.questionText || '',
+    questionType: question?.questionType || 'single_choice',
+    options: question?.options || ['', '', '', ''],
+    correctAnswers: question?.correctAnswers || [],
+    points: question?.points || 1,
+    questionOrder: question?.questionOrder || 1
+  });
+
+  const handleSave = () => {
+    const cleanOptions = formData.options.filter(opt => opt.trim() !== '');
+    onSave({
+      ...formData,
+      options: cleanOptions,
+      correctAnswers: formData.questionType === 'single_choice' 
+        ? formData.correctAnswers[0] || ''
+        : formData.correctAnswers
+    });
+  };
+
+  const updateOption = (index: number, value: string) => {
+    const newOptions = [...formData.options];
+    newOptions[index] = value;
+    setFormData({ ...formData, options: newOptions });
+  };
+
+  const toggleCorrectAnswer = (option: string) => {
+    if (formData.questionType === 'single_choice') {
+      setFormData({ ...formData, correctAnswers: [option] });
+    } else {
+      const newCorrectAnswers = formData.correctAnswers.includes(option)
+        ? formData.correctAnswers.filter(ans => ans !== option)
+        : [...formData.correctAnswers, option];
+      setFormData({ ...formData, correctAnswers: newCorrectAnswers });
+    }
+  };
+
+  return (
+    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>{question ? 'Edit Test Question' : 'Add New Test Question'}</DialogTitle>
+      </DialogHeader>
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="questionText">Question Text</Label>
+          <Textarea
+            id="questionText"
+            value={formData.questionText}
+            onChange={(e) => setFormData({ ...formData, questionText: e.target.value })}
+            placeholder="Enter your question..."
+            rows={3}
+            className="mt-1"
+          />
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="questionType">Question Type</Label>
+            <Select 
+              value={formData.questionType} 
+              onValueChange={(value) => setFormData({ ...formData, questionType: value, correctAnswers: [] })}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="single_choice">Single Choice</SelectItem>
+                <SelectItem value="multiple_choice">Multiple Choice</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="points">Points</Label>
+            <Input
+              id="points"
+              type="number"
+              value={formData.points}
+              onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) || 1 })}
+              min="1"
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label htmlFor="questionOrder">Question Order</Label>
+            <Input
+              id="questionOrder"
+              type="number"
+              value={formData.questionOrder}
+              onChange={(e) => setFormData({ ...formData, questionOrder: parseInt(e.target.value) || 1 })}
+              min="1"
+              className="mt-1"
+            />
+          </div>
+        </div>
+
+        <div>
+          <Label>Answer Options</Label>
+          <div className="space-y-2 mt-2">
+            {formData.options.map((option, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <input
+                  type={formData.questionType === 'single_choice' ? 'radio' : 'checkbox'}
+                  checked={formData.correctAnswers.includes(option)}
+                  onChange={() => toggleCorrectAnswer(option)}
+                  disabled={!option.trim()}
+                />
+                <Input
+                  value={option}
+                  onChange={(e) => updateOption(index, e.target.value)}
+                  placeholder={`Option ${index + 1}`}
+                  className="flex-1"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-end space-x-2 pt-4">
+          <Button variant="outline" disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            disabled={isLoading || !formData.questionText.trim() || formData.correctAnswers.length === 0}
+          >
+            {isLoading ? 'Saving...' : (question ? 'Update Question' : 'Create Question')}
+          </Button>
+        </div>
+      </div>
+    </DialogContent>
   );
 }

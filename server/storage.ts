@@ -205,7 +205,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTheorySlide(id: number): Promise<void> {
     await db.update(theorySlides)
-      .set({ isActive: false })
+      .set({ isActive: false, updatedAt: new Date() })
       .where(eq(theorySlides.id, id));
   }
 

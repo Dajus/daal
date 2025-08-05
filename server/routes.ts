@@ -258,6 +258,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/admin/theory/:slideId", authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      const slideId = parseInt(req.params.slideId);
+      const data = req.body;
+      
+      const slide = await storage.updateTheorySlide(slideId, data);
+      res.json(slide);
+    } catch (error) {
+      console.error("Update theory slide error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/theory/:slideId", authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      const slideId = parseInt(req.params.slideId);
+      await storage.deleteTheorySlide(slideId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete theory slide error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/admin/courses/:courseId/questions", authenticateAdmin, async (req: Request, res: Response) => {
     try {
       const courseId = parseInt(req.params.courseId);
@@ -278,6 +302,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(question);
     } catch (error) {
       console.error("Create test question error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/admin/questions/:questionId", authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      const questionId = parseInt(req.params.questionId);
+      const data = req.body;
+      
+      const question = await storage.updateTestQuestion(questionId, data);
+      res.json(question);
+    } catch (error) {
+      console.error("Update test question error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/questions/:questionId", authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      const questionId = parseInt(req.params.questionId);
+      await storage.deleteTestQuestion(questionId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete test question error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
