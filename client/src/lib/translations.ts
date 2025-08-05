@@ -215,9 +215,6 @@ export const translations = {
   noteAdded: "Poznámka byla přidána",
   notes: "Poznámky",
   noNotes: "Žádné poznámky",
-  bookmark: "Záložka",
-  bookmarked: "Označeno záložkou",
-  completeTheory: "Dokončit teorii",
   editNote: "Upravit poznámku",
   
   // Test Interface New

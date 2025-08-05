@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getAuthHeaders } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { Clock, ChevronLeft, ChevronRight, Flag, CheckCircle, AlertTriangle } from "lucide-react";
-import type { TestQuestion } from "@/types";
+import type { TestQuestion } from "@shared/schema";
 import { t } from "@/lib/translations";
 
 interface TestResult {
@@ -20,6 +20,7 @@ interface TestResult {
     percentage: string;
     passed: boolean;
     timeTakenSeconds: number;
+    attemptNumber: number;
     answers: Array<{
       questionId: number;
       selectedAnswer: string;

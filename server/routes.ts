@@ -469,7 +469,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calculate score and track answer details
       let score = 0;
       let maxScore = 0;
-      const answerDetails = [];
+      const answerDetails: Array<{
+        questionId: number;
+        selectedAnswer: string;
+        correctAnswer: string;
+        isCorrect: boolean;
+        explanation: string | null;
+      }> = [];
       
       questions.forEach(question => {
         const questionPoints = question.points || 1;
@@ -494,8 +500,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         answerDetails.push({
           questionId: question.id,
-          selectedAnswer: Array.isArray(userAnswer) ? userAnswer.join(', ') : userAnswer,
-          correctAnswer: Array.isArray(correctAnswers) ? correctAnswers.join(', ') : correctAnswers,
+          selectedAnswer: Array.isArray(userAnswer) ? userAnswer.join(', ') : String(userAnswer || ''),
+          correctAnswer: Array.isArray(correctAnswers) ? correctAnswers.join(', ') : String(correctAnswers || ''),
           isCorrect,
           explanation: question.explanation || null
         });
