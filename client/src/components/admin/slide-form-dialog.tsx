@@ -45,11 +45,14 @@ export default function SlideFormDialog({ slide, onSave, isLoading }: SlideFormD
   };
 
   return (
-    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="slide-form-description">
       <DialogHeader>
         <DialogTitle>
           {slide ? 'Edit Slide' : 'Add New Slide'}
         </DialogTitle>
+        <div id="slide-form-description" className="text-sm text-gray-600">
+          Use the rich text editor below to create content with formatting and images.
+        </div>
       </DialogHeader>
       
       <form onSubmit={handleSubmit} className="space-y-6">

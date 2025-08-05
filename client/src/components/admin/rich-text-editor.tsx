@@ -46,13 +46,13 @@ export default function RichTextEditor({
         const formData = new FormData();
         formData.append('image', file);
 
-        // Upload to our server endpoint
+        // Upload to our server endpoint using auth helper
+        const authHeaders = { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` };
+        
         const response = await fetch('/api/admin/upload-image', {
           method: 'POST',
           body: formData,
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-          }
+          headers: authHeaders
         });
 
         if (!response.ok) {
