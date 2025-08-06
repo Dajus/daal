@@ -172,15 +172,21 @@ export default function CodeGenerator() {
     window.URL.revokeObjectURL(url);
   };
 
+  // Get recent codes (last 5)
+  const recentCodes = accessCodes.slice(0, 5);
+  
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="space-y-8">
       {/* Code Generation Form */}
       <Card className="bg-white border border-gray-200 shadow-sm">
         <CardHeader className="bg-emerald-50 border-b border-emerald-100">
-          <CardTitle className="text-emerald-800">{t('generateAccessCode')}</CardTitle>
+          <CardTitle className="text-emerald-800 flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            {t('generateAccessCode')}
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="p-6">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="space-y-2">
               <Label htmlFor="course">{t('course')}</Label>
               <Select 
@@ -235,22 +241,20 @@ export default function CodeGenerator() {
               </Select>
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="unlimited">{t('unlimitedParticipants')}</Label>
-              <Switch
-                id="unlimited"
-                checked={formData.unlimitedParticipants}
-                onCheckedChange={(checked) => 
-                  setFormData(prev => ({ ...prev, unlimitedParticipants: checked }))
-                }
-              />
-            </div>
-
-            {!formData.unlimitedParticipants && (
-              <div className="space-y-2">
-                <Label htmlFor="participants">Počet účastníků</Label>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="unlimited">{t('unlimitedParticipants')}</Label>
+                <Switch
+                  id="unlimited"
+                  checked={formData.unlimitedParticipants}
+                  onCheckedChange={(checked) => 
+                    setFormData(prev => ({ ...prev, unlimitedParticipants: checked }))
+                  }
+                />
+              </div>
+              {!formData.unlimitedParticipants && (
                 <Input
-                  id="participants"
+                  placeholder="Počet účastníků"
                   type="number"
                   min="1"
                   value={formData.maxParticipants}
@@ -258,18 +262,20 @@ export default function CodeGenerator() {
                     setFormData(prev => ({ ...prev, maxParticipants: parseInt(e.target.value) }))
                   }
                 />
-              </div>
-            )}
+              )}
+            </div>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="includeTest">{t('theoryToTest')}</Label>
-              <Switch
-                id="includeTest"
-                checked={formData.theoryToTest}
-                onCheckedChange={(checked) => 
-                  setFormData(prev => ({ ...prev, theoryToTest: checked }))
-                }
-              />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="includeTest">{t('theoryToTest')}</Label>
+                <Switch
+                  id="includeTest"
+                  checked={formData.theoryToTest}
+                  onCheckedChange={(checked) => 
+                    setFormData(prev => ({ ...prev, theoryToTest: checked }))
+                  }
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -284,22 +290,75 @@ export default function CodeGenerator() {
               />
             </div>
 
-            <Button 
-              type="submit" 
-              disabled={createCodesMutation.isPending}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              {createCodesMutation.isPending ? "Generování..." : t('generateCode')}
-            </Button>
+            <div className="md:col-span-2 lg:col-span-3">
+              <Button 
+                type="submit" 
+                disabled={createCodesMutation.isPending}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 text-lg font-medium"
+              >
+                {createCodesMutation.isPending ? "Generování..." : t('generateCode')}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
 
-      {/* Generated Codes Display */}
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Vygenerované kódy</h3>
-          <div className="flex space-x-2">
+      {/* Recently Generated Codes */}
+      {recentCodes.length > 0 && (
+        <Card className="bg-emerald-50 border border-emerald-200 shadow-sm">
+          <CardHeader className="bg-emerald-100 border-b border-emerald-200">
+            <CardTitle className="text-emerald-800 flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Nejnovější kódy ({recentCodes.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recentCodes.map(code => {
+                const course = courses.find(c => c.id === code.courseId);
+                const company = companies.find(c => c.id === code.companyId);
+                return (
+                  <div key={code.id} className="bg-white p-4 rounded-lg border border-emerald-200 shadow-sm">
+                    <div className="flex justify-between items-start mb-3">
+                      <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 font-mono text-sm">
+                        {code.code}
+                      </Badge>
+                      <Button
+                        onClick={() => copyToClipboard(code.code)}
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-800"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="space-y-1 text-sm">
+                      <p><span className="font-medium">Kurz:</span> {course?.name || 'N/A'}</p>
+                      <p><span className="font-medium">Společnost:</span> {company?.name || 'N/A'}</p>
+                      <p><span className="font-medium">Platnost:</span> {new Date(code.validUntil).toLocaleDateString('cs-CZ')}</p>
+                      <p><span className="font-medium">Využití:</span> {code.usageCount}/{code.unlimitedParticipants ? '∞' : code.maxParticipants}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge variant={code.theoryToTest ? "default" : "secondary"} className="text-xs">
+                          {code.theoryToTest ? "Teorie + Test" : "Pouze teorie"}
+                        </Badge>
+                        <Badge variant={code.isActive ? "default" : "destructive"} className="text-xs">
+                          {code.isActive ? "Aktivní" : "Neaktivní"}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* All Generated Codes Table */}
+      <Card className="bg-white border border-gray-200 shadow-sm">
+        <CardHeader className="bg-gray-50 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-gray-800">Všechny přístupové kódy ({accessCodes.length})</CardTitle>
             <Button 
               onClick={exportToCSV}
               variant="outline"
@@ -310,75 +369,63 @@ export default function CodeGenerator() {
               {t('exportCsv')}
             </Button>
           </div>
-        </div>
-
-        <Card className="border border-gray-200 shadow-sm">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('code')}</TableHead>
-                    <TableHead>{t('course')}</TableHead>
-                    <TableHead>{t('usage')}</TableHead>
-                    <TableHead>{t('validUntil')}</TableHead>
-                    <TableHead>Akce</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {accessCodes.map((code) => {
-                    const course = courses.find(c => c.id === code.courseId);
-                    const isExpired = new Date(code.validUntil) < new Date();
-                    const isUsedUp = !code.unlimitedParticipants && code.maxParticipants && code.usageCount >= code.maxParticipants;
-                    
-                    return (
-                      <TableRow key={code.id}>
-                        <TableCell className="font-mono text-sm">{code.code}</TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{course?.name}</div>
-                            <Badge variant="secondary" className="mt-1">
-                              {course?.abbreviation}
-                            </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <span className={`${isUsedUp ? 'text-red-600 font-semibold' : ''}`}>
-                            {code.usageCount}/{code.maxParticipants || '∞'}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-gray-400" />
-                            <span className={`text-sm ${isExpired ? 'text-red-600 font-semibold' : ''}`}>
-                              {new Date(code.validUntil).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            onClick={() => copyToClipboard(code.code)}
-                            variant="ghost"
-                            size="sm"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-            
-            {accessCodes.length === 0 && (
-              <div className="p-8 text-center text-gray-500">
-                Zatím nebyly vygenerovány žádné přístupové kódy
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('code')}</TableHead>
+                  <TableHead>{t('course')}</TableHead>
+                  <TableHead>Společnost</TableHead>
+                  <TableHead>{t('usage')}</TableHead>
+                  <TableHead>Typ</TableHead>
+                  <TableHead>{t('validUntil')}</TableHead>
+                  <TableHead>Akce</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {accessCodes.map(code => {
+                  const course = courses.find(c => c.id === code.courseId);
+                  const company = companies.find(c => c.id === code.companyId);
+                  return (
+                    <TableRow key={code.id}>
+                      <TableCell>
+                        <Badge variant="secondary" className="font-mono">
+                          {code.code}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{course?.name || 'N/A'}</TableCell>
+                      <TableCell>{company?.name || 'N/A'}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {code.usageCount}/{code.unlimitedParticipants ? '∞' : code.maxParticipants}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={code.theoryToTest ? "default" : "secondary"} className="text-xs">
+                          {code.theoryToTest ? "Teorie + Test" : "Pouze teorie"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{new Date(code.validUntil).toLocaleDateString('cs-CZ')}</TableCell>
+                      <TableCell>
+                        <Button
+                          onClick={() => copyToClipboard(code.code)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-emerald-600 hover:text-emerald-800"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
