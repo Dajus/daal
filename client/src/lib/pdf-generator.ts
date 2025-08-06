@@ -10,6 +10,40 @@ export interface CertificateData {
   score?: number;
 }
 
+// Helper function to properly encode Czech text for PDF
+const encodeForPDF = (text: string): string => {
+  // Convert problematic Czech characters to ensure proper display
+  return text
+    .replace(/č/g, 'č')
+    .replace(/Č/g, 'Č')
+    .replace(/ř/g, 'ř')
+    .replace(/Ř/g, 'Ř')
+    .replace(/š/g, 'š')
+    .replace(/Š/g, 'Š')
+    .replace(/ž/g, 'ž')
+    .replace(/Ž/g, 'Ž')
+    .replace(/ý/g, 'ý')
+    .replace(/Ý/g, 'Ý')
+    .replace(/á/g, 'á')
+    .replace(/Á/g, 'Á')
+    .replace(/í/g, 'í')
+    .replace(/Í/g, 'Í')
+    .replace(/é/g, 'é')
+    .replace(/É/g, 'É')
+    .replace(/ó/g, 'ó')
+    .replace(/Ó/g, 'Ó')
+    .replace(/ú/g, 'ú')
+    .replace(/Ú/g, 'Ú')
+    .replace(/ů/g, 'ů')
+    .replace(/Ů/g, 'Ů')
+    .replace(/ď/g, 'ď')
+    .replace(/Ď/g, 'Ď')
+    .replace(/ň/g, 'ň')
+    .replace(/Ň/g, 'Ň')
+    .replace(/ť/g, 'ť')
+    .replace(/Ť/g, 'Ť');
+};
+
 export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   const pdf = new jsPDF({
     orientation: 'landscape',
@@ -52,18 +86,18 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   // Subtitle
   pdf.setFontSize(9);
   pdf.setTextColor(209, 250, 229); // emerald-100
-  pdf.text('BEZPEČNOSTNÍ ŠKOLENÍ', 148.5, 48, { align: 'center' });
+  pdf.text(encodeForPDF('BEZPEČNOSTNÍ ŠKOLENÍ'), 148.5, 48, { align: 'center' });
 
   // Certificate title
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(28);
   pdf.setTextColor(6, 78, 59); // emerald-800
-  pdf.text('CERTIFIKÁT', 148.5, 80, { align: 'center' });
+  pdf.text(encodeForPDF('CERTIFIKÁT'), 148.5, 80, { align: 'center' });
   
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(16);
   pdf.setTextColor(16, 185, 129); // emerald-500
-  pdf.text('O ÚSPĚŠNÉM DOKONČENÍ ŠKOLENÍ', 148.5, 92, { align: 'center' });
+  pdf.text(encodeForPDF('O ÚSPĚŠNÉM DOKONČENÍ ŠKOLENÍ'), 148.5, 92, { align: 'center' });
 
   // Decorative line
   pdf.setDrawColor(110, 231, 183); // emerald-300
@@ -74,7 +108,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(14);
   pdf.setTextColor(75, 85, 99); // gray-600
-  pdf.text('Tímto se potvrzuje, že', 148.5, 115, { align: 'center' });
+  pdf.text(encodeForPDF('Tímto se potvrzuje, že'), 148.5, 115, { align: 'center' });
 
   // Student name with modern styling
   pdf.setFont('helvetica', 'bold');
@@ -86,7 +120,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(14);
   pdf.setTextColor(75, 85, 99);
-  pdf.text('úspěšně dokončil(a) školení', 148.5, 145, { align: 'center' });
+  pdf.text(encodeForPDF('úspěšně dokončil(a) školení'), 148.5, 145, { align: 'center' });
 
   // Course name with emphasis
   pdf.setFont('helvetica', 'bold');
@@ -99,7 +133,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(12);
     pdf.setTextColor(107, 114, 128); // gray-500
-    pdf.text(`pro společnost: ${data.companyName}`, 148.5, 172, { align: 'center' });
+    pdf.text(encodeForPDF(`pro společnost: ${data.companyName}`), 148.5, 172, { align: 'center' });
   }
 
   // Bottom section with certificate details
@@ -111,7 +145,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(10);
   pdf.setTextColor(6, 78, 59); // emerald-800
-  pdf.text('DATUM DOKONČENÍ', 60, detailsY, { align: 'center' });
+  pdf.text(encodeForPDF('DATUM DOKONČENÍ'), 60, detailsY, { align: 'center' });
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(11);
   pdf.text(data.completionDate, 60, detailsY + 7, { align: 'center' });
@@ -122,7 +156,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(10);
   pdf.setTextColor(6, 78, 59); // emerald-800
-  pdf.text('ČÍSLO CERTIFIKÁTU', 237, detailsY, { align: 'center' });
+  pdf.text(encodeForPDF('ČÍSLO CERTIFIKÁTU'), 237, detailsY, { align: 'center' });
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(9);
   pdf.text(data.certificateNumber, 237, detailsY + 7, { align: 'center' });
@@ -131,12 +165,12 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(8);
   pdf.setTextColor(107, 114, 128);
-  pdf.text(`Ověřovací kód: ${data.verificationCode}`, 148.5, 202, { align: 'center' });
+  pdf.text(encodeForPDF(`Ověřovací kód: ${data.verificationCode}`), 148.5, 202, { align: 'center' });
 
   // Footer with modern branding
   pdf.setFontSize(8);
   pdf.setTextColor(110, 231, 183); // emerald-300
-  pdf.text('DAAL Školící platforma | Praha, Česká republika', 148.5, 208, { align: 'center' });
+  pdf.text(encodeForPDF('DAAL Školící platforma | Praha, Česká republika'), 148.5, 208, { align: 'center' });
 
   return pdf;
 };
