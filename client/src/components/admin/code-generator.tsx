@@ -261,9 +261,9 @@ export default function CodeGenerator() {
                   placeholder="Počet účastníků"
                   type="number"
                   min="1"
-                  value={formData.maxParticipants}
+                  value={formData.maxParticipants || ''}
                   onChange={(e) => 
-                    setFormData(prev => ({ ...prev, maxParticipants: parseInt(e.target.value) }))
+                    setFormData(prev => ({ ...prev, maxParticipants: parseInt(e.target.value) || 0 }))
                   }
                 />
               )}
@@ -361,20 +361,22 @@ export default function CodeGenerator() {
 
 
 
-      {/* All Generated Codes Table */}
+      {/* Recent Generated Codes Table */}
       <Card className="bg-white border border-gray-200 shadow-sm">
         <CardHeader className="bg-gray-50 border-b border-gray-200">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-gray-800">Všechny přístupové kódy ({accessCodes.length})</CardTitle>
-            <Button 
-              onClick={exportToCSV}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-            >
-              <Download className="h-4 w-4" />
-              {t('exportCsv')}
-            </Button>
+            <CardTitle className="text-gray-800">Nedávné přístupové kódy (posledních 15)</CardTitle>
+            <div className="flex gap-2">
+              <Button 
+                onClick={exportToCSV}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+              >
+                <Download className="h-4 w-4" />
+                {t('exportCsv')} (všechny)
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -392,7 +394,9 @@ export default function CodeGenerator() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {accessCodes.map(code => {
+                {[...accessCodes].sort((a, b) => 
+                  new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+                ).slice(0, 15).map(code => {
                   const course = courses.find(c => c.id === code.courseId);
                   const company = companies.find(c => c.id === code.companyId);
                   return (
@@ -431,6 +435,11 @@ export default function CodeGenerator() {
               </TableBody>
             </Table>
           </div>
+          {accessCodes.length > 15 && (
+            <div className="p-4 bg-gray-50 border-t text-sm text-gray-600 text-center">
+              Zobrazeno 15 z {accessCodes.length} kódů. Pro export všech kódů použijte tlačítko CSV výše.
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
