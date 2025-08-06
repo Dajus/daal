@@ -256,22 +256,32 @@ export default function CourseEditor() {
     
     const reorderedSlides = arrayMove(theorySlides, oldIndex, newIndex);
     
-    // Update slide orders in the backend - only send necessary fields
-    reorderedSlides.forEach((slide, index) => {
-      if (slide.slideOrder !== index + 1) {
-        updateSlideMutation.mutate({
-          id: slide.id,
-          data: { 
-            title: slide.title,
-            content: slide.content,
-            slideOrder: index + 1,
-            estimatedReadTime: slide.estimatedReadTime,
-            courseId: slide.courseId,
-            mediaUrls: slide.mediaUrls,
-            isActive: slide.isActive
-          }
-        });
-      }
+    // Optimistically update the cache with new order
+    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'theory'], () => {
+      return reorderedSlides.map((slide, index) => ({
+        ...slide,
+        slideOrder: index + 1
+      }));
+    });
+    
+    // Update slide orders in the backend - batch all updates
+    const updates = reorderedSlides
+      .map((slide, index) => ({ slide, newOrder: index + 1 }))
+      .filter(({ slide, newOrder }) => slide.slideOrder !== newOrder);
+    
+    updates.forEach(({ slide, newOrder }) => {
+      updateSlideMutation.mutate({
+        id: slide.id,
+        data: { 
+          title: slide.title,
+          content: slide.content,
+          slideOrder: newOrder,
+          estimatedReadTime: slide.estimatedReadTime,
+          courseId: slide.courseId,
+          mediaUrls: slide.mediaUrls,
+          isActive: slide.isActive
+        }
+      });
     });
   };
 
@@ -286,26 +296,36 @@ export default function CourseEditor() {
     
     const reorderedQuestions = arrayMove(testQuestions, oldIndex, newIndex);
     
-    // Update question orders in the backend - only send necessary fields
-    reorderedQuestions.forEach((question, index) => {
-      if (question.questionOrder !== index + 1) {
-        updateQuestionMutation.mutate({
-          id: question.id,
-          data: {
-            questionText: question.questionText,
-            questionType: question.questionType,
-            options: question.options,
-            correctAnswers: question.correctAnswers,
-            points: question.points,
-            questionOrder: index + 1,
-            courseId: question.courseId,
-            explanation: question.explanation,
-            mediaUrl: question.mediaUrl,
-            difficultyLevel: question.difficultyLevel,
-            isActive: question.isActive
-          }
-        });
-      }
+    // Optimistically update the cache with new order
+    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'questions'], () => {
+      return reorderedQuestions.map((question, index) => ({
+        ...question,
+        questionOrder: index + 1
+      }));
+    });
+    
+    // Update question orders in the backend - batch all updates
+    const updates = reorderedQuestions
+      .map((question, index) => ({ question, newOrder: index + 1 }))
+      .filter(({ question, newOrder }) => question.questionOrder !== newOrder);
+    
+    updates.forEach(({ question, newOrder }) => {
+      updateQuestionMutation.mutate({
+        id: question.id,
+        data: {
+          questionText: question.questionText,
+          questionType: question.questionType,
+          options: question.options,
+          correctAnswers: question.correctAnswers,
+          points: question.points,
+          questionOrder: newOrder,
+          courseId: question.courseId,
+          explanation: question.explanation,
+          mediaUrl: question.mediaUrl,
+          difficultyLevel: question.difficultyLevel,
+          isActive: question.isActive
+        }
+      });
     });
   };
 
