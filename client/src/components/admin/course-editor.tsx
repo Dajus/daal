@@ -23,7 +23,7 @@ export default function CourseEditor() {
   const [questionDialogOpen, setQuestionDialogOpen] = useState(false);
   const [editingSlide, setEditingSlide] = useState<TheorySlide | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<TestQuestion | null>(null);
-  const [courseCounts, setCourseCounts] = useState<Record<number, { slides: number; questions: number }>>({});
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -35,11 +35,19 @@ export default function CourseEditor() {
         headers: getAuthHeaders()
       });
       if (!response.ok) throw new Error('Failed to fetch courses');
-      const courseData = await response.json();
-      
-      // Fetch counts for each course
+      return response.json();
+    }
+  });
+
+  // Fetch all course counts
+  const { data: allCourseCounts = {} } = useQuery({
+    queryKey: ['/api/admin/courses/counts'],
+    queryFn: async () => {
       const counts: Record<number, { slides: number; questions: number }> = {};
-      for (const course of courseData) {
+      
+      if (courses.length === 0) return counts;
+      
+      for (const course of courses) {
         try {
           const [slidesResponse, questionsResponse] = await Promise.all([
             fetch(`/api/admin/courses/${course.id}/theory`, { headers: getAuthHeaders() }),
@@ -58,9 +66,9 @@ export default function CourseEditor() {
         }
       }
       
-      setCourseCounts(counts);
-      return courseData;
-    }
+      return counts;
+    },
+    enabled: courses.length > 0
   });
 
   // Fetch theory slides for selected course
@@ -104,7 +112,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
       toast({ title: "Success", description: "Theory slide created successfully" });
       setSlideDialogOpen(false);
     },
@@ -124,7 +132,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
       toast({ title: "Success", description: "Theory slide updated successfully" });
       setSlideDialogOpen(false);
       setEditingSlide(null);
@@ -144,7 +152,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
       toast({ title: "Success", description: "Theory slide deleted successfully" });
     },
     onError: () => {
@@ -163,7 +171,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
       toast({ title: "Success", description: "Test question created successfully" });
       setQuestionDialogOpen(false);
     },
@@ -183,7 +191,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
       toast({ title: "Success", description: "Test question updated successfully" });
       setQuestionDialogOpen(false);
       setEditingQuestion(null);
@@ -203,7 +211,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
       toast({ title: "Success", description: "Test question deleted successfully" });
     },
     onError: () => {
@@ -231,7 +239,7 @@ export default function CourseEditor() {
               <div>
                 <div className="font-medium">{course.name}</div>
                 <div className="text-sm opacity-75 mt-1">
-                  {courseCounts[course.id]?.slides || 0} slides • {courseCounts[course.id]?.questions || 0} questions
+                  {allCourseCounts[course.id]?.slides || 0} slides • {allCourseCounts[course.id]?.questions || 0} questions
                 </div>
               </div>
             </Button>
