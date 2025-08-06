@@ -156,12 +156,15 @@ export default function CourseEditor() {
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' }
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
-      toast({ title: "Success", description: "Theory slide updated successfully" });
-      setSlideDialogOpen(false);
-      setEditingSlide(null);
+    onSuccess: (_, { data }) => {
+      // Only show toast and close dialog if not a drag operation (has slideOrder only)
+      if (Object.keys(data).length > 1 || !data.slideOrder) {
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
+        toast({ title: "Success", description: "Theory slide updated successfully" });
+        setSlideDialogOpen(false);
+        setEditingSlide(null);
+      }
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to update theory slide", variant: "destructive" });
@@ -215,12 +218,15 @@ export default function CourseEditor() {
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' }
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
-      toast({ title: "Success", description: "Test question updated successfully" });
-      setQuestionDialogOpen(false);
-      setEditingQuestion(null);
+    onSuccess: (_, { data }) => {
+      // Only show toast and close dialog if not a drag operation (has questionOrder only)
+      if (Object.keys(data).length > 1 || !data.questionOrder) {
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
+        toast({ title: "Success", description: "Test question updated successfully" });
+        setQuestionDialogOpen(false);
+        setEditingQuestion(null);
+      }
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to update test question", variant: "destructive" });
@@ -256,32 +262,36 @@ export default function CourseEditor() {
     
     const reorderedSlides = arrayMove(theorySlides, oldIndex, newIndex);
     
-    // Optimistically update the cache with new order
-    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'theory'], () => {
-      return reorderedSlides.map((slide, index) => ({
-        ...slide,
-        slideOrder: index + 1
-      }));
-    });
+    // Optimistically update the cache - create new array with updated order
+    const optimisticSlides = reorderedSlides.map((slide, index) => ({
+      ...slide,
+      slideOrder: index + 1
+    }));
     
-    // Update slide orders in the backend - batch all updates
-    const updates = reorderedSlides
-      .map((slide, index) => ({ slide, newOrder: index + 1 }))
-      .filter(({ slide, newOrder }) => slide.slideOrder !== newOrder);
+    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'theory'], optimisticSlides);
     
-    updates.forEach(({ slide, newOrder }) => {
-      updateSlideMutation.mutate({
-        id: slide.id,
-        data: { 
-          title: slide.title,
-          content: slide.content,
-          slideOrder: newOrder,
-          estimatedReadTime: slide.estimatedReadTime,
-          courseId: slide.courseId,
-          mediaUrls: slide.mediaUrls,
-          isActive: slide.isActive
-        }
-      });
+    // Update slide orders in the backend - only send the order changes
+    reorderedSlides.forEach((slide, index) => {
+      const newOrder = index + 1;
+      if (slide.slideOrder !== newOrder) {
+        updateSlideMutation.mutate({
+          id: slide.id,
+          data: { 
+            slideOrder: newOrder
+          }
+        }, {
+          // Don't invalidate queries on success to avoid re-fetching
+          onSuccess: () => {
+            // Silently update the individual item in cache
+            queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'theory'], (oldData: any) => {
+              if (!oldData) return oldData;
+              return oldData.map((s: any) => 
+                s.id === slide.id ? { ...s, slideOrder: newOrder } : s
+              );
+            });
+          }
+        });
+      }
     });
   };
 
@@ -296,36 +306,36 @@ export default function CourseEditor() {
     
     const reorderedQuestions = arrayMove(testQuestions, oldIndex, newIndex);
     
-    // Optimistically update the cache with new order
-    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'questions'], () => {
-      return reorderedQuestions.map((question, index) => ({
-        ...question,
-        questionOrder: index + 1
-      }));
-    });
+    // Optimistically update the cache - create new array with updated order
+    const optimisticQuestions = reorderedQuestions.map((question, index) => ({
+      ...question,
+      questionOrder: index + 1
+    }));
     
-    // Update question orders in the backend - batch all updates
-    const updates = reorderedQuestions
-      .map((question, index) => ({ question, newOrder: index + 1 }))
-      .filter(({ question, newOrder }) => question.questionOrder !== newOrder);
+    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'questions'], optimisticQuestions);
     
-    updates.forEach(({ question, newOrder }) => {
-      updateQuestionMutation.mutate({
-        id: question.id,
-        data: {
-          questionText: question.questionText,
-          questionType: question.questionType,
-          options: question.options,
-          correctAnswers: question.correctAnswers,
-          points: question.points,
-          questionOrder: newOrder,
-          courseId: question.courseId,
-          explanation: question.explanation,
-          mediaUrl: question.mediaUrl,
-          difficultyLevel: question.difficultyLevel,
-          isActive: question.isActive
-        }
-      });
+    // Update question orders in the backend - only send the order changes
+    reorderedQuestions.forEach((question, index) => {
+      const newOrder = index + 1;
+      if (question.questionOrder !== newOrder) {
+        updateQuestionMutation.mutate({
+          id: question.id,
+          data: {
+            questionOrder: newOrder
+          }
+        }, {
+          // Don't invalidate queries on success to avoid re-fetching
+          onSuccess: () => {
+            // Silently update the individual item in cache
+            queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'questions'], (oldData: any) => {
+              if (!oldData) return oldData;
+              return oldData.map((q: any) => 
+                q.id === question.id ? { ...q, questionOrder: newOrder } : q
+              );
+            });
+          }
+        });
+      }
     });
   };
 
