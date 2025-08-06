@@ -10,38 +10,40 @@ export interface CertificateData {
   score?: number;
 }
 
-// Helper function to properly encode Czech text for PDF
-const encodeForPDF = (text: string): string => {
-  // Convert problematic Czech characters to ensure proper display
+// Helper function to convert Czech text to ASCII equivalents that display properly in jsPDF
+const convertCzechForPDF = (text: string): string => {
+  // Replace Czech characters with ASCII equivalents that jsPDF can handle reliably
   return text
-    .replace(/č/g, 'č')
-    .replace(/Č/g, 'Č')
-    .replace(/ř/g, 'ř')
-    .replace(/Ř/g, 'Ř')
-    .replace(/š/g, 'š')
-    .replace(/Š/g, 'Š')
-    .replace(/ž/g, 'ž')
-    .replace(/Ž/g, 'Ž')
-    .replace(/ý/g, 'ý')
-    .replace(/Ý/g, 'Ý')
-    .replace(/á/g, 'á')
-    .replace(/Á/g, 'Á')
-    .replace(/í/g, 'í')
-    .replace(/Í/g, 'Í')
-    .replace(/é/g, 'é')
-    .replace(/É/g, 'É')
-    .replace(/ó/g, 'ó')
-    .replace(/Ó/g, 'Ó')
-    .replace(/ú/g, 'ú')
-    .replace(/Ú/g, 'Ú')
-    .replace(/ů/g, 'ů')
-    .replace(/Ů/g, 'Ů')
-    .replace(/ď/g, 'ď')
-    .replace(/Ď/g, 'Ď')
-    .replace(/ň/g, 'ň')
-    .replace(/Ň/g, 'Ň')
-    .replace(/ť/g, 'ť')
-    .replace(/Ť/g, 'Ť');
+    .replace(/č/g, 'c')
+    .replace(/Č/g, 'C')
+    .replace(/ř/g, 'r')
+    .replace(/Ř/g, 'R')
+    .replace(/š/g, 's')
+    .replace(/Š/g, 'S')
+    .replace(/ž/g, 'z')
+    .replace(/Ž/g, 'Z')
+    .replace(/ý/g, 'y')
+    .replace(/Ý/g, 'Y')
+    .replace(/á/g, 'a')
+    .replace(/Á/g, 'A')
+    .replace(/í/g, 'i')
+    .replace(/Í/g, 'I')
+    .replace(/é/g, 'e')
+    .replace(/É/g, 'E')
+    .replace(/ě/g, 'e')
+    .replace(/Ě/g, 'E')
+    .replace(/ó/g, 'o')
+    .replace(/Ó/g, 'O')
+    .replace(/ú/g, 'u')
+    .replace(/Ú/g, 'U')
+    .replace(/ů/g, 'u')
+    .replace(/Ů/g, 'U')
+    .replace(/ď/g, 'd')
+    .replace(/Ď/g, 'D')
+    .replace(/ň/g, 'n')
+    .replace(/Ň/g, 'N')
+    .replace(/ť/g, 't')
+    .replace(/Ť/g, 'T');
 };
 
 export const generateCertificatePDF = (data: CertificateData): jsPDF => {
@@ -86,18 +88,18 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   // Subtitle
   pdf.setFontSize(9);
   pdf.setTextColor(209, 250, 229); // emerald-100
-  pdf.text(encodeForPDF('BEZPEČNOSTNÍ ŠKOLENÍ'), 148.5, 48, { align: 'center' });
+  pdf.text(convertCzechForPDF('BEZPECNOSTNI SKOLENI'), 148.5, 48, { align: 'center' });
 
   // Certificate title
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(28);
   pdf.setTextColor(6, 78, 59); // emerald-800
-  pdf.text(encodeForPDF('CERTIFIKÁT'), 148.5, 80, { align: 'center' });
+  pdf.text(convertCzechForPDF('CERTIFIKAT'), 148.5, 80, { align: 'center' });
   
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(16);
   pdf.setTextColor(16, 185, 129); // emerald-500
-  pdf.text(encodeForPDF('O ÚSPĚŠNÉM DOKONČENÍ ŠKOLENÍ'), 148.5, 92, { align: 'center' });
+  pdf.text(convertCzechForPDF('O USPESNEM DOKONCENI SKOLENI'), 148.5, 92, { align: 'center' });
 
   // Decorative line
   pdf.setDrawColor(110, 231, 183); // emerald-300
@@ -108,7 +110,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(14);
   pdf.setTextColor(75, 85, 99); // gray-600
-  pdf.text(encodeForPDF('Tímto se potvrzuje, že'), 148.5, 115, { align: 'center' });
+  pdf.text(convertCzechForPDF('Timto se potvrzuje, ze'), 148.5, 115, { align: 'center' });
 
   // Student name with modern styling
   pdf.setFont('helvetica', 'bold');
@@ -120,7 +122,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(14);
   pdf.setTextColor(75, 85, 99);
-  pdf.text(encodeForPDF('úspěšně dokončil(a) školení'), 148.5, 145, { align: 'center' });
+  pdf.text(convertCzechForPDF('uspesne dokoncil(a) skoleni'), 148.5, 145, { align: 'center' });
 
   // Course name with emphasis
   pdf.setFont('helvetica', 'bold');
@@ -133,7 +135,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(12);
     pdf.setTextColor(107, 114, 128); // gray-500
-    pdf.text(encodeForPDF(`pro společnost: ${data.companyName}`), 148.5, 172, { align: 'center' });
+    pdf.text(convertCzechForPDF(`pro spolecnost: ${data.companyName}`), 148.5, 172, { align: 'center' });
   }
 
   // Bottom section with certificate details
@@ -145,7 +147,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(10);
   pdf.setTextColor(6, 78, 59); // emerald-800
-  pdf.text(encodeForPDF('DATUM DOKONČENÍ'), 60, detailsY, { align: 'center' });
+  pdf.text(convertCzechForPDF('DATUM DOKONCENI'), 60, detailsY, { align: 'center' });
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(11);
   pdf.text(data.completionDate, 60, detailsY + 7, { align: 'center' });
@@ -156,7 +158,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(10);
   pdf.setTextColor(6, 78, 59); // emerald-800
-  pdf.text(encodeForPDF('ČÍSLO CERTIFIKÁTU'), 237, detailsY, { align: 'center' });
+  pdf.text(convertCzechForPDF('CISLO CERTIFIKATU'), 237, detailsY, { align: 'center' });
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(9);
   pdf.text(data.certificateNumber, 237, detailsY + 7, { align: 'center' });
@@ -165,12 +167,12 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(8);
   pdf.setTextColor(107, 114, 128);
-  pdf.text(encodeForPDF(`Ověřovací kód: ${data.verificationCode}`), 148.5, 202, { align: 'center' });
+  pdf.text(convertCzechForPDF(`Overovaci kod: ${data.verificationCode}`), 148.5, 202, { align: 'center' });
 
   // Footer with modern branding
   pdf.setFontSize(8);
   pdf.setTextColor(110, 231, 183); // emerald-300
-  pdf.text(encodeForPDF('DAAL Školící platforma | Praha, Česká republika'), 148.5, 208, { align: 'center' });
+  pdf.text(convertCzechForPDF('DAAL Skolici platforma | Praha, Ceska republika'), 148.5, 208, { align: 'center' });
 
   return pdf;
 };
