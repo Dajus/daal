@@ -267,38 +267,6 @@ export default function CourseEditor() {
     }
   });
 
-  // Fetch all course counts
-  const { data: allCourseCounts = {} } = useQuery({
-    queryKey: ['/api/admin/courses/counts'],
-    queryFn: async () => {
-      const counts: Record<number, { slides: number; questions: number }> = {};
-      
-      if (courses.length === 0) return counts;
-      
-      for (const course of courses) {
-        try {
-          const [slidesResponse, questionsResponse] = await Promise.all([
-            fetch(`/api/admin/courses/${course.id}/theory`, { headers: getAuthHeaders() }),
-            fetch(`/api/admin/courses/${course.id}/questions`, { headers: getAuthHeaders() })
-          ]);
-          
-          const slides = slidesResponse.ok ? await slidesResponse.json() : [];
-          const questions = questionsResponse.ok ? await questionsResponse.json() : [];
-          
-          counts[course.id] = {
-            slides: slides.length,
-            questions: questions.length
-          };
-        } catch (error) {
-          counts[course.id] = { slides: 0, questions: 0 };
-        }
-      }
-      
-      return counts;
-    },
-    enabled: courses.length > 0
-  });
-
   // Fetch theory slides for selected course
   const { data: theorySlides = [] } = useQuery<TheorySlide[]>({
     queryKey: ['/api/admin/courses', selectedCourseId, 'theory'],
@@ -310,7 +278,8 @@ export default function CourseEditor() {
       if (!response.ok) throw new Error('Failed to fetch theory slides');
       return response.json();
     },
-    enabled: !!selectedCourseId
+    enabled: !!selectedCourseId,
+    staleTime: 30000 // Cache for 30 seconds
   });
 
   // Fetch test questions for selected course
@@ -324,8 +293,15 @@ export default function CourseEditor() {
       if (!response.ok) throw new Error('Failed to fetch test questions');
       return response.json();
     },
-    enabled: !!selectedCourseId
+    enabled: !!selectedCourseId,
+    staleTime: 30000 // Cache for 30 seconds
   });
+
+  // Optimized: Only show counts for selected course to improve performance
+  const selectedCourseCounts = selectedCourseId ? {
+    slides: theorySlides.length,
+    questions: testQuestions.length
+  } : { slides: 0, questions: 0 };
 
   const selectedCourse = courses.find(c => c.id === selectedCourseId);
   
@@ -347,7 +323,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
+      // Removed for performance optimization
       toast({ title: "Success", description: "Theory slide created successfully" });
       setSlideDialogOpen(false);
     },
@@ -369,7 +345,7 @@ export default function CourseEditor() {
       // Only show toast and close dialog if not a drag operation (has slideOrder only)
       if (Object.keys(data).length > 1 || !data.slideOrder) {
         queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
-        queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
+        // Removed for performance optimization
         toast({ title: "Success", description: "Theory slide updated successfully" });
         setSlideDialogOpen(false);
         setEditingSlide(null);
@@ -390,7 +366,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
+      // Removed for performance optimization
       toast({ title: "Success", description: "Theory slide deleted successfully" });
     },
     onError: () => {
@@ -409,7 +385,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
+      // Removed for performance optimization
       toast({ title: "Success", description: "Test question created successfully" });
       setQuestionDialogOpen(false);
     },
@@ -431,7 +407,7 @@ export default function CourseEditor() {
       // Only show toast and close dialog if not a drag operation (has questionOrder only)
       if (Object.keys(data).length > 1 || !data.questionOrder) {
         queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
-        queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
+        // Removed for performance optimization
         toast({ title: "Success", description: "Test question updated successfully" });
         setQuestionDialogOpen(false);
         setEditingQuestion(null);
@@ -452,7 +428,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
+      // Removed for performance optimization
       toast({ title: "Success", description: "Test question deleted successfully" });
     },
     onError: () => {
@@ -471,7 +447,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
+      // Removed for performance optimization
       toast({ title: "Úspěch", description: "Kurz byl úspěšně vytvořen" });
       setNewCourseDialogOpen(false);
     },
@@ -608,7 +584,7 @@ export default function CourseEditor() {
               <div>
                 <div className="font-medium">{course.name}</div>
                 <div className="text-sm opacity-75 mt-1">
-                  {allCourseCounts[course.id]?.slides || 0} slides • {allCourseCounts[course.id]?.questions || 0} questions
+                  {selectedCourseId === course.id ? `${selectedCourseCounts.slides} slides • ${selectedCourseCounts.questions} questions` : 'Select to view content'}
                 </div>
               </div>
             </Button>

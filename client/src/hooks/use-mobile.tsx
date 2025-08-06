@@ -14,6 +14,23 @@ export function useIsMobile() {
     setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     return () => mql.removeEventListener("change", onChange)
   }, [])
+  
+  // Throttle resize events for better performance
+  React.useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+      }, 100);
+    }
+    
+    window.addEventListener("resize", handleResize)
+    return () => {
+      window.removeEventListener("resize", handleResize)
+      clearTimeout(timeoutId);
+    }
+  }, [])
 
   return !!isMobile
 }
