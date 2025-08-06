@@ -70,30 +70,20 @@ export default function SlideFormDialog({ slide, onSave, isLoading }: SlideFormD
           </div>
           
           <div>
-            <Label htmlFor="slideOrder">Slide Order</Label>
+            <Label htmlFor="estimatedReadTime">{t('estimatedReadTime')}</Label>
             <Input
-              id="slideOrder"
+              id="estimatedReadTime"
               type="number"
               min="1"
-              value={formData.slideOrder}
-              onChange={(e) => setFormData({ ...formData, slideOrder: parseInt(e.target.value) })}
+              max="30"
+              value={formData.estimatedReadTime}
+              onChange={(e) => setFormData({ ...formData, estimatedReadTime: parseInt(e.target.value) })}
               required
             />
           </div>
         </div>
 
-        <div>
-          <Label htmlFor="estimatedReadTime">Estimated Read Time (minutes)</Label>
-          <Input
-            id="estimatedReadTime"
-            type="number"
-            min="1"
-            max="30"
-            value={formData.estimatedReadTime}
-            onChange={(e) => setFormData({ ...formData, estimatedReadTime: parseInt(e.target.value) })}
-            required
-          />
-        </div>
+
 
         <div>
           <Label htmlFor="content">Content</Label>

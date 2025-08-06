@@ -12,10 +12,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { getAuthHeaders } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
-import { Book, HelpCircle, Plus, Edit, Trash2, Clock } from "lucide-react";
+import { Book, HelpCircle, Plus, Edit, Trash2, Clock, GripVertical } from "lucide-react";
 import type { Course, TheorySlide, TestQuestion } from "@/types";
 import SlideFormDialog from "./slide-form-dialog";
 import { t } from "@/lib/translations";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export default function CourseEditor() {
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
@@ -100,6 +119,13 @@ export default function CourseEditor() {
   });
 
   const selectedCourse = courses.find(c => c.id === selectedCourseId);
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Mutation for creating theory slide
   const createSlideMutation = useMutation({
@@ -219,6 +245,50 @@ export default function CourseEditor() {
     }
   });
 
+  // Handle slide reordering
+  const handleSlideReorder = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) return;
+    
+    const oldIndex = theorySlides.findIndex(slide => slide.id.toString() === active.id);
+    const newIndex = theorySlides.findIndex(slide => slide.id.toString() === over.id);
+    
+    const reorderedSlides = arrayMove(theorySlides, oldIndex, newIndex);
+    
+    // Update slide orders in the backend
+    reorderedSlides.forEach((slide, index) => {
+      if (slide.slideOrder !== index + 1) {
+        updateSlideMutation.mutate({
+          id: slide.id,
+          data: { ...slide, slideOrder: index + 1 }
+        });
+      }
+    });
+  };
+
+  // Handle question reordering
+  const handleQuestionReorder = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) return;
+    
+    const oldIndex = testQuestions.findIndex(q => q.id.toString() === active.id);
+    const newIndex = testQuestions.findIndex(q => q.id.toString() === over.id);
+    
+    const reorderedQuestions = arrayMove(testQuestions, oldIndex, newIndex);
+    
+    // Update question orders in the backend
+    reorderedQuestions.forEach((question, index) => {
+      if (question.questionOrder !== index + 1) {
+        updateQuestionMutation.mutate({
+          id: question.id,
+          data: { ...question, questionOrder: index + 1 }
+        });
+      }
+    });
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Course List */}
@@ -304,7 +374,9 @@ export default function CourseEditor() {
                             if (editingSlide) {
                               updateSlideMutation.mutate({ id: editingSlide.id, data });
                             } else {
-                              createSlideMutation.mutate(data);
+                              // Auto-assign the next available slide order
+                              const nextOrder = theorySlides.length > 0 ? Math.max(...theorySlides.map(s => s.slideOrder)) + 1 : 1;
+                              createSlideMutation.mutate({ ...data, slideOrder: nextOrder });
                             }
                           }}
                           isLoading={createSlideMutation.isPending || updateSlideMutation.isPending}
@@ -312,48 +384,35 @@ export default function CourseEditor() {
                       </Dialog>
                     </div>
 
-                    <div className="space-y-3">
-                      {theorySlides.map((slide, index) => (
-                        <Card key={slide.id} className={`${index === 0 ? 'border-l-4 border-l-emerald-500 bg-emerald-50' : ''}`}>
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start">
-                              <div className="flex-1">
-                                <h5 className="font-medium text-gray-900">
-                                  {slide.slideOrder}. {slide.title || `Slide ${slide.slideOrder}`}
-                                </h5>
-                                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                                  {slide.content ? 
-                                    (slide.content.length > 100 ? 
-                                      slide.content.substring(0, 100) + '...' : 
-                                      slide.content
-                                    ) : 
-                                    'No content added yet'
-                                  }
-                                </p>
-                                <div className="flex items-center text-xs text-gray-500 mt-2">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  {slide.estimatedReadTime} min read
-                                </div>
-                              </div>
-                              <div className="flex space-x-2 ml-4">
-                                <Button variant="ghost" size="sm" onClick={() => {
-                                  setEditingSlide(slide);
-                                  setSlideDialogOpen(true);
-                                }}>
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="sm" onClick={() => {
-                                  if (confirm('Are you sure you want to delete this slide?')) {
-                                    deleteSlideMutation.mutate(slide.id);
-                                  }
-                                }}>
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
+                    <DndContext 
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleSlideReorder}
+                    >
+                      <SortableContext 
+                        items={theorySlides.map(slide => slide.id.toString())}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="space-y-3">
+                          {theorySlides.map((slide, index) => (
+                            <SortableSlideItem 
+                              key={slide.id}
+                              slide={slide}
+                              index={index}
+                              onEdit={() => {
+                                setEditingSlide(slide);
+                                setSlideDialogOpen(true);
+                              }}
+                              onDelete={() => {
+                                if (confirm('Are you sure you want to delete this slide?')) {
+                                  deleteSlideMutation.mutate(slide.id);
+                                }
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </SortableContext>
+                    </DndContext>
                       
                       {theorySlides.length === 0 && (
                         <div className="text-center py-8 text-gray-500">
@@ -361,53 +420,6 @@ export default function CourseEditor() {
                         </div>
                       )}
                     </div>
-
-                    {/* Rich Text Editor Preview */}
-                    {theorySlides.length > 0 && (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-base">Content Editor</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="border border-gray-300 rounded-lg">
-                            {/* Toolbar */}
-                            <div className="border-b border-gray-300 p-2 bg-gray-50 rounded-t-lg">
-                              <div className="flex space-x-1">
-                                <Button variant="ghost" size="sm">
-                                  <strong>B</strong>
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  <em>I</em>
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  <u>U</u>
-                                </Button>
-                                <div className="border-l border-gray-300 mx-2"></div>
-                                <Button variant="ghost" size="sm">
-                                  <span>•</span>
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  📷
-                                </Button>
-                              </div>
-                            </div>
-                            {/* Editor Content */}
-                            <div className="p-4 min-h-32">
-                              <p className="text-gray-700">
-                                <strong>Introduction to BOZP</strong><br /><br />
-                                Occupational Health and Safety (BOZP) is fundamental to creating a safe workplace environment. This course covers:
-                                <br /><br />
-                                • Risk identification and assessment<br />
-                                • Personal protective equipment (PPE)<br />
-                                • Emergency procedures<br />
-                                • Legal requirements and compliance
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
                 </TabsContent>
 
                 {/* Test Content Tab */}
@@ -431,7 +443,9 @@ export default function CourseEditor() {
                             if (editingQuestion) {
                               updateQuestionMutation.mutate({ id: editingQuestion.id, data });
                             } else {
-                              createQuestionMutation.mutate(data);
+                              // Auto-assign the next available question order
+                              const nextOrder = testQuestions.length > 0 ? Math.max(...testQuestions.map(q => q.questionOrder)) + 1 : 1;
+                              createQuestionMutation.mutate({ ...data, questionOrder: nextOrder });
                             }
                           }}
                           isLoading={createQuestionMutation.isPending || updateQuestionMutation.isPending}
@@ -439,59 +453,35 @@ export default function CourseEditor() {
                       </Dialog>
                     </div>
 
-                    <div className="space-y-4">
-                      {testQuestions.map((question, index) => (
-                        <Card key={question.id}>
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start mb-3">
-                              <span className="text-sm font-medium text-gray-500">
-                                Question {index + 1} • {question.questionType.replace('_', ' ')} • {question.points} points
-                              </span>
-                              <div className="flex space-x-2">
-                                <Button variant="ghost" size="sm" onClick={() => {
-                                  setEditingQuestion(question);
-                                  setQuestionDialogOpen(true);
-                                }}>
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="sm" onClick={() => {
-                                  if (confirm('Are you sure you want to delete this question?')) {
-                                    deleteQuestionMutation.mutate(question.id);
-                                  }
-                                }}>
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                            <h5 className="font-medium text-gray-900 mb-3">{question.questionText}</h5>
-                            
-                            {Array.isArray(question.options) && (
-                              <div className="space-y-2">
-                                {question.options.map((option: string, optionIndex: number) => {
-                                  const isCorrect = Array.isArray(question.correctAnswers) ? 
-                                    question.correctAnswers.includes(option) :
-                                    question.correctAnswers === option;
-                                  
-                                  return (
-                                    <div key={optionIndex} className="flex items-center">
-                                      <input 
-                                        type={question.questionType === 'multiple_choice' ? 'checkbox' : 'radio'} 
-                                        className="mr-2" 
-                                        checked={isCorrect}
-                                        disabled
-                                      />
-                                      <label className={`text-sm ${isCorrect ? 'font-medium text-gray-900' : 'text-gray-700'}`}>
-                                        {option}
-                                      </label>
-                                      {isCorrect && <span className="ml-2 text-green-600">✓</span>}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
+                    <DndContext 
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleQuestionReorder}
+                    >
+                      <SortableContext 
+                        items={testQuestions.map(q => q.id.toString())}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="space-y-4">
+                          {testQuestions.map((question, index) => (
+                            <SortableQuestionItem 
+                              key={question.id}
+                              question={question}
+                              index={index}
+                              onEdit={() => {
+                                setEditingQuestion(question);
+                                setQuestionDialogOpen(true);
+                              }}
+                              onDelete={() => {
+                                if (confirm('Are you sure you want to delete this question?')) {
+                                  deleteQuestionMutation.mutate(question.id);
+                                }
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </SortableContext>
+                    </DndContext>
                       
                       {testQuestions.length === 0 && (
                         <div className="text-center py-8 text-gray-500">
@@ -499,7 +489,6 @@ export default function CourseEditor() {
                         </div>
                       )}
                     </div>
-                  </div>
                 </TabsContent>
               </Tabs>
             </Card>
@@ -577,7 +566,7 @@ function QuestionFormDialog({ question, onSave, isLoading }: {
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="questionType">Question Type</Label>
             <Select 
@@ -604,17 +593,7 @@ function QuestionFormDialog({ question, onSave, isLoading }: {
               className="mt-1"
             />
           </div>
-          <div>
-            <Label htmlFor="questionOrder">Question Order</Label>
-            <Input
-              id="questionOrder"
-              type="number"
-              value={formData.questionOrder}
-              onChange={(e) => setFormData({ ...formData, questionOrder: parseInt(e.target.value) || 1 })}
-              min="1"
-              className="mt-1"
-            />
-          </div>
+
         </div>
 
         <div>
@@ -652,5 +631,157 @@ function QuestionFormDialog({ question, onSave, isLoading }: {
         </div>
       </div>
     </DialogContent>
+  );
+}
+
+// Sortable Slide Item Component
+function SortableSlideItem({ slide, index, onEdit, onDelete }: {
+  slide: TheorySlide;
+  index: number;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: slide.id.toString() });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <Card 
+      ref={setNodeRef} 
+      style={style}
+      className={`${index === 0 ? 'border-l-4 border-l-emerald-500 bg-emerald-50' : ''} ${
+        isDragging ? 'opacity-50' : ''
+      }`}
+    >
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start">
+          <div className="flex items-start gap-3 flex-1">
+            <button
+              className="mt-1 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
+              {...attributes}
+              {...listeners}
+            >
+              <GripVertical className="h-4 w-4" />
+            </button>
+            <div className="flex-1">
+              <h5 className="font-medium text-gray-900">
+                {slide.slideOrder}. {slide.title || `Slide ${slide.slideOrder}`}
+              </h5>
+              <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                {slide.content ? 
+                  (slide.content.length > 100 ? 
+                    slide.content.substring(0, 100) + '...' : 
+                    slide.content
+                  ) : 
+                  'No content added yet'
+                }
+              </p>
+              <div className="flex items-center text-xs text-gray-500 mt-2">
+                <Clock className="h-3 w-3 mr-1" />
+                {slide.estimatedReadTime} min read
+              </div>
+            </div>
+          </div>
+          <div className="flex space-x-2 ml-4">
+            <Button variant="ghost" size="sm" onClick={onEdit}>
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onDelete}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Sortable Question Item Component  
+function SortableQuestionItem({ question, index, onEdit, onDelete }: {
+  question: TestQuestion;
+  index: number;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: question.id.toString() });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <Card 
+      ref={setNodeRef} 
+      style={style}
+      className={isDragging ? 'opacity-50' : ''}
+    >
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start mb-3">
+          <div className="flex items-center gap-3">
+            <button
+              className="text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
+              {...attributes}
+              {...listeners}
+            >
+              <GripVertical className="h-4 w-4" />
+            </button>
+            <span className="text-sm font-medium text-gray-500">
+              Question {index + 1} • {question.questionType.replace('_', ' ')} • {question.points} points
+            </span>
+          </div>
+          <div className="flex space-x-2">
+            <Button variant="ghost" size="sm" onClick={onEdit}>
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onDelete}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        <h5 className="font-medium text-gray-900 mb-3">{question.questionText}</h5>
+        
+        {Array.isArray(question.options) && (
+          <div className="space-y-2">
+            {question.options.map((option: string, optionIndex: number) => {
+              const isCorrect = Array.isArray(question.correctAnswers) ? 
+                question.correctAnswers.includes(option) :
+                question.correctAnswers === option;
+              
+              return (
+                <div key={optionIndex} className="flex items-center">
+                  <input 
+                    type={question.questionType === 'multiple_choice' ? 'checkbox' : 'radio'} 
+                    className="mr-2" 
+                    checked={isCorrect}
+                    disabled
+                  />
+                  <label className={`text-sm ${isCorrect ? 'font-medium text-gray-900' : 'text-gray-700'}`}>
+                    {option}
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
