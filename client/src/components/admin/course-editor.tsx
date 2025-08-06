@@ -255,19 +255,14 @@ export default function CourseEditor() {
   const handleSlideReorder = (event: DragEndEvent) => {
     const { active, over } = event;
     
-    console.log('Drag end event:', { activeId: active.id, overId: over?.id });
-    
     if (!over || active.id === over.id) return;
     
     const oldIndex = theorySlides.findIndex(slide => slide.id.toString() === active.id);
     const newIndex = theorySlides.findIndex(slide => slide.id.toString() === over.id);
     
-    console.log('Indexes:', { oldIndex, newIndex });
-    
     if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
     
     const reorderedSlides = arrayMove(theorySlides, oldIndex, newIndex);
-    console.log('Reordered slides:', reorderedSlides.map(s => ({ id: s.id, order: s.slideOrder })));
     
     // Update cache immediately with new order
     const updatedSlides = reorderedSlides.map((slide, index) => ({
@@ -275,21 +270,15 @@ export default function CourseEditor() {
       slideOrder: index + 1
     }));
     
-    console.log('Updated slides:', updatedSlides.map(s => ({ id: s.id, order: s.slideOrder })));
-    
     queryClient.setQueryData(['/api/admin/courses', selectedCourseId, 'theory'], updatedSlides);
     
     // Only update the slides that actually moved in the backend
     const startIndex = Math.min(oldIndex, newIndex);
     const endIndex = Math.max(oldIndex, newIndex);
     
-    console.log('Will update slides from index', startIndex, 'to', endIndex);
-    
     for (let i = startIndex; i <= endIndex; i++) {
       const slide = reorderedSlides[i];
       const newOrder = i + 1;
-      
-      console.log('Updating slide', slide.id, 'to order', newOrder);
       
       updateSlideMutation.mutate(
         { id: slide.id, data: { slideOrder: newOrder } },

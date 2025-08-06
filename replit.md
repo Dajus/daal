@@ -17,6 +17,13 @@ Language preference: Czech language for all user-facing text and interface eleme
 
 Update: January 5, 2025 - Full Czech localization successfully implemented across entire platform.
 
+Update: January 6, 2025 - Successfully implemented working drag-and-drop functionality for course content reordering:
+- Fixed timestamp field handling in database updates during drag operations
+- Implemented efficient range-based updates (only items that moved are updated)
+- Added optimistic cache updates for immediate UI response
+- Resolved performance issues and bouncing effects
+- Drag and drop now works smoothly for both theory slides and test questions
+
 # System Architecture
 
 ## Frontend Architecture
