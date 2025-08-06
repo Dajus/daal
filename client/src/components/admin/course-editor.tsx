@@ -36,15 +36,224 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+// New Course Form Component
+function NewCourseForm({ onSubmit }: { onSubmit: (data: any) => void }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    slug: '',
+    abbreviation: '',
+    description: '',
+    passingScore: 80,
+    timeLimitMinutes: 60,
+    maxAttempts: 3
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.name.trim() && formData.slug.trim() && formData.abbreviation.trim()) {
+      onSubmit(formData);
+    }
+  };
+
+  const generateSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="courseName">Název kurzu *</Label>
+        <Input
+          id="courseName"
+          value={formData.name}
+          onChange={(e) => {
+            const name = e.target.value;
+            setFormData(prev => ({
+              ...prev,
+              name,
+              slug: generateSlug(name)
+            }));
+          }}
+          placeholder="např. Workplace Safety Fundamentals"
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="courseSlug">URL slug *</Label>
+        <Input
+          id="courseSlug"
+          value={formData.slug}
+          onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
+          placeholder="workplace-safety-fundamentals"
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="courseAbbreviation">Zkratka *</Label>
+        <Input
+          id="courseAbbreviation"
+          value={formData.abbreviation}
+          onChange={(e) => setFormData(prev => ({ ...prev, abbreviation: e.target.value.toUpperCase() }))}
+          placeholder="WSF"
+          maxLength={10}
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="courseDescription">Popis</Label>
+        <Textarea
+          id="courseDescription"
+          value={formData.description}
+          onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+          placeholder="Stručný popis kurzu..."
+          rows={3}
+        />
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <Label htmlFor="passingScore">Procházející skóre (%)</Label>
+          <Input
+            id="passingScore"
+            type="number"
+            min="1"
+            max="100"
+            value={formData.passingScore}
+            onChange={(e) => setFormData(prev => ({ ...prev, passingScore: parseInt(e.target.value) }))}
+          />
+        </div>
+        <div>
+          <Label htmlFor="timeLimit">Časový limit (min)</Label>
+          <Input
+            id="timeLimit"
+            type="number"
+            min="5"
+            max="300"
+            value={formData.timeLimitMinutes}
+            onChange={(e) => setFormData(prev => ({ ...prev, timeLimitMinutes: parseInt(e.target.value) }))}
+          />
+        </div>
+        <div>
+          <Label htmlFor="maxAttempts">Max. pokusů</Label>
+          <Input
+            id="maxAttempts"
+            type="number"
+            min="1"
+            max="10"
+            value={formData.maxAttempts}
+            onChange={(e) => setFormData(prev => ({ ...prev, maxAttempts: parseInt(e.target.value) }))}
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+          Vytvořit kurz
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+// New Company Form Component
+function NewCompanyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    contactEmail: '',
+    contactPhone: '',
+    address: ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.name.trim()) {
+      onSubmit(formData);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="companyName">Název společnosti *</Label>
+        <Input
+          id="companyName"
+          value={formData.name}
+          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          placeholder="např. ACME Corporation"
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="contactEmail">Kontaktní email</Label>
+        <Input
+          id="contactEmail"
+          type="email"
+          value={formData.contactEmail}
+          onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
+          placeholder="kontakt@acme.cz"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="contactPhone">Kontaktní telefon</Label>
+        <Input
+          id="contactPhone"
+          value={formData.contactPhone}
+          onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value }))}
+          placeholder="+420 123 456 789"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="address">Adresa</Label>
+        <Textarea
+          id="address"
+          value={formData.address}
+          onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+          placeholder="Ulice 123, 110 00 Praha"
+          rows={3}
+        />
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+          Vytvořit společnost
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 export default function CourseEditor() {
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
   const [slideDialogOpen, setSlideDialogOpen] = useState(false);
   const [questionDialogOpen, setQuestionDialogOpen] = useState(false);
   const [editingSlide, setEditingSlide] = useState<TheorySlide | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<TestQuestion | null>(null);
+  const [newCourseDialogOpen, setNewCourseDialogOpen] = useState(false);
+  const [newCompanyDialogOpen, setNewCompanyDialogOpen] = useState(false);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch companies for selection
+  const { data: companies = [] } = useQuery({
+    queryKey: ['/api/admin/companies'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/companies', {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) throw new Error('Failed to fetch companies');
+      return response.json();
+    }
+  });
 
   // Fetch courses
   const { data: courses = [] } = useQuery<Course[]>({
@@ -251,6 +460,45 @@ export default function CourseEditor() {
     }
   });
 
+  // Mutation for creating new course
+  const createCourseMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest('/api/admin/courses', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses/counts'] });
+      toast({ title: "Úspěch", description: "Kurz byl úspěšně vytvořen" });
+      setNewCourseDialogOpen(false);
+    },
+    onError: () => {
+      toast({ title: "Chyba", description: "Nepodařilo se vytvořit kurz", variant: "destructive" });
+    }
+  });
+
+  // Mutation for creating new company
+  const createCompanyMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest('/api/admin/companies', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/companies'] });
+      toast({ title: "Úspěch", description: "Společnost byla úspěšně vytvořena" });
+      setNewCompanyDialogOpen(false);
+    },
+    onError: () => {
+      toast({ title: "Chyba", description: "Nepodařilo se vytvořit společnost", variant: "destructive" });
+    }
+  });
+
   // Handle slide reordering
   const handleSlideReorder = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -327,7 +575,24 @@ export default function CourseEditor() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Course List */}
       <div className="lg:col-span-1">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('courses')}</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">{t('courses')}</h3>
+          <Dialog open={newCourseDialogOpen} onOpenChange={setNewCourseDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                <Plus className="h-4 w-4 mr-1" />
+                Nový kurz
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Vytvořit nový kurz</DialogTitle>
+              </DialogHeader>
+              <NewCourseForm onSubmit={(data) => createCourseMutation.mutate(data)} />
+            </DialogContent>
+          </Dialog>
+        </div>
+        
         <div className="space-y-2">
           {courses.map(course => (
             <Button

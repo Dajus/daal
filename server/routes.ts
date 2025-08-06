@@ -13,7 +13,9 @@ import {
   insertTestAttemptSchema,
   insertCertificateSchema,
   insertTheorySlideSchema,
-  insertTestQuestionSchema
+  insertTestQuestionSchema,
+  insertCourseSchema,
+  insertCompanySchema
 } from "@shared/schema";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
@@ -196,6 +198,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(companies);
     } catch (error) {
       console.error("Get companies error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/companies", authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      const data = insertCompanySchema.parse(req.body);
+      const company = await storage.createCompany(data);
+      res.json(company);
+    } catch (error) {
+      console.error("Create company error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/courses", authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      const data = insertCourseSchema.parse(req.body);
+      const course = await storage.createCourse(data);
+      res.json(course);
+    } catch (error) {
+      console.error("Create course error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

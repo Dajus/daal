@@ -12,12 +12,15 @@ import { useToast } from "@/hooks/use-toast";
 import { getAuthHeaders } from "@/lib/auth";
 import { t } from "@/lib/translations";
 import { apiRequest } from "@/lib/queryClient";
-import { Download, Copy, Calendar } from "lucide-react";
+import { Download, Copy, Calendar, Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import type { Course, Company, AccessCode } from "@/types";
 
 export default function CodeGenerator() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [newCompanyDialogOpen, setNewCompanyDialogOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     courseId: '',
@@ -64,6 +67,25 @@ export default function CodeGenerator() {
     }
   });
 
+  // Mutation for creating new company
+  const createCompanyMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return apiRequest('/api/admin/companies', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/companies'] });
+      toast({ title: "Úspěch", description: "Společnost byla úspěšně vytvořena" });
+      setNewCompanyDialogOpen(false);
+    },
+    onError: () => {
+      toast({ title: "Chyba", description: "Nepodařilo se vytvořit společnost", variant: "destructive" });
+    }
+  });
+
   // Create access codes mutation
   const createCodesMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -76,8 +98,8 @@ export default function CodeGenerator() {
     },
     onSuccess: () => {
       toast({
-        title: t('success'),
-        description: t('codeGenerated')
+        title: "Úspěch",
+        description: "Přístupový kód byl vygenerován"
       });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/access-codes'] });
       // Reset form
@@ -92,7 +114,7 @@ export default function CodeGenerator() {
     },
     onError: (error: Error) => {
       toast({
-        title: t('error'),
+        title: "Chyba",
         description: error.message,
         variant: "destructive"
       });
@@ -104,7 +126,7 @@ export default function CodeGenerator() {
     
     if (!formData.courseId || !formData.companyId) {
       toast({
-        title: t('error'),
+        title: "Chyba",
         description: "Vyberte prosím kurz i společnost",
         variant: "destructive"
       });
@@ -124,8 +146,8 @@ export default function CodeGenerator() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: t('copied'),
-      description: t('codeCopied')
+      title: "Zkopírováno",
+      description: "Kód byl zkopírován do schránky"
     });
   };
 
@@ -179,7 +201,23 @@ export default function CodeGenerator() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="company">{t('company')}</Label>
+              <div className="flex justify-between items-center">
+                <Label htmlFor="company">{t('company')}</Label>
+                <Dialog open={newCompanyDialogOpen} onOpenChange={setNewCompanyDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button type="button" size="sm" variant="outline" className="text-xs">
+                      <Plus className="h-3 w-3 mr-1" />
+                      Nová společnost
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Vytvořit novou společnost</DialogTitle>
+                    </DialogHeader>
+                    <NewCompanyForm onSubmit={(data) => createCompanyMutation.mutate(data)} />
+                  </DialogContent>
+                </Dialog>
+              </div>
               <Select 
                 value={formData.companyId} 
                 onValueChange={(value) => setFormData(prev => ({ ...prev, companyId: value }))}
@@ -342,5 +380,75 @@ export default function CodeGenerator() {
         </Card>
       </div>
     </div>
+  );
+}
+
+// New Company Form Component
+function NewCompanyForm({ onSubmit }: { onSubmit: (data: any) => void }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    contactEmail: '',
+    contactPhone: '',
+    address: ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.name.trim()) {
+      onSubmit(formData);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="companyName">Název společnosti *</Label>
+        <Input
+          id="companyName"
+          value={formData.name}
+          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          placeholder="např. ACME Corporation"
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="contactEmail">Kontaktní email</Label>
+        <Input
+          id="contactEmail"
+          type="email"
+          value={formData.contactEmail}
+          onChange={(e) => setFormData(prev => ({ ...prev, contactEmail: e.target.value }))}
+          placeholder="kontakt@acme.cz"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="contactPhone">Kontaktní telefon</Label>
+        <Input
+          id="contactPhone"
+          value={formData.contactPhone}
+          onChange={(e) => setFormData(prev => ({ ...prev, contactPhone: e.target.value }))}
+          placeholder="+420 123 456 789"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="address">Adresa</Label>
+        <Textarea
+          id="address"
+          value={formData.address}
+          onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+          placeholder="Ulice 123, 110 00 Praha"
+          rows={3}
+        />
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+          Vytvořit společnost
+        </Button>
+      </div>
+    </form>
   );
 }
