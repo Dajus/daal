@@ -179,14 +179,14 @@ Dokončeno
         </div>
 
         {/* Slide Content */}
-        <div className="prose max-w-none">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        <div className="theory-content max-w-none">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             {currentSlide.title || `Slide ${currentSlide.slideOrder}`}
           </h2>
           
           {/* Render slide content */}
           <div 
-            className="text-lg text-gray-700 mb-6 leading-relaxed"
+            className="theory-text text-lg text-gray-700 mb-8 leading-relaxed"
             dangerouslySetInnerHTML={{ 
               __html: currentSlide.content || 'No content available for this slide.' 
             }}
@@ -194,34 +194,18 @@ Dokončeno
 
           {/* Media content if available */}
           {currentSlide.mediaUrls && Array.isArray(currentSlide.mediaUrls) && currentSlide.mediaUrls.length > 0 && (
-            <div className="mb-6">
+            <div className="theory-media mb-8 space-y-6">
               {currentSlide.mediaUrls.map((url: string, index: number) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`Slide ${currentSlide.slideOrder} media ${index + 1}`}
-                  className="w-full rounded-lg shadow-md mb-4"
-                />
+                <div key={index} className="flex justify-center">
+                  <img
+                    src={url}
+                    alt={`Slide ${currentSlide.slideOrder} media ${index + 1}`}
+                    className="max-w-full max-h-96 rounded-xl shadow-lg border border-gray-200 transition-transform hover:scale-105 cursor-zoom-in"
+                  />
+                </div>
               ))}
             </div>
           )}
-
-          {/* Information box */}
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded mb-6">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-blue-800 font-medium">Remember:</p>
-                <p className="text-blue-700 mt-1">
-                  Take your time to understand each concept. You can navigate back to review previous slides at any time.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Slide Actions */}
