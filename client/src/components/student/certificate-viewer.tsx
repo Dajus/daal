@@ -44,7 +44,7 @@ export default function CertificateViewer({ progress }: { progress?: any }) {
     }
   });
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (!certificateData) return;
 
     const pdfData = {
@@ -57,12 +57,20 @@ export default function CertificateViewer({ progress }: { progress?: any }) {
       score: progress?.attempts?.[0]?.percentage ? parseInt(progress.attempts[0].percentage) : undefined
     };
 
-    downloadCertificate(pdfData);
-    
-    toast({
-      title: "Download Started",
-      description: "Your certificate is being downloaded"
-    });
+    try {
+      await downloadCertificate(pdfData);
+      
+      toast({
+        title: "Certificate Downloaded",
+        description: "Your certificate with Czech characters has been downloaded successfully"
+      });
+    } catch (error) {
+      toast({
+        title: "Download Error",
+        description: "Failed to download certificate. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleEmailCertificate = () => {

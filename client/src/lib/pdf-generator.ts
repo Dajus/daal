@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import { loadRobotoFont, addRobotoToJSPDF } from './font-loader';
 
 export interface CertificateData {
   studentName: string;
@@ -11,10 +12,16 @@ export interface CertificateData {
 }
 
 // Helper function to load a custom font with Czech character support
-const loadCustomFont = (pdf: jsPDF) => {
-  // We'll use DejaVu Sans which has excellent Czech support
-  // For now, we'll use a workaround with Unicode escape sequences
-  pdf.setFont('helvetica', 'normal');
+const loadCustomFont = async (pdf: jsPDF): Promise<boolean> => {
+  try {
+    const fontBase64 = await loadRobotoFont();
+    if (fontBase64) {
+      return addRobotoToJSPDF(pdf, fontBase64);
+    }
+  } catch (error) {
+    console.error('Failed to load custom font:', error);
+  }
+  return false;
 };
 
 // Helper function to encode Czech text using Unicode escape sequences
@@ -88,15 +95,22 @@ const useHTMLEntities = (text: string): string => {
     .replace(/Ž/g, 'Ž');
 };
 
-export const generateCertificatePDF = (data: CertificateData): jsPDF => {
+export const generateCertificatePDF = async (data: CertificateData): Promise<jsPDF> => {
   const pdf = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',
     format: 'a4'
   });
 
-  // Try to load custom font (placeholder for now)
-  loadCustomFont(pdf);
+  // Try to load custom font with Czech support
+  const customFontLoaded = await loadCustomFont(pdf);
+  
+  // Set the font - use Roboto if loaded successfully, otherwise fall back to Helvetica
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal');
+  } else {
+    pdf.setFont('helvetica', 'normal');
+  }
 
   // Modern gradient background
   pdf.setFillColor(255, 255, 255); // White background
@@ -130,31 +144,39 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setTextColor(255, 255, 255); // White text
   pdf.text('DAAL', 148.5, 42, { align: 'center' });
   
-  // Subtitle - try Unicode encoding
+  // Subtitle - use original Czech text with custom font
   pdf.setFontSize(9);
   pdf.setTextColor(209, 250, 229); // emerald-100
-  try {
-    pdf.text(encodeCzechText('BEZPEČNOSTNÍ ŠKOLENÍ'), 148.5, 48, { align: 'center' });
-  } catch (e) {
+  if (customFontLoaded) {
+    pdf.text('BEZPEČNOSTNÍ ŠKOLENÍ', 148.5, 48, { align: 'center' });
+  } else {
     pdf.text('BEZPECNOSTNI SKOLENI', 148.5, 48, { align: 'center' });
   }
 
-  // Certificate title - try Unicode encoding
-  pdf.setFont('helvetica', 'bold');
+  // Certificate title - use original Czech text with custom font
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal'); // Roboto doesn't have separate bold, use normal
+  } else {
+    pdf.setFont('helvetica', 'bold');
+  }
   pdf.setFontSize(28);
   pdf.setTextColor(6, 78, 59); // emerald-800
-  try {
-    pdf.text(encodeCzechText('CERTIFIKÁT'), 148.5, 80, { align: 'center' });
-  } catch (e) {
+  if (customFontLoaded) {
+    pdf.text('CERTIFIKÁT', 148.5, 80, { align: 'center' });
+  } else {
     pdf.text('CERTIFIKAT', 148.5, 80, { align: 'center' });
   }
   
-  pdf.setFont('helvetica', 'normal');
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal');
+  } else {
+    pdf.setFont('helvetica', 'normal');
+  }
   pdf.setFontSize(16);
   pdf.setTextColor(16, 185, 129); // emerald-500
-  try {
-    pdf.text(encodeCzechText('O ÚSPĚŠNÉM DOKONČENÍ ŠKOLENÍ'), 148.5, 92, { align: 'center' });
-  } catch (e) {
+  if (customFontLoaded) {
+    pdf.text('O ÚSPĚŠNÉM DOKONČENÍ ŠKOLENÍ', 148.5, 92, { align: 'center' });
+  } else {
     pdf.text('O USPESNEM DOKONCENI SKOLENI', 148.5, 92, { align: 'center' });
   }
 
@@ -163,46 +185,66 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   pdf.setLineWidth(2);
   pdf.line(80, 100, 217, 100);
 
-  // Main content section - try Unicode encoding
-  pdf.setFont('helvetica', 'normal');
+  // Main content section - use original Czech text with custom font
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal');
+  } else {
+    pdf.setFont('helvetica', 'normal');
+  }
   pdf.setFontSize(14);
   pdf.setTextColor(75, 85, 99); // gray-600
-  try {
-    pdf.text(encodeCzechText('Tímto se potvrzuje, že'), 148.5, 115, { align: 'center' });
-  } catch (e) {
+  if (customFontLoaded) {
+    pdf.text('Tímto se potvrzuje, že', 148.5, 115, { align: 'center' });
+  } else {
     pdf.text('Timto se potvrzuje, ze', 148.5, 115, { align: 'center' });
   }
 
   // Student name with modern styling
-  pdf.setFont('helvetica', 'bold');
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal');
+  } else {
+    pdf.setFont('helvetica', 'bold');
+  }
   pdf.setFontSize(22);
   pdf.setTextColor(6, 78, 59); // emerald-800
   pdf.text(data.studentName.toUpperCase(), 148.5, 130, { align: 'center' });
 
-  // Course completion text - try Unicode encoding
-  pdf.setFont('helvetica', 'normal');
+  // Course completion text - use original Czech text with custom font
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal');
+  } else {
+    pdf.setFont('helvetica', 'normal');
+  }
   pdf.setFontSize(14);
   pdf.setTextColor(75, 85, 99);
-  try {
-    pdf.text(encodeCzechText('úspěšně dokončil(a) školení'), 148.5, 145, { align: 'center' });
-  } catch (e) {
+  if (customFontLoaded) {
+    pdf.text('úspěšně dokončil(a) školení', 148.5, 145, { align: 'center' });
+  } else {
     pdf.text('uspesne dokoncil(a) skoleni', 148.5, 145, { align: 'center' });
   }
 
   // Course name with emphasis
-  pdf.setFont('helvetica', 'bold');
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal');
+  } else {
+    pdf.setFont('helvetica', 'bold');
+  }
   pdf.setFontSize(17);
   pdf.setTextColor(16, 185, 129); // emerald-500
   pdf.text(data.courseName, 148.5, 160, { align: 'center' });
 
-  // Company name if available - try Unicode encoding
+  // Company name if available - use original Czech text with custom font
   if (data.companyName) {
-    pdf.setFont('helvetica', 'normal');
+    if (customFontLoaded) {
+      pdf.setFont('Roboto', 'normal');
+    } else {
+      pdf.setFont('helvetica', 'normal');
+    }
     pdf.setFontSize(12);
     pdf.setTextColor(107, 114, 128); // gray-500
-    try {
-      pdf.text(encodeCzechText(`pro společnost: ${data.companyName}`), 148.5, 172, { align: 'center' });
-    } catch (e) {
+    if (customFontLoaded) {
+      pdf.text(`pro společnost: ${data.companyName}`, 148.5, 172, { align: 'center' });
+    } else {
       pdf.text(`pro spolecnost: ${data.companyName}`, 148.5, 172, { align: 'center' });
     }
   }
@@ -210,60 +252,80 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   // Bottom section with certificate details
   const detailsY = 185;
   
-  // Left side - Date with modern card styling - try Unicode encoding
+  // Left side - Date with modern card styling - use original Czech text with custom font
   pdf.setFillColor(240, 253, 244); // emerald-50
   pdf.roundedRect(30, detailsY - 5, 60, 12, 2, 2, 'F');
-  pdf.setFont('helvetica', 'bold');
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal');
+  } else {
+    pdf.setFont('helvetica', 'bold');
+  }
   pdf.setFontSize(10);
   pdf.setTextColor(6, 78, 59); // emerald-800
-  try {
-    pdf.text(encodeCzechText('DATUM DOKONČENÍ'), 60, detailsY, { align: 'center' });
-  } catch (e) {
+  if (customFontLoaded) {
+    pdf.text('DATUM DOKONČENÍ', 60, detailsY, { align: 'center' });
+  } else {
     pdf.text('DATUM DOKONCENI', 60, detailsY, { align: 'center' });
   }
-  pdf.setFont('helvetica', 'normal');
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal');
+  } else {
+    pdf.setFont('helvetica', 'normal');
+  }
   pdf.setFontSize(11);
   pdf.text(data.completionDate, 60, detailsY + 7, { align: 'center' });
 
-  // Right side - Certificate ID with modern card styling - try Unicode encoding
+  // Right side - Certificate ID with modern card styling - use original Czech text with custom font
   pdf.setFillColor(240, 253, 244); // emerald-50
   pdf.roundedRect(207, detailsY - 5, 60, 12, 2, 2, 'F');
-  pdf.setFont('helvetica', 'bold');
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal');
+  } else {
+    pdf.setFont('helvetica', 'bold');
+  }
   pdf.setFontSize(10);
   pdf.setTextColor(6, 78, 59); // emerald-800
-  try {
-    pdf.text(encodeCzechText('ČÍSLO CERTIFIKÁTU'), 237, detailsY, { align: 'center' });
-  } catch (e) {
+  if (customFontLoaded) {
+    pdf.text('ČÍSLO CERTIFIKÁTU', 237, detailsY, { align: 'center' });
+  } else {
     pdf.text('CISLO CERTIFIKATU', 237, detailsY, { align: 'center' });
   }
-  pdf.setFont('helvetica', 'normal');
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal');
+  } else {
+    pdf.setFont('helvetica', 'normal');
+  }
   pdf.setFontSize(9);
   pdf.text(data.certificateNumber, 237, detailsY + 7, { align: 'center' });
 
-  // Verification section - try Unicode encoding
-  pdf.setFont('helvetica', 'normal');
+  // Verification section - use original Czech text with custom font
+  if (customFontLoaded) {
+    pdf.setFont('Roboto', 'normal');
+  } else {
+    pdf.setFont('helvetica', 'normal');
+  }
   pdf.setFontSize(8);
   pdf.setTextColor(107, 114, 128);
-  try {
-    pdf.text(encodeCzechText(`Ověřovací kód: ${data.verificationCode}`), 148.5, 202, { align: 'center' });
-  } catch (e) {
+  if (customFontLoaded) {
+    pdf.text(`Ověřovací kód: ${data.verificationCode}`, 148.5, 202, { align: 'center' });
+  } else {
     pdf.text(`Overovaci kod: ${data.verificationCode}`, 148.5, 202, { align: 'center' });
   }
 
-  // Footer with modern branding - try Unicode encoding
+  // Footer with modern branding - use original Czech text with custom font
   pdf.setFontSize(8);
   pdf.setTextColor(110, 231, 183); // emerald-300
-  try {
-    pdf.text(encodeCzechText('DAAL Školící platforma | Praha, Česká republika'), 148.5, 208, { align: 'center' });
-  } catch (e) {
+  if (customFontLoaded) {
+    pdf.text('DAAL Školící platforma | Praha, Česká republika', 148.5, 208, { align: 'center' });
+  } else {
     pdf.text('DAAL Skolici platforma | Praha, Ceska republika', 148.5, 208, { align: 'center' });
   }
 
   return pdf;
 };
 
-export const downloadCertificate = (data: CertificateData): void => {
-  const pdf = generateCertificatePDF(data);
+export const downloadCertificate = async (data: CertificateData): Promise<void> => {
+  const pdf = await generateCertificatePDF(data);
   const fileName = `certifikat-${data.certificateNumber.replace(/[^a-zA-Z0-9]/g, '-')}.pdf`;
   pdf.save(fileName);
 };
