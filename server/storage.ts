@@ -30,6 +30,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, count, sql, and, gte, isNotNull, isNull } from "drizzle-orm";
+import { nanoid } from "nanoid";
 
 export interface IStorage {
   // Admin operations
@@ -73,7 +74,7 @@ export interface IStorage {
   getStudentSessionByNameEmailAndCode(name: string, email: string, accessCodeId: number): Promise<StudentSession | undefined>;
   getActiveSessionsCountForCode(accessCodeId: number): Promise<number>;
   createStudentSession(session: InsertStudentSession): Promise<StudentSession>;
-  markTheoryComplete(sessionId: number): Promise<void>;
+  markTheoryComplete(sessionId: number): Promise<{ theoryToTest: boolean }>;
 
   // Test attempt operations
   getTestAttemptsBySession(sessionId: number): Promise<TestAttempt[]>;
@@ -281,10 +282,50 @@ export class DatabaseStorage implements IStorage {
     return newSession;
   }
 
-  async markTheoryComplete(sessionId: number): Promise<void> {
+  async markTheoryComplete(sessionId: number): Promise<{ theoryToTest: boolean }> {
+    // First, get the session and access code info
+    const [sessionWithCode] = await db.select({
+      sessionId: studentSessions.id,
+      theoryToTest: accessCodes.theoryToTest,
+      studentName: studentSessions.studentName,
+      studentEmail: studentSessions.studentEmail,
+      courseId: accessCodes.courseId,
+      companyId: accessCodes.companyId
+    })
+    .from(studentSessions)
+    .innerJoin(accessCodes, eq(accessCodes.id, studentSessions.accessCodeId))
+    .where(eq(studentSessions.id, sessionId));
+
+    if (!sessionWithCode) {
+      throw new Error('Session not found');
+    }
+
+    // Mark theory as complete
     await db.update(studentSessions)
       .set({ theoryCompletedAt: new Date() })
       .where(eq(studentSessions.id, sessionId));
+
+    const theoryToTest = sessionWithCode.theoryToTest ?? true;
+
+    // If theory-to-test is disabled, automatically generate a certificate
+    if (!theoryToTest) {
+      // Check if certificate doesn't already exist
+      const existingCertificate = await this.getCertificateBySession(sessionId);
+      if (!existingCertificate) {
+        const verificationCode = `CERT-${Date.now()}-${nanoid(8).toUpperCase()}`;
+        await this.createCertificate({
+          studentSessionId: sessionId,
+          testAttemptId: null, // No test attempt for theory-only
+          certificateNumber: `CERT-${sessionId}-${Date.now()}`,
+          verificationCode,
+          issuedAt: new Date(),
+          isValid: true
+        });
+      }
+    }
+
+    // Return the theoryToTest setting 
+    return { theoryToTest };
   }
 
   // Test attempt operations

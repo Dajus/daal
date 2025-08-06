@@ -42,16 +42,28 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
       });
       return response.json();
     },
-    onSuccess: () => {
-      toast({
-        title: t('theoryCompleted'),
-        description: t('redirectingToTest') + "..."
-      });
+    onSuccess: (data: { success: boolean; theoryToTest: boolean }) => {
       queryClient.invalidateQueries({ queryKey: ['/api/student/progress'] });
-      // Auto-redirect to test after 2 seconds
-      setTimeout(() => {
-        window.location.href = '/student/test';
-      }, 2000);
+      
+      if (data.theoryToTest) {
+        // Theory to test is enabled - redirect to test
+        toast({
+          title: t('theoryCompleted'),
+          description: t('redirectingToTest') + "..."
+        });
+        setTimeout(() => {
+          window.location.href = '/student/test';
+        }, 2000);
+      } else {
+        // Theory to test is disabled - redirect to certificate/completion
+        toast({
+          title: t('theoryCompleted'),
+          description: "Přesměrování na dokončení kurzu..."
+        });
+        setTimeout(() => {
+          window.location.href = '/student/certificate';
+        }, 2000);
+      }
     },
     onError: (error: Error) => {
       toast({

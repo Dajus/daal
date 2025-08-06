@@ -452,9 +452,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/student/theory/complete", authenticateStudent, async (req: any, res: Response) => {
     try {
       const session = req.session;
-      await storage.markTheoryComplete(session.id);
+      const result = await storage.markTheoryComplete(session.id);
       
-      res.json({ success: true });
+      res.json({ success: true, theoryToTest: result.theoryToTest });
     } catch (error) {
       console.error("Mark theory complete error:", error);
       res.status(500).json({ message: "Internal server error" });
