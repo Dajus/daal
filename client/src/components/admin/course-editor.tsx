@@ -256,12 +256,20 @@ export default function CourseEditor() {
     
     const reorderedSlides = arrayMove(theorySlides, oldIndex, newIndex);
     
-    // Update slide orders in the backend
+    // Update slide orders in the backend - only send necessary fields
     reorderedSlides.forEach((slide, index) => {
       if (slide.slideOrder !== index + 1) {
         updateSlideMutation.mutate({
           id: slide.id,
-          data: { ...slide, slideOrder: index + 1 }
+          data: { 
+            title: slide.title,
+            content: slide.content,
+            slideOrder: index + 1,
+            estimatedReadTime: slide.estimatedReadTime,
+            courseId: slide.courseId,
+            mediaUrls: slide.mediaUrls,
+            isActive: slide.isActive
+          }
         });
       }
     });
@@ -278,12 +286,24 @@ export default function CourseEditor() {
     
     const reorderedQuestions = arrayMove(testQuestions, oldIndex, newIndex);
     
-    // Update question orders in the backend
+    // Update question orders in the backend - only send necessary fields
     reorderedQuestions.forEach((question, index) => {
       if (question.questionOrder !== index + 1) {
         updateQuestionMutation.mutate({
           id: question.id,
-          data: { ...question, questionOrder: index + 1 }
+          data: {
+            questionText: question.questionText,
+            questionType: question.questionType,
+            options: question.options,
+            correctAnswers: question.correctAnswers,
+            points: question.points,
+            questionOrder: index + 1,
+            courseId: question.courseId,
+            explanation: question.explanation,
+            mediaUrl: question.mediaUrl,
+            difficultyLevel: question.difficultyLevel,
+            isActive: question.isActive
+          }
         });
       }
     });
@@ -444,7 +464,7 @@ export default function CourseEditor() {
                               updateQuestionMutation.mutate({ id: editingQuestion.id, data });
                             } else {
                               // Auto-assign the next available question order
-                              const nextOrder = testQuestions.length > 0 ? Math.max(...testQuestions.map(q => q.questionOrder)) + 1 : 1;
+                              const nextOrder = testQuestions.length > 0 ? Math.max(...testQuestions.map(q => q.questionOrder || 1)) + 1 : 1;
                               createQuestionMutation.mutate({ ...data, questionOrder: nextOrder });
                             }
                           }}
