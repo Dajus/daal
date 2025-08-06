@@ -44,7 +44,7 @@ export default function CertificateViewer({ progress }: { progress?: any }) {
     }
   });
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDF = () => {
     if (!certificateData) return;
 
     const pdfData = {
@@ -58,16 +58,16 @@ export default function CertificateViewer({ progress }: { progress?: any }) {
     };
 
     try {
-      await downloadCertificate(pdfData);
+      downloadCertificate(pdfData);
       
       toast({
-        title: "Certificate Downloaded",
-        description: "Your certificate with Czech characters has been downloaded successfully"
+        title: "Certifikát stažen",
+        description: "Váš certifikát byl úspěšně stažen (ASCII verze z důvodu kompatibility PDF)"
       });
     } catch (error) {
       toast({
-        title: "Download Error",
-        description: "Failed to download certificate. Please try again.",
+        title: "Chyba při stahování",
+        description: "Nepodařilo se stáhnout certifikát. Zkuste to prosím znovu.",
         variant: "destructive"
       });
     }

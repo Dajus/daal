@@ -26,9 +26,15 @@ export const loadRobotoFont = async (): Promise<string | null> => {
 
 export const addRobotoToJSPDF = (pdf: any, fontBase64: string): boolean => {
   try {
-    pdf.addFileToVFS('Roboto-Regular.ttf', fontBase64);
-    pdf.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
-    return true;
+    // Check if addFileToVFS exists (newer jsPDF versions)
+    if (typeof pdf.addFileToVFS === 'function') {
+      pdf.addFileToVFS('Roboto-Regular.ttf', fontBase64);
+      pdf.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+      return true;
+    } else {
+      console.warn('addFileToVFS not available in this jsPDF version');
+      return false;
+    }
   } catch (error) {
     console.error('Failed to add Roboto font to jsPDF:', error);
     return false;
