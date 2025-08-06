@@ -563,16 +563,16 @@ export default function TestInterface({ progress }: { progress?: any }) {
                 className="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
               >
                 <input
-                  type={currentQuestion.questionType === 'multiple_choice' ? 'checkbox' : 'radio'}
+                  type={['multiple_choice', 'multiple_select'].includes(currentQuestion.questionType || '') ? 'checkbox' : 'radio'}
                   name={`question-${currentQuestion.id}`}
                   value={option}
                   checked={
-                    currentQuestion.questionType === 'multiple_choice' 
+                    ['multiple_choice', 'multiple_select'].includes(currentQuestion.questionType || '')
                       ? Array.isArray(answers[currentQuestion.id]) && answers[currentQuestion.id].includes(option)
                       : answers[currentQuestion.id] === option
                   }
                   onChange={(e) => {
-                    if (currentQuestion.questionType === 'multiple_choice') {
+                    if (['multiple_choice', 'multiple_select'].includes(currentQuestion.questionType || '')) {
                       const currentAnswers = Array.isArray(answers[currentQuestion.id]) ? answers[currentQuestion.id] : [];
                       if (e.target.checked) {
                         handleAnswerChange(currentQuestion.id, [...currentAnswers, option]);
