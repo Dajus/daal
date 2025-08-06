@@ -262,35 +262,22 @@ export default function CourseEditor() {
     
     const reorderedSlides = arrayMove(theorySlides, oldIndex, newIndex);
     
-    // Optimistically update the cache - create new array with updated order
-    const optimisticSlides = reorderedSlides.map((slide, index) => ({
-      ...slide,
-      slideOrder: index + 1
-    }));
+    // Update cache with new order
+    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'theory'], 
+      reorderedSlides.map((slide, index) => ({
+        ...slide,
+        slideOrder: index + 1
+      }))
+    );
     
-    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'theory'], optimisticSlides);
-    
-    // Update slide orders in the backend - only send the order changes
+    // Update backend with minimal data
     reorderedSlides.forEach((slide, index) => {
       const newOrder = index + 1;
       if (slide.slideOrder !== newOrder) {
-        updateSlideMutation.mutate({
-          id: slide.id,
-          data: { 
-            slideOrder: newOrder
-          }
-        }, {
-          // Don't invalidate queries on success to avoid re-fetching
-          onSuccess: () => {
-            // Silently update the individual item in cache
-            queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'theory'], (oldData: any) => {
-              if (!oldData) return oldData;
-              return oldData.map((s: any) => 
-                s.id === slide.id ? { ...s, slideOrder: newOrder } : s
-              );
-            });
-          }
-        });
+        updateSlideMutation.mutate(
+          { id: slide.id, data: { slideOrder: newOrder } },
+          { onSuccess: () => {} } // Prevent automatic invalidation
+        );
       }
     });
   };
@@ -306,35 +293,22 @@ export default function CourseEditor() {
     
     const reorderedQuestions = arrayMove(testQuestions, oldIndex, newIndex);
     
-    // Optimistically update the cache - create new array with updated order
-    const optimisticQuestions = reorderedQuestions.map((question, index) => ({
-      ...question,
-      questionOrder: index + 1
-    }));
+    // Update cache with new order
+    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'questions'], 
+      reorderedQuestions.map((question, index) => ({
+        ...question,
+        questionOrder: index + 1
+      }))
+    );
     
-    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'questions'], optimisticQuestions);
-    
-    // Update question orders in the backend - only send the order changes
+    // Update backend with minimal data
     reorderedQuestions.forEach((question, index) => {
       const newOrder = index + 1;
       if (question.questionOrder !== newOrder) {
-        updateQuestionMutation.mutate({
-          id: question.id,
-          data: {
-            questionOrder: newOrder
-          }
-        }, {
-          // Don't invalidate queries on success to avoid re-fetching
-          onSuccess: () => {
-            // Silently update the individual item in cache
-            queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'questions'], (oldData: any) => {
-              if (!oldData) return oldData;
-              return oldData.map((q: any) => 
-                q.id === question.id ? { ...q, questionOrder: newOrder } : q
-              );
-            });
-          }
-        });
+        updateQuestionMutation.mutate(
+          { id: question.id, data: { questionOrder: newOrder } },
+          { onSuccess: () => {} } // Prevent automatic invalidation
+        );
       }
     });
   };
