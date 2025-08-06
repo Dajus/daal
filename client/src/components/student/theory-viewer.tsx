@@ -127,8 +127,8 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
     }));
     setShowNoteModal(false);
     toast({
-      title: t('success'),
-      description: t('noteAdded')
+      title: "Úspěch",
+      description: "Poznámka byla přidána"
     });
   };
 
@@ -141,7 +141,7 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
             onClick={handlePrevious}
             disabled={isFirstSlide}
             variant="ghost"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-emerald-700 hover:bg-emerald-50"
           >
             <ChevronLeft className="h-4 w-4" />
             {t('previousQuestion')}
@@ -155,13 +155,13 @@ export default function TheoryViewer({ progress }: { progress?: any }) {
           <Button
             onClick={handleNext}
             disabled={completeTheoryMutation.isPending}
-            className="flex items-center gap-2 bg-primary hover:bg-primary-dark"
+            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
           >
             {isLastSlide ? (
               progress?.theoryCompleted ? (
                 <>
                   <CheckCircle className="h-4 w-4" />
-                  {t('completed')}
+Dokončeno
                 </>
               ) : (
                 <>

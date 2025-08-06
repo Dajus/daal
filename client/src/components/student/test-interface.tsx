@@ -176,18 +176,18 @@ export default function TestInterface({ progress }: { progress?: any }) {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 max-w-4xl mx-auto">
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className="text-3xl font-bold text-primary mb-2">{testResult.attempt.percentage}%</div>
+            <div className="text-center p-4 bg-emerald-50 rounded-lg">
+              <div className="text-3xl font-bold text-emerald-600 mb-2">{testResult.attempt.percentage}%</div>
               <div className="text-sm text-gray-600">{t('score')}</div>
             </div>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
+            <div className="text-center p-4 bg-teal-50 rounded-lg">
+              <div className="text-3xl font-bold text-teal-600 mb-2">
                 {testResult.attempt.score}/{testResult.attempt.maxScore}
               </div>
               <div className="text-sm text-gray-600">Points Earned</div>
             </div>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className="text-3xl font-bold text-purple-600 mb-2">
+            <div className="text-center p-4 bg-emerald-50 rounded-lg">
+              <div className="text-3xl font-bold text-emerald-600 mb-2">
                 {formatTime(testResult.attempt.timeTakenSeconds)}
               </div>
               <div className="text-sm text-gray-600">Time Taken</div>
@@ -256,7 +256,7 @@ export default function TestInterface({ progress }: { progress?: any }) {
             <Button 
               onClick={() => setShowResultsReview(!showResultsReview)}
               variant="outline"
-              className="border-blue-500 text-blue-600 hover:bg-blue-50"
+              className="border-emerald-500 text-emerald-600 hover:bg-emerald-50"
             >
               {showResultsReview ? 'Skrýt detaily' : t('reviewAnswers')}
             </Button>
@@ -322,7 +322,7 @@ export default function TestInterface({ progress }: { progress?: any }) {
           <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
             <Button 
               onClick={() => setLocation('/student')}
-              className="bg-primary hover:bg-primary-dark"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               {t('backToDashboard')}
             </Button>

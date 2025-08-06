@@ -51,8 +51,8 @@ export default function ProgressCard({ progress }: ProgressCardProps) {
     <Card className="shadow-lg">
       <CardContent className="p-8">
         <div className="flex items-center mb-6">
-          <div className="w-16 h-16 bg-primary-light rounded-lg flex items-center justify-center mr-4">
-            <Award className="text-primary text-2xl h-8 w-8" />
+          <div className="w-16 h-16 bg-emerald-100 rounded-lg flex items-center justify-center mr-4">
+            <Award className="text-emerald-600 text-2xl h-8 w-8" />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{progress.course.name}</h2>
@@ -64,7 +64,7 @@ export default function ProgressCard({ progress }: ProgressCardProps) {
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium text-gray-700">{t('overallProgress')}</span>
-            <span className="text-sm font-medium text-primary">{overallProgress}%</span>
+            <span className="text-sm font-medium text-emerald-600">{overallProgress}%</span>
           </div>
           <Progress value={overallProgress} className="h-3" />
         </div>
@@ -72,18 +72,18 @@ export default function ProgressCard({ progress }: ProgressCardProps) {
         {/* Course Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Theory Section */}
-          <Card className={`${progress.theoryCompleted ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+          <Card className={`${progress.theoryCompleted ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200'}`}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   {progress.theoryCompleted ? (
-                    <CheckCircle className="text-green-600 text-xl h-6 w-6 mr-3" />
+                    <CheckCircle className="text-emerald-600 text-xl h-6 w-6 mr-3" />
                   ) : (
                     <Clock className="text-gray-600 text-xl h-6 w-6 mr-3" />
                   )}
                   <h3 className="text-lg font-semibold text-gray-900">Theory</h3>
                 </div>
-                <Badge variant={progress.theoryCompleted ? "default" : "secondary"} className={progress.theoryCompleted ? "bg-green-100 text-green-800" : ""}>
+                <Badge variant={progress.theoryCompleted ? "default" : "secondary"} className={progress.theoryCompleted ? "bg-emerald-100 text-emerald-800" : ""}>
                   {progress.theoryCompleted ? "Completed" : "Pending"}
                 </Badge>
               </div>
@@ -96,7 +96,7 @@ export default function ProgressCard({ progress }: ProgressCardProps) {
               <Button
                 onClick={() => setLocation('/student/theory')}
                 variant={progress.theoryCompleted ? "outline" : "default"}
-                className={progress.theoryCompleted ? "text-green-600 border-green-600 hover:bg-green-50" : ""}
+                className={progress.theoryCompleted ? "text-emerald-600 border-emerald-600 hover:bg-emerald-50" : "bg-emerald-600 text-white hover:bg-emerald-700"}
               >
                 {progress.theoryCompleted ? (
                   <>
@@ -115,7 +115,7 @@ export default function ProgressCard({ progress }: ProgressCardProps) {
 
           {/* Test Section */}
           <Card className={`${
-            progress.passed ? 'bg-green-50 border-green-200' : 
+            progress.passed ? 'bg-emerald-50 border-emerald-200' : 
             progress.testCompleted ? 'bg-yellow-50 border-yellow-200' : 
             'bg-gray-50 border-gray-200'
           }`}>
@@ -123,7 +123,7 @@ export default function ProgressCard({ progress }: ProgressCardProps) {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   {progress.passed ? (
-                    <CheckCircle className="text-green-600 text-xl h-6 w-6 mr-3" />
+                    <CheckCircle className="text-emerald-600 text-xl h-6 w-6 mr-3" />
                   ) : progress.testCompleted ? (
                     <RotateCcw className="text-yellow-600 text-xl h-6 w-6 mr-3" />
                   ) : (
@@ -134,7 +134,7 @@ export default function ProgressCard({ progress }: ProgressCardProps) {
                 <Badge 
                   variant={progress.passed ? "default" : progress.testCompleted ? "secondary" : "outline"}
                   className={
-                    progress.passed ? "bg-green-100 text-green-800" :
+                    progress.passed ? "bg-emerald-100 text-emerald-800" :
                     progress.testCompleted ? "bg-yellow-100 text-yellow-800" : ""
                   }
                 >
@@ -166,7 +166,7 @@ export default function ProgressCard({ progress }: ProgressCardProps) {
                 {progress.theoryCompleted && (canRetakeTest || !progress.testCompleted) && (
                   <Button
                     onClick={() => setLocation('/student/test')}
-                    className="bg-primary text-white hover:bg-primary-dark"
+                    className="bg-emerald-600 text-white hover:bg-emerald-700"
                   >
                     <Play className="h-4 w-4 mr-2" />
                     {progress.testCompleted ? "Retake Test" : "Start Test"}

@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { logout, isAuthenticated, getAuthHeaders } from "@/lib/auth";
-import { LogOut } from "lucide-react";
+import { LogOut, GraduationCap } from "lucide-react";
 import ProgressCard from "@/components/student/progress-card";
 import TheoryViewer from "@/components/student/theory-viewer";
 import TestInterface from "@/components/student/test-interface";
@@ -72,7 +72,7 @@ export default function StudentDashboard() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
           <p className="text-gray-600">{t('loading')}</p>
         </div>
       </div>
@@ -97,17 +97,18 @@ export default function StudentDashboard() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <img 
-                className="h-10 w-auto" 
-                src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=80" 
-                alt="DAAL Logo" 
-              />
-              <Badge className="ml-4 bg-primary text-white">{t('student')}</Badge>
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
+                  <GraduationCap className="text-white h-6 w-6" />
+                </div>
+                <span className="ml-3 text-xl font-bold text-gray-900">DAAL</span>
+              </div>
+              <Badge className="ml-4 bg-emerald-600 text-white">{t('student')}</Badge>
             </div>
             <Button 
               onClick={handleLogout}
               variant="outline"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
             >
               <LogOut className="h-4 w-4" />
               {t('logout')}

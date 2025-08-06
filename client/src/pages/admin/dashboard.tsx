@@ -32,17 +32,18 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <img 
-                className="h-10 w-auto" 
-                src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=80" 
-                alt="DAAL Logo" 
-              />
-              <Badge className="ml-4 bg-gray-900 text-white">{t('admin')}</Badge>
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
+                  <Key className="text-white h-6 w-6" />
+                </div>
+                <span className="ml-3 text-xl font-bold text-gray-900">DAAL</span>
+              </div>
+              <Badge className="ml-4 bg-emerald-600 text-white">{t('admin')}</Badge>
             </div>
             <Button 
               onClick={handleLogout}
               variant="outline"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
             >
               <LogOut className="h-4 w-4" />
               {t('logout')}
@@ -67,21 +68,21 @@ export default function AdminDashboard() {
                 <TabsList className="w-full justify-start h-auto p-0 bg-transparent">
                   <TabsTrigger 
                     value="codes" 
-                    className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+                    className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 rounded-none"
                   >
                     <Key className="h-4 w-4" />
                     {t('accessCodes')}
                   </TabsTrigger>
                   <TabsTrigger 
                     value="courses"
-                    className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+                    className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 rounded-none"
                   >
                     <Book className="h-4 w-4" />
                     {t('courseManagement')}
                   </TabsTrigger>
                   <TabsTrigger 
                     value="analytics"
-                    className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+                    className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 rounded-none"
                   >
                     <BarChart3 className="h-4 w-4" />
                     {t('analytics')}

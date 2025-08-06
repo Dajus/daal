@@ -121,7 +121,7 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
             )}
             {mode === 'student' && (
               <>
-                <GraduationCap className="h-5 w-5 text-primary" />
+                <GraduationCap className="h-5 w-5 text-emerald-600" />
                 Course Participant
               </>
             )}
@@ -147,14 +147,14 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
             <Button
               onClick={() => setMode('student')}
-              className="w-full bg-primary text-white p-6 h-auto hover:bg-primary-dark flex items-start gap-4"
+              className="w-full bg-emerald-600 text-white p-6 h-auto hover:bg-emerald-700 flex items-start gap-4"
             >
-              <div className="w-12 h-12 bg-primary-dark rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-emerald-700 rounded-lg flex items-center justify-center">
                 <GraduationCap className="h-6 w-6 text-white" />
               </div>
               <div className="text-left">
                 <div className="font-semibold">Course Participant</div>
-                <div className="text-sm text-blue-100">Access your training</div>
+                <div className="text-sm text-emerald-100">Access your training</div>
               </div>
             </Button>
           </div>
@@ -240,7 +240,7 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
             <Button
               type="submit"
               disabled={studentLogin.isPending}
-              className="w-full bg-primary hover:bg-primary-dark"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               {studentLogin.isPending ? "Entering..." : "Enter Course"}
             </Button>

@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { logout, isAuthenticated } from "@/lib/auth";
-import { LogOut, ArrowLeft } from "lucide-react";
+import { LogOut, ArrowLeft, Book } from "lucide-react";
 import CourseEditor from "@/components/admin/course-editor";
 
 export default function AdminCoursesPage() {
@@ -26,18 +26,19 @@ export default function AdminCoursesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <img 
-                className="h-10 w-auto" 
-                src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=80" 
-                alt="DAAL Logo" 
-              />
-              <Badge className="ml-4 bg-gray-900 text-white">Admin</Badge>
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
+                  <Book className="text-white h-6 w-6" />
+                </div>
+                <span className="ml-3 text-xl font-bold text-gray-900">DAAL</span>
+              </div>
+              <Badge className="ml-4 bg-emerald-600 text-white">Admin</Badge>
             </div>
             <div className="flex items-center space-x-4">
               <Button 
                 onClick={() => setLocation('/admin')}
                 variant="ghost"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-emerald-700 hover:bg-emerald-50"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Dashboard
@@ -45,7 +46,7 @@ export default function AdminCoursesPage() {
               <Button 
                 onClick={handleLogout}
                 variant="outline"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
               >
                 <LogOut className="h-4 w-4" />
                 Logout

@@ -153,9 +153,9 @@ export default function CodeGenerator() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Code Generation Form */}
-      <Card className="bg-gray-50">
-        <CardHeader>
-          <CardTitle>{t('generateAccessCode')}</CardTitle>
+      <Card className="bg-white border border-gray-200 shadow-sm">
+        <CardHeader className="bg-emerald-50 border-b border-emerald-100">
+          <CardTitle className="text-emerald-800">{t('generateAccessCode')}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -249,7 +249,7 @@ export default function CodeGenerator() {
             <Button 
               type="submit" 
               disabled={createCodesMutation.isPending}
-              className="w-full bg-primary hover:bg-primary-dark"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               {createCodesMutation.isPending ? "Generování..." : t('generateCode')}
             </Button>
@@ -266,7 +266,7 @@ export default function CodeGenerator() {
               onClick={exportToCSV}
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
             >
               <Download className="h-4 w-4" />
               {t('exportCsv')}
@@ -274,7 +274,7 @@ export default function CodeGenerator() {
           </div>
         </div>
 
-        <Card>
+        <Card className="border border-gray-200 shadow-sm">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <Table>

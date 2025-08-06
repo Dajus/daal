@@ -75,29 +75,29 @@ export default function AdminAnalytics() {
       icon: Key,
       title: "Active Codes",
       value: analytics.activeCodes,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100"
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-100"
     },
     {
       icon: GraduationCap,
       title: "Completions",
       value: analytics.totalCompletions,
-      color: "text-green-600",
-      bgColor: "bg-green-100"
+      color: "text-teal-600",
+      bgColor: "bg-teal-100"
     },
     {
       icon: Clock,
       title: "In Progress",
       value: analytics.inProgress,
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-100"
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-100"
     },
     {
       icon: TrendingUp,
       title: "Success Rate",
       value: `${analytics.successRate}%`,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100"
+      color: "text-teal-600",
+      bgColor: "bg-teal-100"
     }
   ];
 
@@ -106,7 +106,7 @@ export default function AdminAnalytics() {
       {/* Overview Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {statCards.map((stat, index) => (
-          <Card key={index}>
+          <Card key={index} className="border border-gray-200 shadow-sm">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className={`w-12 h-12 ${stat.bgColor} rounded-lg flex items-center justify-center`}>
@@ -124,9 +124,9 @@ export default function AdminAnalytics() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Popular Courses */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Most Popular Courses</CardTitle>
+        <Card className="border border-gray-200 shadow-sm">
+          <CardHeader className="bg-emerald-50 border-b border-emerald-100">
+            <CardTitle className="text-emerald-800">Most Popular Courses</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -146,9 +146,9 @@ export default function AdminAnalytics() {
         </Card>
 
         {/* Company Performance */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Company Performance</CardTitle>
+        <Card className="border border-gray-200 shadow-sm">
+          <CardHeader className="bg-emerald-50 border-b border-emerald-100">
+            <CardTitle className="text-emerald-800">Company Performance</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
