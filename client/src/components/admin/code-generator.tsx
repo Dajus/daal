@@ -172,21 +172,25 @@ export default function CodeGenerator() {
     window.URL.revokeObjectURL(url);
   };
 
-  // Get recent codes (last 5)
-  const recentCodes = accessCodes.slice(0, 5);
+  // Get recent codes (last 5, newest first)
+  const recentCodes = [...accessCodes].sort((a, b) => 
+    new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+  ).slice(0, 5);
   
   return (
     <div className="space-y-8">
-      {/* Code Generation Form */}
-      <Card className="bg-white border border-gray-200 shadow-sm">
-        <CardHeader className="bg-emerald-50 border-b border-emerald-100">
-          <CardTitle className="text-emerald-800 flex items-center gap-2">
-            <Plus className="h-5 w-5" />
-            {t('generateAccessCode')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Top Row: Form and Recent Codes */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Code Generation Form */}
+        <Card className="bg-white border border-gray-200 shadow-sm">
+          <CardHeader className="bg-emerald-50 border-b border-emerald-100">
+            <CardTitle className="text-emerald-800 flex items-center gap-2">
+              <Plus className="h-5 w-5" />
+              {t('generateAccessCode')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="course">{t('course')}</Label>
               <Select 
@@ -290,21 +294,18 @@ export default function CodeGenerator() {
               />
             </div>
 
-            <div className="md:col-span-2 lg:col-span-3">
-              <Button 
-                type="submit" 
-                disabled={createCodesMutation.isPending}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 text-lg font-medium"
-              >
-                {createCodesMutation.isPending ? "Generování..." : t('generateCode')}
-              </Button>
-            </div>
+            <Button 
+              type="submit" 
+              disabled={createCodesMutation.isPending}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              {createCodesMutation.isPending ? "Generování..." : t('generateCode')}
+            </Button>
           </form>
         </CardContent>
       </Card>
 
-      {/* Recently Generated Codes */}
-      {recentCodes.length > 0 && (
+        {/* Recently Generated Codes */}
         <Card className="bg-emerald-50 border border-emerald-200 shadow-sm">
           <CardHeader className="bg-emerald-100 border-b border-emerald-200">
             <CardTitle className="text-emerald-800 flex items-center gap-2">
@@ -312,47 +313,53 @@ export default function CodeGenerator() {
               Nejnovější kódy ({recentCodes.length})
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {recentCodes.map(code => {
-                const course = courses.find(c => c.id === code.courseId);
-                const company = companies.find(c => c.id === code.companyId);
-                return (
-                  <div key={code.id} className="bg-white p-4 rounded-lg border border-emerald-200 shadow-sm">
-                    <div className="flex justify-between items-start mb-3">
-                      <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 font-mono text-sm">
-                        {code.code}
-                      </Badge>
-                      <Button
-                        onClick={() => copyToClipboard(code.code)}
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-800"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="space-y-1 text-sm">
-                      <p><span className="font-medium">Kurz:</span> {course?.name || 'N/A'}</p>
-                      <p><span className="font-medium">Společnost:</span> {company?.name || 'N/A'}</p>
-                      <p><span className="font-medium">Platnost:</span> {new Date(code.validUntil).toLocaleDateString('cs-CZ')}</p>
-                      <p><span className="font-medium">Využití:</span> {code.usageCount}/{code.unlimitedParticipants ? '∞' : code.maxParticipants}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Badge variant={code.theoryToTest ? "default" : "secondary"} className="text-xs">
-                          {code.theoryToTest ? "Teorie + Test" : "Pouze teorie"}
+          <CardContent className="p-4">
+            {recentCodes.length > 0 ? (
+              <div className="space-y-3">
+                {recentCodes.map(code => {
+                  const course = courses.find(c => c.id === code.courseId);
+                  const company = companies.find(c => c.id === code.companyId);
+                  return (
+                    <div key={code.id} className="bg-white p-3 rounded-lg border border-emerald-200 shadow-sm">
+                      <div className="flex justify-between items-start mb-2">
+                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 font-mono text-sm">
+                          {code.code}
                         </Badge>
-                        <Badge variant={code.isActive ? "default" : "destructive"} className="text-xs">
-                          {code.isActive ? "Aktivní" : "Neaktivní"}
-                        </Badge>
+                        <Button
+                          onClick={() => copyToClipboard(code.code)}
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 text-emerald-600 hover:text-emerald-800"
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <div className="space-y-1 text-xs">
+                        <p><span className="font-medium">Kurz:</span> {course?.name || 'N/A'}</p>
+                        <p><span className="font-medium">Společnost:</span> {company?.name || 'N/A'}</p>
+                        <div className="flex items-center justify-between">
+                          <Badge variant={code.theoryToTest ? "default" : "secondary"} className="text-xs">
+                            {code.theoryToTest ? "Teorie + Test" : "Pouze teorie"}
+                          </Badge>
+                          <span className="text-xs text-gray-500">
+                            {code.usageCount}/{code.unlimitedParticipants ? '∞' : code.maxParticipants}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-8 text-sm">
+                Zatím nebyly vygenerovány žádné kódy
+              </div>
+            )}
           </CardContent>
         </Card>
-      )}
+      </div>
+
+
 
       {/* All Generated Codes Table */}
       <Card className="bg-white border border-gray-200 shadow-sm">
