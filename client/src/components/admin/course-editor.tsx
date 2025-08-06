@@ -260,26 +260,31 @@ export default function CourseEditor() {
     const oldIndex = theorySlides.findIndex(slide => slide.id.toString() === active.id);
     const newIndex = theorySlides.findIndex(slide => slide.id.toString() === over.id);
     
+    if (oldIndex === newIndex) return;
+    
     const reorderedSlides = arrayMove(theorySlides, oldIndex, newIndex);
     
-    // Update cache with new order
-    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'theory'], 
-      reorderedSlides.map((slide, index) => ({
-        ...slide,
-        slideOrder: index + 1
-      }))
-    );
+    // Update cache immediately with new order
+    const updatedSlides = reorderedSlides.map((slide, index) => ({
+      ...slide,
+      slideOrder: index + 1
+    }));
     
-    // Update backend with minimal data
-    reorderedSlides.forEach((slide, index) => {
-      const newOrder = index + 1;
-      if (slide.slideOrder !== newOrder) {
-        updateSlideMutation.mutate(
-          { id: slide.id, data: { slideOrder: newOrder } },
-          { onSuccess: () => {} } // Prevent automatic invalidation
-        );
-      }
-    });
+    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'theory'], updatedSlides);
+    
+    // Only update the slides that actually moved in the backend
+    const startIndex = Math.min(oldIndex, newIndex);
+    const endIndex = Math.max(oldIndex, newIndex);
+    
+    for (let i = startIndex; i <= endIndex; i++) {
+      const slide = reorderedSlides[i];
+      const newOrder = i + 1;
+      
+      updateSlideMutation.mutate(
+        { id: slide.id, data: { slideOrder: newOrder } },
+        { onSuccess: () => {} }
+      );
+    }
   };
 
   // Handle question reordering
@@ -291,26 +296,31 @@ export default function CourseEditor() {
     const oldIndex = testQuestions.findIndex(q => q.id.toString() === active.id);
     const newIndex = testQuestions.findIndex(q => q.id.toString() === over.id);
     
+    if (oldIndex === newIndex) return;
+    
     const reorderedQuestions = arrayMove(testQuestions, oldIndex, newIndex);
     
-    // Update cache with new order
-    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'questions'], 
-      reorderedQuestions.map((question, index) => ({
-        ...question,
-        questionOrder: index + 1
-      }))
-    );
+    // Update cache immediately with new order
+    const updatedQuestions = reorderedQuestions.map((question, index) => ({
+      ...question,
+      questionOrder: index + 1
+    }));
     
-    // Update backend with minimal data
-    reorderedQuestions.forEach((question, index) => {
-      const newOrder = index + 1;
-      if (question.questionOrder !== newOrder) {
-        updateQuestionMutation.mutate(
-          { id: question.id, data: { questionOrder: newOrder } },
-          { onSuccess: () => {} } // Prevent automatic invalidation
-        );
-      }
-    });
+    queryClient.setQueryData(['api/admin/courses', selectedCourseId, 'questions'], updatedQuestions);
+    
+    // Only update the questions that actually moved in the backend
+    const startIndex = Math.min(oldIndex, newIndex);
+    const endIndex = Math.max(oldIndex, newIndex);
+    
+    for (let i = startIndex; i <= endIndex; i++) {
+      const question = reorderedQuestions[i];
+      const newOrder = i + 1;
+      
+      updateQuestionMutation.mutate(
+        { id: question.id, data: { questionOrder: newOrder } },
+        { onSuccess: () => {} }
+      );
+    }
   };
 
   return (
