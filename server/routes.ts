@@ -143,13 +143,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Access code has expired" });
       }
 
-      // Check usage limits
-      if (!code.unlimitedParticipants && code.maxParticipants && (code.usageCount || 0) >= code.maxParticipants) {
-        return res.status(401).json({ message: "Access code usage limit reached" });
+      // Check usage limits - count active sessions instead of total usage
+      if (!code.unlimitedParticipants && code.maxParticipants) {
+        const activeSessionsCount = await storage.getActiveSessionsCountForCode(code.id);
+        if (activeSessionsCount >= code.maxParticipants) {
+          return res.status(401).json({ message: "Maximum participants currently active for this code" });
+        }
       }
 
-      // Create or get existing student session
-      let session = await storage.getStudentSessionByEmailAndCode(studentEmail, code.id);
+      // Allow multiple users with same email but different names for classroom scenarios
+      // Create or get existing student session by name+email+code combination
+      let session = await storage.getStudentSessionByNameEmailAndCode(studentName, studentEmail, code.id);
       if (!session) {
         session = await storage.createStudentSession({
           accessCodeId: code.id,
@@ -158,9 +162,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ipAddress: req.ip,
           userAgent: req.headers['user-agent'] || null
         });
-
-        // Increment usage count
-        await storage.incrementAccessCodeUsage(code.id);
       }
 
       const token = jwt.sign({ sessionId: session.id }, JWT_SECRET, { expiresIn: "7d" });

@@ -29,7 +29,7 @@ import {
   type InsertCertificate
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, count, sql, and, gte } from "drizzle-orm";
+import { eq, desc, count, sql, and, gte, isNotNull, isNull } from "drizzle-orm";
 
 export interface IStorage {
   // Admin operations
@@ -70,6 +70,8 @@ export interface IStorage {
   // Student session operations
   getStudentSession(id: number): Promise<StudentSession | undefined>;
   getStudentSessionByEmailAndCode(email: string, accessCodeId: number): Promise<StudentSession | undefined>;
+  getStudentSessionByNameEmailAndCode(name: string, email: string, accessCodeId: number): Promise<StudentSession | undefined>;
+  getActiveSessionsCountForCode(accessCodeId: number): Promise<number>;
   createStudentSession(session: InsertStudentSession): Promise<StudentSession>;
   markTheoryComplete(sessionId: number): Promise<void>;
 
@@ -248,6 +250,30 @@ export class DatabaseStorage implements IStorage {
         eq(studentSessions.accessCodeId, accessCodeId)
       ));
     return session || undefined;
+  }
+
+  async getStudentSessionByNameEmailAndCode(name: string, email: string, accessCodeId: number): Promise<StudentSession | undefined> {
+    const [session] = await db.select().from(studentSessions)
+      .where(and(
+        eq(studentSessions.studentName, name),
+        eq(studentSessions.studentEmail, email),
+        eq(studentSessions.accessCodeId, accessCodeId)
+      ));
+    return session || undefined;
+  }
+
+  async getActiveSessionsCountForCode(accessCodeId: number): Promise<number> {
+    // Count sessions that have started theory but not completed the course (no certificate)
+    const [result] = await db
+      .select({ count: count() })
+      .from(studentSessions)
+      .leftJoin(certificates, eq(certificates.studentSessionId, studentSessions.id))
+      .where(and(
+        eq(studentSessions.accessCodeId, accessCodeId),
+        isNotNull(studentSessions.createdAt),
+        isNull(certificates.id) // No certificate = still active
+      ));
+    return result.count;
   }
 
   async createStudentSession(session: InsertStudentSession): Promise<StudentSession> {

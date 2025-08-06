@@ -24,6 +24,17 @@ Update: January 6, 2025 - Successfully implemented working drag-and-drop functio
 - Resolved performance issues and bouncing effects
 - Drag and drop now works smoothly for both theory slides and test questions
 
+Update: January 6, 2025 - **MAJOR**: Implemented shared access code functionality for classroom scenarios:
+- **Problem Solved**: Previous system only supported individual access codes (1 code = 1 person)
+- **New Capability**: Multiple students (20-150) can now use the same access code simultaneously
+- **Real-world Use Case**: Company with 150 members in one room, 50-minute course, single teacher-provided code
+- **Technical Changes**: 
+  - Modified authentication logic to allow multiple concurrent sessions per access code
+  - Changed usage limit checking from total count to active session count
+  - Added unique session identification by name+email+code combination
+  - Supports classroom scenarios where multiple people can have similar emails/names
+- **Backward Compatibility**: Existing access codes continue to work as before
+
 # System Architecture
 
 ## Frontend Architecture
