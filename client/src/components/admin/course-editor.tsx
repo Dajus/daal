@@ -23,6 +23,7 @@ export default function CourseEditor() {
   const [questionDialogOpen, setQuestionDialogOpen] = useState(false);
   const [editingSlide, setEditingSlide] = useState<TheorySlide | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<TestQuestion | null>(null);
+  const [courseCounts, setCourseCounts] = useState<Record<number, { slides: number; questions: number }>>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -34,7 +35,31 @@ export default function CourseEditor() {
         headers: getAuthHeaders()
       });
       if (!response.ok) throw new Error('Failed to fetch courses');
-      return response.json();
+      const courseData = await response.json();
+      
+      // Fetch counts for each course
+      const counts: Record<number, { slides: number; questions: number }> = {};
+      for (const course of courseData) {
+        try {
+          const [slidesResponse, questionsResponse] = await Promise.all([
+            fetch(`/api/admin/courses/${course.id}/theory`, { headers: getAuthHeaders() }),
+            fetch(`/api/admin/courses/${course.id}/questions`, { headers: getAuthHeaders() })
+          ]);
+          
+          const slides = slidesResponse.ok ? await slidesResponse.json() : [];
+          const questions = questionsResponse.ok ? await questionsResponse.json() : [];
+          
+          counts[course.id] = {
+            slides: slides.length,
+            questions: questions.length
+          };
+        } catch (error) {
+          counts[course.id] = { slides: 0, questions: 0 };
+        }
+      }
+      
+      setCourseCounts(counts);
+      return courseData;
     }
   });
 
@@ -79,6 +104,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
       toast({ title: "Success", description: "Theory slide created successfully" });
       setSlideDialogOpen(false);
     },
@@ -98,6 +124,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
       toast({ title: "Success", description: "Theory slide updated successfully" });
       setSlideDialogOpen(false);
       setEditingSlide(null);
@@ -117,6 +144,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'theory'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
       toast({ title: "Success", description: "Theory slide deleted successfully" });
     },
     onError: () => {
@@ -135,6 +163,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
       toast({ title: "Success", description: "Test question created successfully" });
       setQuestionDialogOpen(false);
     },
@@ -154,6 +183,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
       toast({ title: "Success", description: "Test question updated successfully" });
       setQuestionDialogOpen(false);
       setEditingQuestion(null);
@@ -173,6 +203,7 @@ export default function CourseEditor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/courses', selectedCourseId, 'questions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
       toast({ title: "Success", description: "Test question deleted successfully" });
     },
     onError: () => {
@@ -193,14 +224,14 @@ export default function CourseEditor() {
               variant={selectedCourseId === course.id ? "default" : "outline"}
               className={`w-full justify-start text-left p-4 h-auto ${
                 selectedCourseId === course.id 
-                  ? "bg-primary text-white" 
-                  : "bg-white hover:bg-gray-50"
+                  ? "bg-emerald-600 text-white" 
+                  : "bg-white hover:bg-emerald-50 border-emerald-200 text-gray-900"
               }`}
             >
               <div>
                 <div className="font-medium">{course.name}</div>
                 <div className="text-sm opacity-75 mt-1">
-                  {theorySlides.length} slides • {testQuestions.length} questions
+                  {courseCounts[course.id]?.slides || 0} slides • {courseCounts[course.id]?.questions || 0} questions
                 </div>
               </div>
             </Button>
@@ -229,14 +260,14 @@ export default function CourseEditor() {
                   <TabsList className="w-full justify-start h-auto p-0 bg-transparent">
                     <TabsTrigger 
                       value="theory"
-                      className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+                      className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 rounded-none"
                     >
                       <Book className="h-4 w-4" />
                       {t('theory')}
                     </TabsTrigger>
                     <TabsTrigger 
                       value="test"
-                      className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none"
+                      className="flex items-center gap-2 px-6 py-4 border-b-2 border-transparent data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 rounded-none"
                     >
                       <HelpCircle className="h-4 w-4" />
                       {t('test')}
@@ -251,7 +282,7 @@ export default function CourseEditor() {
                       <h4 className="font-semibold text-gray-900">{t('theory')} - Snímky</h4>
                       <Dialog open={slideDialogOpen} onOpenChange={setSlideDialogOpen}>
                         <DialogTrigger asChild>
-                          <Button className="flex items-center gap-2" onClick={() => {
+                          <Button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => {
                             setEditingSlide(null);
                             setSlideDialogOpen(true);
                           }}>
@@ -275,7 +306,7 @@ export default function CourseEditor() {
 
                     <div className="space-y-3">
                       {theorySlides.map((slide, index) => (
-                        <Card key={slide.id} className={`${index === 0 ? 'border-l-4 border-l-primary bg-primary-light' : ''}`}>
+                        <Card key={slide.id} className={`${index === 0 ? 'border-l-4 border-l-emerald-500 bg-emerald-50' : ''}`}>
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start">
                               <div className="flex-1">
@@ -378,7 +409,7 @@ export default function CourseEditor() {
                       <h4 className="font-semibold text-gray-900">Test Questions</h4>
                       <Dialog open={questionDialogOpen} onOpenChange={setQuestionDialogOpen}>
                         <DialogTrigger asChild>
-                          <Button className="flex items-center gap-2" onClick={() => {
+                          <Button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => {
                             setEditingQuestion(null);
                             setQuestionDialogOpen(true);
                           }}>
