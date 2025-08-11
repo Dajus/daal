@@ -49,6 +49,37 @@ export const translations = {
   accessCodeGenerator: "Generátor přístupových kódů",
   analytics: "Analytika",
   companies: "Společnosti",
+  accessCodes: "Přístupové kódy",
+  
+  // Company Management  
+  companyManagement: "Správa společností",
+  createCompanyAdmin: "Vytvořit administrátora společnosti",
+  companyAdmins: "Administrátoři společností",
+  companyName: "Název společnosti",
+  assignToCompany: "Přiřadit ke společnosti",
+  createAccount: "Vytvořit účet",
+  deleteAccount: "Smazat účet",
+  confirmDelete: "Opravdu chcete smazat tento účet?",
+  accountDeleted: "Účet byl úspěšně smazán",
+  accountCreated: "Účet byl úspěšně vytvořen",
+  employeesTrained: "Vyškolení zaměstnanci",
+  coursesOffered: "Nabízené kurzy",
+
+  // Dark mode
+  toggleTheme: "Přepnout motiv",
+  lightMode: "Světlý režim", 
+  darkMode: "Tmavý režim",
+
+  // Cookie consent
+  cookieConsentTitle: "Používáme cookies",
+  cookieConsentMessage: "Tento web používá cookies k zajištění nejlepšího uživatelského zážitku. Cookies pomáhají s funkcionalitou webu, analýzou návštěvnosti a personalizací obsahu. Pokračováním v prohlížení souhlasíte s jejich používáním.",
+  cookieAccept: "Přijmout vše",
+  cookieDecline: "Odmítnout volitelné",
+  cookieSettings: "Nastavení cookies",
+  essentialCookies: "Nezbytné cookies",
+  analyticalCookies: "Analytické cookies", 
+  marketingCookies: "Marketingové cookies",
+  cookieDescription: "Cookies jsou malé textové soubory, které webové stránky ukládají do vašeho prohlížeče pro zlepšení funkčnosti a uživatelského zážitku.",
   
   // Course Management
   courses: "Kurzy",
@@ -96,8 +127,6 @@ export const translations = {
   questionUpdated: "Otázka byla aktualizována", 
   questionDeleted: "Otázka byla smazána",
   confirmDeleteQuestion: "Opravdu chcete smazat tuto otázku?",
-  
-
   
   // Student Interface
   studentDashboard: "Studentský přehled",
@@ -248,7 +277,7 @@ export const translations = {
   back: "Zpět",
   continue: "Pokračovat",
   finish: "Dokončit",
-  start: "Začít"
+  start: "Začít",
 };
 
 export type TranslationKey = keyof typeof translations;

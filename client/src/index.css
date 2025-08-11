@@ -2,6 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  :root {
+    /* Light mode colors */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 159 84% 39%;
+    --primary-foreground: 355 7% 97%;
+    --secondary: 210 40% 98%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 98%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 98%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 159 84% 39%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark mode colors - Professional dark theme */
+    --background: 222 47% 11%;
+    --foreground: 213 31% 91%;
+    --card: 222 47% 11%;
+    --card-foreground: 213 31% 91%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 159 84% 39%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 222 47% 17%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 222 47% 17%;
+    --muted-foreground: 215 20% 70%;
+    --accent: 222 47% 17%;
+    --accent-foreground: 213 31% 91%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 213 31% 91%;
+    --border: 222 47% 17%;
+    --input: 222 47% 17%;
+    --ring: 159 84% 39%;
+  }
+}
+
 /* Quill.js styles are imported automatically by react-quill */
 
 /* Override Quill styles to match our theme */
@@ -19,6 +72,32 @@
 
 .ql-editor p {
   margin-bottom: 12px;
+}
+
+/* Theory content image styling */
+.prose img,
+.theory-content img {
+  max-width: 100%;
+  height: auto;
+  max-height: 400px;
+  border-radius: 8px;
+  margin: 12px auto;
+  display: block;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prose img:hover,
+.theory-content img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .prose img,
+.dark .theory-content img {
+  border-color: #374151;
 }
 
 .ql-editor h1, .ql-editor h2, .ql-editor h3 {
@@ -39,9 +118,91 @@
   border-right: 1px solid #e5e7eb;
 }
 
-/* Enhanced styling for theory slides */
+/* Enhanced styling for theory slides with compact spacing */
 .theory-content {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+/* Compact spacing for theory content - Override all prose classes aggressively */
+.theory-content.prose-sm h1,
+.theory-content.prose-sm h2,
+.theory-content.prose-sm h3,
+.theory-content.prose-sm h4,
+.theory-content.prose-sm h5,
+.theory-content.prose-sm h6,
+.theory-content.prose h1,
+.theory-content.prose h2,
+.theory-content.prose h3,
+.theory-content.prose h4,
+.theory-content.prose h5,
+.theory-content.prose h6,
+.theory-content h1,
+.theory-content h2,
+.theory-content h3,
+.theory-content h4,
+.theory-content h5,
+.theory-content h6 {
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.theory-content.prose-sm p,
+.theory-content.prose p,
+.theory-content p {
+  margin-top: 0 !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.theory-content.prose-sm ul,
+.theory-content.prose-sm ol,
+.theory-content.prose ul,
+.theory-content.prose ol,
+.theory-content ul,
+.theory-content ol {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.theory-content.prose-sm li,
+.theory-content.prose li,
+.theory-content li {
+  margin-top: 0 !important;
+  margin-bottom: 0.125rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Override default prose spacing completely for all sizes */
+.theory-content.prose-sm > * + *,
+.theory-content.prose > * + * {
+  margin-top: 0.25rem !important;
+}
+
+/* Target specific list item spacing */
+.theory-content.prose-sm ul > li,
+.theory-content.prose-sm ol > li,
+.theory-content.prose ul > li,
+.theory-content.prose ol > li {
+  margin-top: 0 !important;
+  margin-bottom: 0.125rem !important;
+}
+
+/* Responsive padding for admin cards on mobile */
+@media (max-width: 768px) {
+  .admin-card {
+    padding: 0.75rem !important;
+  }
+  
+  .p-6 {
+    padding: 0.75rem !important;
+  }
+  
+  /* Override any component specific p-6 classes on mobile */
+  .card .p-6,
+  .Card .p-6,
+  [class*="card"] .p-6 {
+    padding: 0.75rem !important;
+  }
 }
 
 /* Text content styling */
@@ -52,10 +213,19 @@
 .theory-text h5,
 .theory-text h6 {
   text-align: center;
-  margin: 2rem 0 1.5rem 0;
+  margin: 1.5rem 0 0.75rem 0;
   font-weight: bold;
   color: #1f2937;
   line-height: 1.2;
+}
+
+.dark .theory-text h1,
+.dark .theory-text h2,
+.dark .theory-text h3,
+.dark .theory-text h4,
+.dark .theory-text h5,
+.dark .theory-text h6 {
+  color: #f3f4f6;
 }
 
 .theory-text h1 { font-size: 2.5rem; }
@@ -67,24 +237,28 @@
 
 /* Paragraph styling */
 .theory-text p {
-  margin-bottom: 1.5rem;
-  line-height: 1.8;
+  margin-bottom: 1rem;
+  line-height: 1.6;
   text-align: justify;
   color: #374151;
+}
+
+.dark .theory-text p {
+  color: #d1d5db;
 }
 
 /* List styling */
 .theory-text ul,
 .theory-text ol {
-  margin: 1.5rem 0;
+  margin: 1rem 0;
   padding-left: 0;
   list-style: none;
 }
 
 .theory-text ul li,
 .theory-text ol li {
-  margin-bottom: 1rem;
-  padding: 1rem 1.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem 1.25rem;
   background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
   border-left: 4px solid #10b981;
   border-radius: 0.5rem;

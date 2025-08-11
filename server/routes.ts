@@ -15,12 +15,13 @@ import {
   insertTheorySlideSchema,
   insertTestQuestionSchema,
   insertCourseSchema,
-  insertCompanySchema
+  insertCompanySchema,
+  insertCompanyAdminSchema
 } from "@shared/schema";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-// Middleware for admin authentication
+// Middleware for admin authentication (supports both regular admin and company admin)
 const authenticateAdmin = async (req: any, res: Response, next: any) => {
   try {
     const token = req.headers.authorization?.replace("Bearer ", "");
@@ -29,13 +30,55 @@ const authenticateAdmin = async (req: any, res: Response, next: any) => {
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as any;
-    const admin = await storage.getAdmin(decoded.adminId);
     
+    // Check if it's a regular admin
+    if (decoded.adminId) {
+      const admin = await storage.getAdmin(decoded.adminId);
+      if (!admin || !admin.isActive) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+      req.admin = admin;
+      req.userType = 'admin';
+      next();
+    }
+    // Check if it's a company admin
+    else if (decoded.companyAdminId) {
+      const companyAdmin = await storage.getCompanyAdmin(decoded.companyAdminId);
+      if (!companyAdmin || !companyAdmin.isActive) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+      req.admin = companyAdmin;
+      req.userType = 'company_admin';
+      next();
+    }
+    else {
+      return res.status(401).json({ message: "Invalid token format" });
+    }
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+};
+
+// Middleware for super admin only (regular admin)
+const authenticateSuperAdmin = async (req: any, res: Response, next: any) => {
+  try {
+    const token = req.headers.authorization?.replace("Bearer ", "");
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    if (!decoded.adminId) {
+      return res.status(403).json({ message: "Super admin access required" });
+    }
+    
+    const admin = await storage.getAdmin(decoded.adminId);
     if (!admin || !admin.isActive) {
       return res.status(401).json({ message: "Invalid token" });
     }
 
     req.admin = admin;
+    req.userType = 'admin';
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid token" });
@@ -93,30 +136,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username and password required" });
       }
 
+      // First, try to find regular admin
       const admin = await storage.getAdminByUsername(username);
-      if (!admin || !admin.isActive) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
+      if (admin && admin.isActive) {
+        const isValid = await bcrypt.compare(password, admin.passwordHash);
+        if (isValid) {
+          // Update last login
+          await storage.updateAdminLastLogin(admin.id);
 
-      const isValid = await bcrypt.compare(password, admin.passwordHash);
-      if (!isValid) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      // Update last login
-      await storage.updateAdminLastLogin(admin.id);
-
-      const token = jwt.sign({ adminId: admin.id }, JWT_SECRET, { expiresIn: "24h" });
-      
-      res.json({
-        token,
-        admin: {
-          id: admin.id,
-          username: admin.username,
-          email: admin.email,
-          role: admin.role
+          const token = jwt.sign({ adminId: admin.id }, JWT_SECRET, { expiresIn: "24h" });
+          
+          return res.json({
+            token,
+            admin: {
+              id: admin.id,
+              username: admin.username,
+              email: admin.email,
+              role: admin.role,
+              userType: 'admin'
+            }
+          });
         }
-      });
+      }
+
+      // If not found as regular admin, try company admin
+      const companyAdmin = await storage.getCompanyAdminByUsername(username);
+      if (companyAdmin && companyAdmin.isActive) {
+        const isValid = await bcrypt.compare(password, companyAdmin.passwordHash);
+        if (isValid) {
+          // Update last login
+          await storage.updateCompanyAdminLastLogin(companyAdmin.id);
+
+          const token = jwt.sign({ companyAdminId: companyAdmin.id }, JWT_SECRET, { expiresIn: "24h" });
+          
+          return res.json({
+            token,
+            admin: {
+              id: companyAdmin.id,
+              username: companyAdmin.username,
+              email: companyAdmin.email,
+              role: 'company_admin',
+              userType: 'company_admin',
+              companyId: companyAdmin.companyId
+            }
+          });
+        }
+      }
+
+      // If neither found or password invalid
+      return res.status(401).json({ message: "Invalid credentials" });
     } catch (error) {
       console.error("Admin login error:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -203,13 +271,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/companies", authenticateAdmin, async (req: Request, res: Response) => {
+  app.post("/api/admin/companies", authenticateSuperAdmin, async (req: Request, res: Response) => {
     try {
       const data = insertCompanySchema.parse(req.body);
       const company = await storage.createCompany(data);
       res.json(company);
     } catch (error) {
       console.error("Create company error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Company Admin management routes (only for super admin)
+  app.get("/api/admin/company-admins", authenticateSuperAdmin, async (req: Request, res: Response) => {
+    try {
+      const companyAdmins = await storage.getAllCompanyAdmins();
+      res.json(companyAdmins);
+    } catch (error) {
+      console.error("Get company admins error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/admin/company-admins/:companyId", authenticateSuperAdmin, async (req: Request, res: Response) => {
+    try {
+      const companyId = parseInt(req.params.companyId);
+      if (isNaN(companyId)) {
+        return res.status(400).json({ message: "Invalid company ID" });
+      }
+      
+      const companyAdmins = await storage.getCompanyAdminsByCompany(companyId);
+      res.json(companyAdmins);
+    } catch (error) {
+      console.error("Get company admins by company error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/company-admins", authenticateSuperAdmin, async (req: Request, res: Response) => {
+    try {
+      const data = insertCompanyAdminSchema.parse(req.body);
+      
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(data.passwordHash, 10);
+      const companyAdminData = {
+        ...data,
+        passwordHash: hashedPassword,
+        createdBy: (req as any).admin.id
+      };
+      
+      const companyAdmin = await storage.createCompanyAdmin(companyAdminData);
+      
+      // Return without password hash
+      const { passwordHash, ...companyAdminResponse } = companyAdmin;
+      res.json(companyAdminResponse);
+    } catch (error) {
+      console.error("Create company admin error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/company-admins/:id", authenticateSuperAdmin, async (req: Request, res: Response) => {
+    try {
+      const companyAdminId = parseInt(req.params.id);
+      if (isNaN(companyAdminId)) {
+        return res.status(400).json({ message: "Invalid company admin ID" });
+      }
+
+      await storage.deleteCompanyAdmin(companyAdminId);
+      res.json({ success: true, message: "Company admin deleted successfully" });
+    } catch (error) {
+      console.error("Delete company admin error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/admin/company-admins/:id", authenticateSuperAdmin, async (req: Request, res: Response) => {
+    try {
+      const companyAdminId = parseInt(req.params.id);
+      if (isNaN(companyAdminId)) {
+        return res.status(400).json({ message: "Invalid company admin ID" });
+      }
+
+      const data = insertCompanyAdminSchema.parse(req.body);
+      
+      // Hash the password if provided
+      const updateData = data.passwordHash 
+        ? { ...data, passwordHash: await bcrypt.hash(data.passwordHash, 10) }
+        : data;
+      
+      const updatedCompanyAdmin = await storage.updateCompanyAdmin(companyAdminId, updateData);
+      
+      // Return without password hash
+      const { passwordHash, ...companyAdminResponse } = updatedCompanyAdmin;
+      res.json(companyAdminResponse);
+    } catch (error) {
+      console.error("Update company admin error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -221,6 +378,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(course);
     } catch (error) {
       console.error("Create course error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/admin/courses/:id", authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertCourseSchema.partial().parse(req.body);
+      const course = await storage.updateCourse(id, data);
+      res.json(course);
+    } catch (error) {
+      console.error("Update course error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/courses/:id", authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      const courseId = parseInt(req.params.id);
+      if (isNaN(courseId)) {
+        return res.status(400).json({ message: "Invalid course ID" });
+      }
+
+      // Check if course exists
+      const course = await storage.getCourse(courseId);
+      if (!course) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+
+      // Delete course (cascading deletes will handle related data)
+      await storage.deleteCourse(courseId);
+      
+      res.json({ success: true, message: "Course deleted successfully" });
+    } catch (error) {
+      console.error("Delete course error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -267,10 +459,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/admin/analytics", authenticateAdmin, async (req: Request, res: Response) => {
     try {
-      const analytics = await storage.getAnalytics();
-      res.json(analytics);
+      const userType = (req as any).userType;
+      const admin = (req as any).admin;
+      
+      // If it's a company admin, get company-specific analytics
+      if (userType === 'company_admin') {
+        const analytics = await storage.getAnalyticsByCompany(admin.companyId);
+        res.json(analytics);
+      } else {
+        // Regular admin gets full analytics
+        const analytics = await storage.getAnalytics();
+        res.json(analytics);
+      }
     } catch (error) {
       console.error("Get analytics error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Company detailed access codes endpoint (company admin only)
+  app.get("/api/admin/company-access-codes-detailed", authenticateAdmin, async (req: Request, res: Response) => {
+    try {
+      const userType = (req as any).userType;
+      const admin = (req as any).admin;
+      
+      // Only company admins can access this endpoint
+      if (userType !== 'company_admin') {
+        return res.status(403).json({ message: "Company admin access required" });
+      }
+      
+      const detailedCodes = await storage.getCompanyAccessCodesDetailed(admin.companyId);
+      res.json(detailedCodes);
+    } catch (error) {
+      console.error("Get company access codes detailed error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -465,17 +686,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const session = req.session;
       const accessCode = await storage.getAccessCode(session.accessCodeId);
+      const course = await storage.getCourse(accessCode!.courseId!);
       const questions = await storage.getTestQuestionsByCourse(accessCode!.courseId!);
       
-      // Randomize questions and options
-      const shuffledQuestions = questions
-        .sort(() => Math.random() - 0.5)
-        .map(q => ({
-          ...q,
-          options: Array.isArray(q.options) ? (q.options as any[]).sort(() => Math.random() - 0.5) : q.options
-        }));
+      // Randomize questions
+      let shuffledQuestions = questions.sort(() => Math.random() - 0.5);
       
-      res.json(shuffledQuestions);
+      // Limit number of questions if maxQuestionsInTest is set
+      if (course?.maxQuestionsInTest && course.maxQuestionsInTest > 0) {
+        shuffledQuestions = shuffledQuestions.slice(0, course.maxQuestionsInTest);
+      }
+      
+      // Randomize options for each question
+      const finalQuestions = shuffledQuestions.map(q => ({
+        ...q,
+        options: Array.isArray(q.options) ? (q.options as any[]).sort(() => Math.random() - 0.5) : q.options
+      }));
+      
+      res.json(finalQuestions);
     } catch (error) {
       console.error("Get test questions error:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -488,8 +716,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { answers, timeTakenSeconds } = req.body;
       
       const accessCode = await storage.getAccessCode(session.accessCodeId);
-      const questions = await storage.getTestQuestionsByCourse(accessCode!.courseId!);
+      const allQuestions = await storage.getTestQuestionsByCourse(accessCode!.courseId!);
       const course = await storage.getCourse(accessCode!.courseId!);
+      
+      // Only evaluate questions that were actually answered (present in the test)
+      const answeredQuestionIds = Object.keys(answers).map(id => parseInt(id));
+      const questionsInTest = allQuestions.filter(q => answeredQuestionIds.includes(q.id));
       
       // Calculate score and track answer details
       let score = 0;
@@ -502,7 +734,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         explanation: string | null;
       }> = [];
       
-      questions.forEach(question => {
+      questionsInTest.forEach(question => {
         const questionPoints = question.points || 1;
         maxScore += questionPoints;
         const userAnswer = answers[question.id];
@@ -581,6 +813,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         score,
         maxScore,
         percentage,
+        questionsCount: questionsInTest.length,
         attemptsRemaining: (course!.maxAttempts || 3) - attemptNumber
       });
     } catch (error) {

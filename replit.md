@@ -35,6 +35,81 @@ Update: January 6, 2025 - **MAJOR**: Implemented shared access code functionalit
   - Supports classroom scenarios where multiple people can have similar emails/names
 - **Backward Compatibility**: Existing access codes continue to work as before
 
+Update: January 7, 2025 - **COMPLETED**: Full course delete functionality with proper cascade handling:
+- **Problem Solved**: Course deletion was failing due to foreign key constraint violations
+- **Technical Implementation**: 
+  - Fixed deletion order: certificates → test attempts → student sessions → access codes → theory slides/questions → course
+  - Added proper inArray import and step-by-step deletion logic
+  - Implemented cache invalidation for both courses and access codes lists
+- **User Experience**: Hover-to-reveal delete button with comprehensive Czech confirmation dialog
+- **Data Safety**: Complete cascade deletion removes all related data without orphaned records
+- **UI Integration**: Automatic selection reset and immediate list refresh after deletion
+
+Update: January 7, 2025 - **COMPLETED**: Seamless theory-to-test transition with loading experience:
+- **Problem Solved**: White screen delay and jarring transition when navigating from theory completion to test
+- **Technical Solution**: 
+  - Replaced browser navigation (window.location.href) with React Router navigation (setLocation)
+  - Added enhanced loading overlay with professional animations and progress indicators
+  - Implemented proper transition state management and cleanup
+- **UX Improvements**: 
+  - Completely eliminated white screen flash during navigation
+  - Added smooth loading animations with spinner, progress bar, and bouncing dots
+  - Applied comprehensive Czech messaging and dark mode styling
+  - Reduced transition time to 1.5 seconds for optimal user experience
+- **Technical Impact**: Maintains application state during navigation, providing seamless single-page application experience
+
+Update: January 7, 2025 - **COMPLETED**: Unified loading spinner system across entire application:
+- **Problem Solved**: Inconsistent loading indicators (different spinners, balls, progress bars, skeletons) throughout app
+- **Technical Implementation**:
+  - Created centralized Spinner and LoadingScreen components with consistent emerald theme
+  - Standardized all loading states to use bigger, professional spinners
+  - Removed complex animations (bouncing dots, progress bars) in favor of clean spinner design
+  - Added size variants (sm, md, lg, xl) for different contexts
+- **Components Updated**: Theory viewer, test interface, certificate viewer, analytics, student dashboard
+- **User Experience**: Clean, consistent loading experience with proper Czech messaging and dark mode support
+
+Update: January 8, 2025 - **CRITICAL BUG FIX**: Resolved major analytics data integrity issue:
+- **Problem Solved**: Students who never took tests were incorrectly showing "20%" test scores in analytics
+- **Root Cause**: Drizzle ORM SQL subqueries were returning corrupted data, mixing results from different sessions
+- **Technical Solution**: 
+  - Completely rewrote backend analytics query in `getCompanyAccessCodesDetailed` method
+  - Replaced buggy SQL subqueries with separate sequential queries for each student session
+  - Fixed data mapping to ensure NULL test scores display correctly as NULL, not false percentages
+- **Data Integrity**: Analytics now accurately displays actual test performance vs. no-test status
+- **Impact**: Company admin analytics now show reliable, trustworthy data for training compliance tracking
+
+Update: January 8, 2025 - **COMPLETED**: Accordion interface for company administration analytics:
+- **Problem Solved**: Company analytics detailed section was overwhelming with all access codes expanded
+- **Implementation**: 
+  - Added nested accordion structure for course types and individual access codes
+  - All sections default to closed state for better organization and overview
+  - Two-level accordion: Course level → Access code level → Student details
+  - Maintains all functionality while improving UX with collapsible sections
+- **User Experience**: Clean, organized interface where admins can focus on specific courses/codes
+- **Technical**: Used shadcn/ui Accordion components with proper Czech styling and emerald theme
+
+Update: January 8, 2025 - **COMPLETED**: Logout loading overlay system across entire application:
+- **Problem Solved**: White screen flash during logout process for both admin and student users
+- **Technical Implementation**:
+  - Created LoadingOverlay component with fullscreen backdrop and professional spinner
+  - Modified logout function to accept React Router navigation callback
+  - Added loading state management with 1.5 second delay for smooth transition
+  - Replaced window.location.href with React Router navigation to eliminate white screen
+- **Coverage**: Implemented across all logout points (admin dashboard, student dashboard, admin codes, admin courses)
+- **User Experience**: Seamless logout with professional "Odhlašování..." message and loading animation
+- **Consistency**: Unified with existing loading system using emerald theme and Czech localization
+
+Update: January 8, 2025 - **COMPLETED**: Image upload and lightbox viewer system for theory slides:
+- **Problem Solved**: Large image uploads failing due to Express body size limits, and oversized images affecting readability
+- **Technical Implementation**:
+  - Increased Express body parser limits to 50MB for image uploads
+  - Added responsive CSS styling for automatic image resizing (max-height: 400px, responsive width)
+  - Implemented full-screen lightbox modal for detailed image viewing
+  - Added hover effects and click indicators for enhanced user experience
+- **Features**: Click any image to view full-size with dark overlay, close button, and "click to close" functionality
+- **User Experience**: Professional image handling with automatic sizing and easy full-screen viewing for detailed content like receipts/documents
+- **Cross-Platform**: Works on all screen sizes with proper responsive scaling
+
 # System Architecture
 
 ## Frontend Architecture

@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import LoginModal from "@/components/login-modal";
 import { 
   Car, 
@@ -20,13 +21,15 @@ import {
   Globe,
   Award,
   ArrowRight,
-  Sparkles,
-  Zap
+  BookOpen,
+  Zap,
+  UserCog
 } from "lucide-react";
 import { t } from "@/lib/translations";
 
 export default function Landing() {
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [studentLoginModalOpen, setStudentLoginModalOpen] = useState(false);
+  const [adminLoginModalOpen, setAdminLoginModalOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -84,7 +87,7 @@ export default function Landing() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-teal-900 to-emerald-900 overflow-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-900 via-teal-900 to-emerald-900 dark:from-gray-900 dark:via-gray-800 dark:to-emerald-900 overflow-hidden relative">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div 
@@ -114,7 +117,7 @@ export default function Landing() {
       </div>
 
       {/* Navigation */}
-      <nav className="bg-white/10 backdrop-blur-md border-b border-white/10 fixed w-full top-0 z-50">
+      <nav className="bg-gray-800/70 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-600/20 dark:border-gray-700/50 fixed w-full top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -127,18 +130,19 @@ export default function Landing() {
               <div className="hidden md:block ml-8">
                 <div className="flex items-baseline space-x-4">
                   <a href="#hero" className="text-white hover:text-emerald-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">Domů</a>
-                  <a href="#about" className="text-white/70 hover:text-emerald-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">O nás</a>
-                  <a href="#services" className="text-white/70 hover:text-emerald-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">Služby</a>
-                  <a href="#contact" className="text-white/70 hover:text-emerald-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">Kontakt</a>
+                  <a href="#about" className="text-white/80 hover:text-emerald-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">O nás</a>
+                  <a href="#services" className="text-white/80 hover:text-emerald-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">Služby</a>
+                  <a href="#contact" className="text-white/80 hover:text-emerald-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">Kontakt</a>
                 </div>
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              <ThemeToggle />
               <Button 
-                onClick={() => setLoginModalOpen(true)}
+                onClick={() => setStudentLoginModalOpen(true)}
                 className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 border-0 shadow-lg hover:shadow-xl transition-all duration-300 group"
               >
-                <Sparkles className="mr-2 h-4 w-4 group-hover:animate-spin" />
+                <BookOpen className="mr-2 h-4 w-4" />
                 Přístup ke kurzům
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -168,15 +172,20 @@ export default function Landing() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button 
-                onClick={() => setLoginModalOpen(true)}
+                onClick={() => setStudentLoginModalOpen(true)}
                 className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-emerald-600 hover:to-teal-700 shadow-2xl hover:shadow-emerald-500/25 transition-all duration-300 group border-0"
               >
-                <Sparkles className="mr-2 h-5 w-5 group-hover:animate-spin" />
+                <BookOpen className="mr-2 h-5 w-5" />
                 Začít učení
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button 
                 variant="outline"
+                onClick={() => {
+                  document.getElementById('contact')?.scrollIntoView({ 
+                    behavior: 'smooth' 
+                  });
+                }}
                 className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold backdrop-blur-md border-white/20 hover:bg-white/20 transition-all duration-300"
               >
                 Zjistit více
@@ -187,22 +196,22 @@ export default function Landing() {
       </section>
 
       {/* Services Section */}
-      <section id="services" className="py-24 bg-white relative z-10">
+      <section id="services" className="py-24 bg-white dark:bg-gray-900 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Naše výukové kurzy</h2>
-            <p className="text-xl text-gray-600">Komplexní bezpečnostní školící programy přizpůsobené potřebám vašeho odvětví</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Naše výukové kurzy</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400">Komplexní bezpečnostní školící programy přizpůsobené potřebám vašeho odvětví</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {courses.map((course, index) => (
-              <Card key={index} className="border border-gray-200 hover:shadow-lg transition-shadow duration-300 bg-white">
+              <Card key={index} className="border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-800">
                 <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
-                    <course.icon className="text-emerald-600 h-6 w-6" />
+                  <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center mb-4">
+                    <course.icon className="text-emerald-600 dark:text-emerald-400 h-6 w-6" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{course.title}</h3>
-                  <p className="text-gray-600 mb-4 leading-relaxed">{course.description}</p>
-                  <span className="inline-block bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{course.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">{course.description}</p>
+                  <span className="inline-block bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full text-sm font-medium">
                     {course.code}
                   </span>
                 </CardContent>
@@ -213,15 +222,15 @@ export default function Landing() {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-24 bg-gray-50 relative z-10">
+      <section className="py-24 bg-gray-50 dark:bg-gray-800 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-5xl font-bold text-emerald-600 mb-2">
+                <div className="text-5xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">
                   {stat.value}
                 </div>
-                <div className="text-gray-600 font-medium">{stat.label}</div>
+                <div className="text-gray-600 dark:text-gray-400 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -229,7 +238,7 @@ export default function Landing() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-24 bg-white relative z-10">
+      <section id="about" className="py-24 bg-white dark:bg-gray-900 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -240,25 +249,25 @@ export default function Landing() {
               />
             </div>
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">O společnosti DAAL</h2>
-              <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">O společnosti DAAL</h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
                 S více než 15letými zkušenostmi v oblasti školení bezpečnosti práce se DAAL stal důvěryhodným partnerem pro společnosti po celé Evropě. Specializujeme se na komplexní bezpečnostní vzdělávání, které kombinuje teoretické znalosti s praktickou aplikací.
               </p>
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
                 Naši certifikovaní instruktoři a moderní e-learningová platforma zajišťují, že vaši zaměstnanci získají vysoce kvalitní školení při zachování flexibility a pohodlí.
               </p>
               <div className="flex flex-wrap gap-4">
-                <div className="flex items-center bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-200">
-                  <Award className="text-emerald-600 mr-2 h-5 w-5" />
-                  <span className="text-gray-700 font-medium">ISO 9001 Certified</span>
+                <div className="flex items-center bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-lg border border-emerald-200 dark:border-emerald-700">
+                  <Award className="text-emerald-600 dark:text-emerald-400 mr-2 h-5 w-5" />
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">ISO 9001 Certified</span>
                 </div>
-                <div className="flex items-center bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-200">
-                  <Shield className="text-emerald-600 mr-2 h-5 w-5" />
-                  <span className="text-gray-700 font-medium">EU Compliant</span>
+                <div className="flex items-center bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-lg border border-emerald-200 dark:border-emerald-700">
+                  <Shield className="text-emerald-600 dark:text-emerald-400 mr-2 h-5 w-5" />
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">EU Compliant</span>
                 </div>
-                <div className="flex items-center bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-200">
-                  <Globe className="text-emerald-600 mr-2 h-5 w-5" />
-                  <span className="text-gray-700 font-medium">Multi-language</span>
+                <div className="flex items-center bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-lg border border-emerald-200 dark:border-emerald-700">
+                  <Globe className="text-emerald-600 dark:text-emerald-400 mr-2 h-5 w-5" />
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Multi-language</span>
                 </div>
               </div>
             </div>
@@ -267,51 +276,54 @@ export default function Landing() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-24 bg-gray-50 relative z-10">
+      <section id="contact" className="py-12 sm:py-16 lg:py-24 bg-white dark:bg-gray-900 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Kontaktujte nás</h2>
-            <p className="text-xl text-gray-600">Jste připraveni začít s bezpečnostním školením na pracovišti?</p>
+          <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Kontaktujte nás</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400">Jste připraveni začít s bezpečnostním školením na pracovišti?</p>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
-            <Card className="shadow-lg bg-white border border-gray-200">
-              <CardContent className="p-8">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-8 flex items-center">
-                  <Mail className="mr-3 h-6 w-6 text-emerald-600" />
+            <Card className="shadow-xl bg-white dark:bg-gray-800 border-0 overflow-hidden">
+              <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6">
+                <h3 className="text-2xl font-bold text-white flex items-center">
+                  <Mail className="mr-3 h-6 w-6" />
                   Napište nám
                 </h3>
-                <form className="space-y-6">
+                <p className="text-emerald-100 mt-2">Rádi vám pomůžeme s vašimi požadavky</p>
+              </div>
+              <CardContent className="p-4 sm:p-6 lg:p-8">
+                <form className="space-y-4 sm:space-y-6">
                   <div>
-                    <Label htmlFor="company" className="text-gray-700 font-medium">Název společnosti</Label>
+                    <Label htmlFor="company" className="text-gray-700 dark:text-gray-300 font-semibold">Název společnosti</Label>
                     <Input 
                       id="company"
                       type="text" 
                       placeholder="Vaše společnost"
-                      className="mt-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      className="mt-2 h-12 border-2 border-gray-300 dark:border-gray-600 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-0 rounded-lg font-medium"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email" className="text-gray-700 font-medium">E-mailová adresa</Label>
+                    <Label htmlFor="email" className="text-gray-700 dark:text-gray-300 font-semibold">E-mailová adresa</Label>
                     <Input 
                       id="email"
                       type="email" 
                       placeholder="kontakt@vase-spolecnost.cz"
-                      className="mt-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      className="mt-2 h-12 border-2 border-gray-300 dark:border-gray-600 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-0 rounded-lg font-medium"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="message" className="text-gray-700 font-medium">Zpráva</Label>
+                    <Label htmlFor="message" className="text-gray-700 dark:text-gray-300 font-semibold">Zpráva</Label>
                     <Textarea 
                       id="message"
                       rows={5} 
                       placeholder="Napište nám o vašich školicích potřebách..."
-                      className="mt-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
+                      className="mt-2 border-2 border-gray-300 dark:border-gray-600 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-0 rounded-lg font-medium resize-none"
                     />
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 font-semibold transition-colors duration-300"
+                    className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 border-0"
                   >
                     <Mail className="mr-2 h-5 w-5" />
                     Odeslat zprávu
@@ -321,39 +333,61 @@ export default function Landing() {
             </Card>
 
             {/* Contact Information */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg p-6 shadow border border-gray-200">
-                <div className="flex items-start">
-                  <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mr-4">
-                    <MapPin className="text-emerald-600 h-6 w-6" />
-                  </div>
+            <div className="space-y-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow">
+                <div className="flex items-center">
+                  <MapPin className="text-emerald-600 dark:text-emerald-400 h-6 w-6 mr-4 flex-shrink-0" />
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Adresa</h4>
-                    <p className="text-gray-600">Praha, Česká republika<br />Dostupné v celé EU</p>
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Adresa</h4>
+                    <p className="text-gray-600 dark:text-gray-400">Praha, Česká republika</p>
+                    <p className="text-gray-500 dark:text-gray-500 text-sm">Dostupné v celé EU</p>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white rounded-lg p-6 shadow border border-gray-200">
-                <div className="flex items-start">
-                  <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mr-4">
-                    <Mail className="text-emerald-600 h-6 w-6" />
-                  </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow">
+                <div className="flex items-center">
+                  <Mail className="text-emerald-600 dark:text-emerald-400 h-6 w-6 mr-4 flex-shrink-0" />
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">E-mail</h4>
-                    <p className="text-gray-600">info@daal.cz</p>
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">E-mail</h4>
+                    <a 
+                      href="mailto:info@daal.cz" 
+                      className="text-gray-600 dark:text-gray-400 font-medium hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                    >
+                      info@daal.cz
+                    </a>
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white rounded-lg p-6 shadow border border-gray-200">
-                <div className="flex items-start">
-                  <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mr-4">
-                    <Phone className="text-emerald-600 h-6 w-6" />
-                  </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow">
+                <div className="flex items-center">
+                  <Phone className="text-emerald-600 dark:text-emerald-400 h-6 w-6 mr-4 flex-shrink-0" />
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Telefon</h4>
-                    <p className="text-gray-600">+420 XXX XXX XXX</p>
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Telefon</h4>
+                    <a 
+                      href="tel:+420XXXXXXXXX" 
+                      className="text-gray-600 dark:text-gray-400 font-medium hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                    >
+                      +420 XXX XXX XXX
+                    </a>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-6 border border-emerald-200 dark:border-emerald-700">
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm">
+                    <Check className="mr-2 h-4 w-4 text-emerald-600" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Rychlá odpověď</span>
+                  </div>
+                  <div className="flex items-center bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm">
+                    <Check className="mr-2 h-4 w-4 text-emerald-600" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Expert podpora</span>
+                  </div>
+                  <div className="flex items-center bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm">
+                    <Check className="mr-2 h-4 w-4 text-emerald-600" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Řešení na míru</span>
                   </div>
                 </div>
               </div>
@@ -363,7 +397,7 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 relative z-10">
+      <footer className="bg-gray-900 dark:bg-gray-950 text-white py-12 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
@@ -373,11 +407,11 @@ export default function Landing() {
                 </div>
                 <h3 className="text-lg font-bold">DAAL Training</h3>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">Profesionální školení bezpečnosti práce a certifikace pro evropské společnosti.</p>
+              <p className="text-gray-400 dark:text-gray-500 text-sm leading-relaxed">Profesionální školení bezpečnosti práce a certifikace pro evropské společnosti.</p>
             </div>
             <div>
               <h4 className="text-md font-semibold mb-4 text-white">Služby</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
+              <ul className="space-y-2 text-sm text-gray-400 dark:text-gray-500">
                 <li className="hover:text-white transition-colors cursor-pointer">BOZP školení</li>
                 <li className="hover:text-white transition-colors cursor-pointer">Školení řidičů</li>
                 <li className="hover:text-white transition-colors cursor-pointer">Kurzy první pomoci</li>
@@ -386,7 +420,7 @@ export default function Landing() {
             </div>
             <div>
               <h4 className="text-md font-semibold mb-4 text-white">Společnost</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
+              <ul className="space-y-2 text-sm text-gray-400 dark:text-gray-500">
                 <li className="hover:text-white transition-colors cursor-pointer">O nás</li>
                 <li className="hover:text-white transition-colors cursor-pointer">Certifikace</li>
                 <li className="hover:text-white transition-colors cursor-pointer">Ochrana soukromí</li>
@@ -395,10 +429,12 @@ export default function Landing() {
             </div>
             <div>
               <h4 className="text-md font-semibold mb-4 text-white">Kontakt</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
+              <ul className="space-y-2 text-sm text-gray-400 dark:text-gray-500">
                 <li className="flex items-center hover:text-white transition-colors">
                   <Mail className="mr-2 h-4 w-4" />
-                  info@daal.cz
+                  <a href="mailto:info@daal.cz" className="hover:text-emerald-300 transition-colors">
+                    info@daal.cz
+                  </a>
                 </li>
                 <li className="flex items-center hover:text-white transition-colors">
                   <MapPin className="mr-2 h-4 w-4" />
@@ -411,14 +447,37 @@ export default function Landing() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            <p>&copy; 2024 DAAL Training Platform. Všechna práva vyhrazena.</p>
+          <div className="border-t border-gray-800 dark:border-gray-700 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-400 dark:text-gray-500">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+              <p>&copy; 2024 DAAL Training Platform. Všechna práva vyhrazena.</p>
+              <p className="text-xs text-gray-500 dark:text-gray-600">Created by DM - 2025</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setAdminLoginModalOpen(true)}
+              className="text-gray-500 hover:text-emerald-300 hover:bg-emerald-900/20 text-xs mt-2 sm:mt-0 transition-all duration-200 flex items-center gap-1"
+            >
+              <UserCog className="h-3 w-3" />
+              Administrace
+            </Button>
           </div>
         </div>
       </footer>
 
-      {/* Login Modal */}
-      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
+      {/* Student Login Modal */}
+      <LoginModal 
+        open={studentLoginModalOpen} 
+        onOpenChange={setStudentLoginModalOpen}
+        type="student"
+      />
+      
+      {/* Admin Login Modal */}
+      <LoginModal 
+        open={adminLoginModalOpen} 
+        onOpenChange={setAdminLoginModalOpen}
+        type="admin"
+      />
     </div>
   );
 }

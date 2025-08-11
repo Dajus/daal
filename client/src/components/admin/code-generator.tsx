@@ -12,21 +12,24 @@ import { useToast } from "@/hooks/use-toast";
 import { getAuthHeaders } from "@/lib/auth";
 import { t } from "@/lib/translations";
 import { apiRequest } from "@/lib/queryClient";
-import { Download, Copy, Calendar, Plus } from "lucide-react";
+import { Download, Copy, Calendar, Plus, Clipboard } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import type { Course, Company, AccessCode } from "@/types";
+
+type GeneratedAccessCode = AccessCode & { generatedAt?: string };
 
 export default function CodeGenerator() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [newCompanyDialogOpen, setNewCompanyDialogOpen] = useState(false);
+  const [justGeneratedCodes, setJustGeneratedCodes] = useState<GeneratedAccessCode[]>([]);
 
   const [formData, setFormData] = useState({
     courseId: '',
     companyId: '',
     unlimitedParticipants: false,
-    maxParticipants: 25,
+    maxParticipants: 5,
     theoryToTest: true,
     validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 30 days from now
   });
@@ -96,18 +99,28 @@ export default function CodeGenerator() {
       });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (generatedCodes: AccessCode[]) => {
       toast({
         title: "Úspěch",
-        description: "Přístupový kód byl vygenerován"
+        description: `${generatedCodes.length} přístupový${generatedCodes.length > 1 ? 'ch kódů bylo' : ' kód byl'} vygenerován${generatedCodes.length > 1 ? 'o' : ''}`
       });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/access-codes'] });
+      
+      // Add generated codes to the "just generated" section
+      setJustGeneratedCodes(prev => [
+        ...generatedCodes.map((code: AccessCode) => ({
+          ...code,
+          generatedAt: new Date().toISOString() // Mark when this batch was generated
+        } as GeneratedAccessCode)),
+        ...prev
+      ]);
+      
       // Reset form
       setFormData({
         courseId: '',
         companyId: '',
         unlimitedParticipants: false,
-        maxParticipants: 25,
+        maxParticipants: 5,
         theoryToTest: true,
         validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
       });
@@ -151,6 +164,25 @@ export default function CodeGenerator() {
     });
   };
 
+  const copyAllGeneratedCodes = () => {
+    const allCodes = justGeneratedCodes.map(code => code.code);
+    if (allCodes.length === 0) {
+      toast({
+        title: "Žádné kódy",
+        description: "Nejsou k dispozici žádné kódy ke zkopírování",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const formattedCodes = `Kódy: ${allCodes.join(', ')}`;
+    navigator.clipboard.writeText(formattedCodes);
+    toast({
+      title: "Zkopírováno",
+      description: `${allCodes.length} kód${allCodes.length > 1 ? 'ů' : ''} bylo zkopírováno do schránky`
+    });
+  };
+
   const exportToCSV = () => {
     const csvContent = [
       ['Code', 'Course', 'Company', 'Usage', 'Valid Until'].join(','),
@@ -172,24 +204,41 @@ export default function CodeGenerator() {
     window.URL.revokeObjectURL(url);
   };
 
-  // Get recent codes (last 5, newest first)
-  const recentCodes = [...accessCodes].sort((a, b) => 
-    new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-  ).slice(0, 5);
+  // Group just generated codes by generation batch
+  const groupedGeneratedCodes = justGeneratedCodes.reduce((groups: any[], code) => {
+    const codeTime = new Date(code.generatedAt || code.createdAt || 0).getTime();
+    
+    // Find existing group within 1 minute
+    const existingGroup = groups.find(group => {
+      const groupTime = new Date(group.timestamp).getTime();
+      return Math.abs(codeTime - groupTime) < 60000; // 1 minute threshold
+    });
+    
+    if (existingGroup) {
+      existingGroup.codes.push(code);
+    } else {
+      groups.push({
+        timestamp: code.generatedAt || code.createdAt,
+        codes: [code]
+      });
+    }
+    
+    return groups;
+  }, []);
   
   return (
     <div className="space-y-8">
       {/* Top Row: Form and Recent Codes */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Code Generation Form */}
-        <Card className="bg-white border border-gray-200 shadow-sm">
-          <CardHeader className="bg-emerald-50 border-b border-emerald-100">
-            <CardTitle className="text-emerald-800 flex items-center gap-2">
+        <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+          <CardHeader className="bg-emerald-50 dark:bg-emerald-900/20 border-b border-emerald-100 dark:border-emerald-800">
+            <CardTitle className="text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
               <Plus className="h-5 w-5" />
               {t('generateAccessCode')}
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="course">{t('course')}</Label>
@@ -305,54 +354,102 @@ export default function CodeGenerator() {
         </CardContent>
       </Card>
 
-        {/* Recently Generated Codes */}
-        <Card className="bg-emerald-50 border border-emerald-200 shadow-sm">
-          <CardHeader className="bg-emerald-100 border-b border-emerald-200">
-            <CardTitle className="text-emerald-800 flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Nejnovější kódy ({recentCodes.length})
-            </CardTitle>
+        {/* Just Generated Codes */}
+        <Card className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800 shadow-sm">
+          <CardHeader className="bg-emerald-100 dark:bg-emerald-900/20 border-b border-emerald-200 dark:border-emerald-800">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Právě vygenerované kódy ({justGeneratedCodes.length})
+              </CardTitle>
+              {justGeneratedCodes.length > 0 && (
+                <Button
+                  onClick={copyAllGeneratedCodes}
+                  variant="outline"
+                  size="sm"
+                  className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-600 dark:text-emerald-300 dark:hover:bg-emerald-900/20"
+                >
+                  <Clipboard className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </CardHeader>
-          <CardContent className="p-4">
-            {recentCodes.length > 0 ? (
-              <div className="space-y-3">
-                {recentCodes.map(code => {
-                  const course = courses.find(c => c.id === code.courseId);
-                  const company = companies.find(c => c.id === code.companyId);
+          <CardContent className="p-3 sm:p-4">
+            {groupedGeneratedCodes.length > 0 ? (
+              <div className="space-y-4">
+                {groupedGeneratedCodes.map((group, groupIndex) => {
+                  const groupTime = new Date(group.timestamp);
+                  const isToday = groupTime.toDateString() === new Date().toDateString();
+                  const timeDisplay = isToday 
+                    ? `Dnes ${groupTime.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })}`
+                    : groupTime.toLocaleString('cs-CZ', { 
+                        day: '2-digit', 
+                        month: '2-digit', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      });
+
                   return (
-                    <div key={code.id} className="bg-white p-3 rounded-lg border border-emerald-200 shadow-sm">
-                      <div className="flex justify-between items-start mb-2">
-                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 font-mono text-sm">
-                          {code.code}
-                        </Badge>
-                        <Button
-                          onClick={() => copyToClipboard(code.code)}
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0 text-emerald-600 hover:text-emerald-800"
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <div className="space-y-1 text-xs">
-                        <p><span className="font-medium">Kurz:</span> {course?.name || 'N/A'}</p>
-                        <p><span className="font-medium">Společnost:</span> {company?.name || 'N/A'}</p>
-                        <div className="flex items-center justify-between">
-                          <Badge variant={code.theoryToTest ? "default" : "secondary"} className="text-xs">
-                            {code.theoryToTest ? "Teorie + Test" : "Pouze teorie"}
-                          </Badge>
-                          <span className="text-xs text-gray-500">
-                            {code.usageCount}/{code.unlimitedParticipants ? '∞' : code.maxParticipants}
-                          </span>
+                    <div key={groupIndex} className="space-y-3">
+                      {/* Group separator with timestamp */}
+                      {groupIndex > 0 && (
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-emerald-300 dark:border-emerald-600"></div>
+                          </div>
                         </div>
+                      )}
+                      
+                      {/* Timestamp header for group */}
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-1 rounded-md">
+                          {timeDisplay} • {group.codes.length} kód{group.codes.length > 1 ? 'y' : ''}
+                        </div>
+                      </div>
+
+                      {/* Codes in this group */}
+                      <div className="space-y-2">
+                        {group.codes.map((code: any) => {
+                          const course = courses.find(c => c.id === code.courseId);
+                          const company = companies.find(c => c.id === code.companyId);
+                          return (
+                            <div key={code.id} className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-emerald-200 dark:border-emerald-700 shadow-sm">
+                              <div className="flex justify-between items-start mb-2">
+                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 font-mono text-sm">
+                                  {code.code}
+                                </Badge>
+                                <Button
+                                  onClick={() => copyToClipboard(code.code)}
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0 text-emerald-600 hover:text-emerald-800"
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </div>
+                              <div className="space-y-1 text-xs">
+                                <p className="text-gray-700 dark:text-gray-300"><span className="font-medium">Kurz:</span> {course?.name || 'N/A'}</p>
+                                <p className="text-gray-700 dark:text-gray-300"><span className="font-medium">Společnost:</span> {company?.name || 'N/A'}</p>
+                                <div className="flex items-center justify-between">
+                                  <Badge variant={code.theoryToTest ? "default" : "secondary"} className="text-xs">
+                                    {code.theoryToTest ? "Teorie + Test" : "Pouze teorie"}
+                                  </Badge>
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    {code.usageCount}/{code.unlimitedParticipants ? '∞' : code.maxParticipants}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <div className="text-center text-gray-500 py-8 text-sm">
-                Zatím nebyly vygenerovány žádné kódy
+              <div className="text-center text-gray-500 dark:text-gray-400 py-8 text-sm">
+                Zde se zobrazí nově vygenerované kódy
               </div>
             )}
           </CardContent>
@@ -362,16 +459,16 @@ export default function CodeGenerator() {
 
 
       {/* Recent Generated Codes Table */}
-      <Card className="bg-white border border-gray-200 shadow-sm">
-        <CardHeader className="bg-gray-50 border-b border-gray-200">
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-gray-800">Nedávné přístupové kódy (posledních 15)</CardTitle>
+      <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <CardHeader className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <CardTitle className="text-gray-800 dark:text-gray-200">Nedávné přístupové kódy (posledních 15)</CardTitle>
             <div className="flex gap-2">
               <Button 
                 onClick={exportToCSV}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                className="flex items-center gap-2 border-emerald-200 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
               >
                 <Download className="h-4 w-4" />
                 {t('exportCsv')} (všechny)

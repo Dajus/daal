@@ -46,12 +46,12 @@ export default function SlideFormDialog({ slide, onSave, isLoading }: SlideFormD
   };
 
   return (
-    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="slide-form-description">
+    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700" aria-describedby="slide-form-description">
       <DialogHeader>
-        <DialogTitle>
+        <DialogTitle className="text-gray-900 dark:text-white">
           {slide ? t('editSlide') : t('addSlide')}
         </DialogTitle>
-        <div id="slide-form-description" className="text-sm text-gray-600">
+        <div id="slide-form-description" className="text-sm text-gray-600 dark:text-gray-400">
           {t('richTextEditorDescription')}
         </div>
       </DialogHeader>

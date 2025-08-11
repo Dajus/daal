@@ -1,15 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { logout, isAuthenticated, getAuthHeaders } from "@/lib/auth";
 import { LogOut, GraduationCap } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import ProgressCard from "@/components/student/progress-card";
 import TheoryViewer from "@/components/student/theory-viewer";
 import TestInterface from "@/components/student/test-interface";
 import CertificateViewer from "@/components/student/certificate-viewer";
 import { t } from "@/lib/translations";
+import { LoadingScreen, LoadingOverlay } from "@/components/ui/spinner";
 
 interface StudentProgress {
   session: {
@@ -46,6 +48,7 @@ interface StudentProgress {
 
 export default function StudentDashboard() {
   const [location, setLocation] = useLocation();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -65,25 +68,25 @@ export default function StudentDashboard() {
   });
 
   const handleLogout = () => {
-    logout();
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      logout(() => setLocation('/'));
+    }, 1500);
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('loading')}</p>
-        </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <LoadingScreen title={t('loading')} description="Načítání vašeho pokroku" />
       </div>
     );
   }
 
   if (error || !progress) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{t('error')}</p>
+          <p className="text-red-600 dark:text-red-400 mb-4">{t('error')}</p>
           <Button onClick={() => setLocation('/')}>{t('back')}</Button>
         </div>
       </div>
@@ -91,9 +94,9 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b border-gray-200 fixed w-full top-0 z-50">
+      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 fixed w-full top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -101,24 +104,27 @@ export default function StudentDashboard() {
                 <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
                   <GraduationCap className="text-white h-6 w-6" />
                 </div>
-                <span className="ml-3 text-xl font-bold text-gray-900">DAAL</span>
+                <span className="ml-3 text-xl font-bold text-gray-900 dark:text-white">DAAL</span>
               </div>
               <Badge className="ml-4 bg-emerald-600 text-white">{t('student')}</Badge>
             </div>
-            <Button 
-              onClick={handleLogout}
-              variant="outline"
-              className="flex items-center gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-            >
-              <LogOut className="h-4 w-4" />
-              {t('logout')}
-            </Button>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Button 
+                onClick={handleLogout}
+                variant="outline"
+                className="flex items-center gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900"
+              >
+                <LogOut className="h-4 w-4" />
+                {t('logout')}
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Content */}
-      <div className="pt-16">
+      <div className="pt-24">
         <Switch>
           <Route path="/student/theory">
             <TheoryViewer progress={progress} />
@@ -133,10 +139,10 @@ export default function StudentDashboard() {
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {/* Header */}
               <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {t('welcomeBack')}, {progress.session.studentName}
                 </h1>
-                <p className="text-gray-600 mt-1">{progress.course.name}</p>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">{progress.course.name}</p>
               </div>
 
               {/* Progress Card */}
@@ -145,6 +151,14 @@ export default function StudentDashboard() {
           </Route>
         </Switch>
       </div>
+      
+      {/* Loading Overlay for Logout */}
+      {isLoggingOut && (
+        <LoadingOverlay 
+          title="Odhlašování..." 
+          description="Přesměrování na hlavní stránku"
+        />
+      )}
     </div>
   );
 }

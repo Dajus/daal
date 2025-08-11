@@ -19,7 +19,26 @@ export const isAuthenticated = (): boolean => {
   return !!getAuthToken();
 };
 
-export const logout = (): void => {
+export const logout = (navigateCallback?: () => void): void => {
   removeAuthToken();
-  window.location.href = '/';
+  if (navigateCallback) {
+    // Use React Router navigation when callback provided
+    navigateCallback();
+  } else {
+    // Fallback to window.location for contexts without router
+    window.location.href = '/';
+  }
+};
+
+export const getUserInfo = () => {
+  const token = getAuthToken();
+  if (!token) return null;
+  
+  try {
+    // Decode JWT payload (simple base64 decode)
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload;
+  } catch {
+    return null;
+  }
 };

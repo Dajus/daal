@@ -1,13 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { logout, isAuthenticated } from "@/lib/auth";
 import { LogOut, ArrowLeft, Book } from "lucide-react";
+import { LoadingOverlay } from "@/components/ui/spinner";
 import CourseEditor from "@/components/admin/course-editor";
 
 export default function AdminCoursesPage() {
   const [, setLocation] = useLocation();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -16,7 +18,10 @@ export default function AdminCoursesPage() {
   }, [setLocation]);
 
   const handleLogout = () => {
-    logout();
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      logout(() => setLocation('/'));
+    }, 1500);
   };
 
   return (
@@ -71,6 +76,14 @@ export default function AdminCoursesPage() {
           </div>
         </div>
       </div>
+      
+      {/* Loading Overlay for Logout */}
+      {isLoggingOut && (
+        <LoadingOverlay 
+          title="Odhlašování..." 
+          description="Přesměrování na hlavní stránku"
+        />
+      )}
     </div>
   );
 }

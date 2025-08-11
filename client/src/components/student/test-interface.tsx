@@ -11,6 +11,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Clock, ChevronLeft, ChevronRight, Flag, CheckCircle, AlertTriangle } from "lucide-react";
 import type { TestQuestion } from "@shared/schema";
 import { t } from "@/lib/translations";
+import { LoadingScreen } from "@/components/ui/spinner";
 
 interface TestResult {
   attempt: {
@@ -159,10 +160,10 @@ export default function TestInterface({ progress }: { progress?: any }) {
   // Show result screen
   if (testResult) {
     return (
-      <Card className="shadow-lg">
+      <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="p-8 text-center">
           <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
-            testResult.attempt.passed ? 'bg-green-100' : 'bg-red-100'
+            testResult.attempt.passed ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'
           }`}>
             {testResult.attempt.passed ? (
               <CheckCircle className="h-10 w-10 text-green-600" />
@@ -171,79 +172,87 @@ export default function TestInterface({ progress }: { progress?: any }) {
             )}
           </div>
           
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            {testResult.attempt.passed ? 'Test Passed!' : 'Test Not Passed'}
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            {testResult.attempt.passed ? 'Test úspěšně dokončen!' : 'Test nebyl úspěšný'}
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 max-w-4xl mx-auto">
-            <div className="text-center p-4 bg-emerald-50 rounded-lg">
-              <div className="text-3xl font-bold text-emerald-600 mb-2">{testResult.attempt.percentage}%</div>
-              <div className="text-sm text-gray-600">{t('score')}</div>
+            <div className="text-center p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+              <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">{testResult.attempt.percentage}%</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{t('score')}</div>
             </div>
-            <div className="text-center p-4 bg-teal-50 rounded-lg">
-              <div className="text-3xl font-bold text-teal-600 mb-2">
-                {testResult.attempt.score}/{testResult.attempt.maxScore}
+            <div className="text-center p-4 bg-teal-50 dark:bg-teal-900/20 rounded-lg">
+              <div className="text-3xl font-bold text-teal-600 dark:text-teal-400 mb-2">
+                {testResult.attempt.answers ? 
+                  testResult.attempt.answers.filter((answer: any) => answer.isCorrect).length : 
+                  Math.round((testResult.attempt.score / testResult.attempt.maxScore) * (testResult.questionsCount || questions.length))
+                }/{testResult.questionsCount || questions.length}
               </div>
-              <div className="text-sm text-gray-600">Points Earned</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Správné odpovědi</div>
             </div>
-            <div className="text-center p-4 bg-emerald-50 rounded-lg">
-              <div className="text-3xl font-bold text-emerald-600 mb-2">
+            <div className="text-center p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+              <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">
                 {formatTime(testResult.attempt.timeTakenSeconds)}
               </div>
-              <div className="text-sm text-gray-600">Time Taken</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Strávený čas</div>
             </div>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className={`text-3xl font-bold mb-2 ${testResult.attempt.passed ? 'text-green-600' : 'text-red-600'}`}>
-                {testResult.attempt.passed ? 'PASSED' : 'FAILED'}
+            <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div className={`text-3xl font-bold mb-2 ${testResult.attempt.passed ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {testResult.attempt.passed ? 'ÚSPĚCH' : 'NEÚSPĚCH'}
               </div>
-              <div className="text-sm text-gray-600">Status</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Stav</div>
             </div>
           </div>
           
           {/* Detailed Analytics */}
-          <div className="bg-gray-50 p-6 rounded-lg mb-8 max-w-3xl mx-auto">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Analysis</h3>
+          <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg mb-8 max-w-3xl mx-auto">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Analýza výkonu</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="font-medium text-gray-700 mb-2">Test Information</h4>
-                <div className="space-y-2 text-sm">
+                <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Informace o testu</h4>
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex justify-between">
-                    <span>Course:</span>
-                    <span className="font-medium">{progress?.course?.name}</span>
+                    <span>Kurz:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{progress?.course?.name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Questions:</span>
-                    <span className="font-medium">{questions.length} total</span>
+                    <span>Otázky:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{testResult.questionsCount || questions.length} celkem</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Passing Score:</span>
-                    <span className="font-medium">{progress?.course?.passingScore || 70}%</span>
+                    <span>Nutné skóre:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{progress?.course?.passingScore || 70}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Attempt Number:</span>
-                    <span className="font-medium">#{testResult.attempt.attemptNumber}</span>
+                    <span>Pokus číslo:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">#{testResult.attempt.attemptNumber}</span>
                   </div>
                 </div>
               </div>
               <div>
-                <h4 className="font-medium text-gray-700 mb-2">Your Results</h4>
-                <div className="space-y-2 text-sm">
+                <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Vaše výsledky</h4>
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex justify-between">
-                    <span>Correct Answers:</span>
-                    <span className="font-medium text-green-600">{testResult.attempt.score}/{testResult.attempt.maxScore}</span>
+                    <span>Správné odpovědi:</span>
+                    <span className="font-medium text-green-600 dark:text-green-400">
+                      {testResult.attempt.answers ? 
+                        testResult.attempt.answers.filter((answer: any) => answer.isCorrect).length : 
+                        Math.round((testResult.attempt.score / testResult.attempt.maxScore) * (testResult.questionsCount || questions.length))
+                      }/{testResult.questionsCount || questions.length}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Accuracy:</span>
-                    <span className="font-medium">{testResult.attempt.percentage}%</span>
+                    <span>Přesnost:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{testResult.attempt.percentage}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Time Per Question:</span>
-                    <span className="font-medium">{Math.round(testResult.attempt.timeTakenSeconds / questions.length)}s avg</span>
+                    <span>Čas na otázku:</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{Math.round(testResult.attempt.timeTakenSeconds / (testResult.questionsCount || questions.length))}s průměr</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Grade:</span>
-                    <span className={`font-medium ${testResult.attempt.passed ? 'text-green-600' : 'text-red-600'}`}>
-                      {testResult.attempt.passed ? 'PASS' : 'FAIL'}
+                    <span>Hodnocení:</span>
+                    <span className={`font-medium ${testResult.attempt.passed ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                      {testResult.attempt.passed ? 'ÚSPĚCH' : 'NEÚSPĚCH'}
                     </span>
                   </div>
                 </div>
@@ -264,19 +273,21 @@ export default function TestInterface({ progress }: { progress?: any }) {
 
           {/* Results Review Section */}
           {showResultsReview && Array.isArray(testResult.attempt.answers) && (
-            <div className="bg-white border rounded-lg p-6 mb-8 max-w-4xl mx-auto">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('testResults')} - {t('reviewAnswers')}</h3>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-8 max-w-4xl mx-auto">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('testResults')} - {t('reviewAnswers')}</h3>
               <div className="space-y-4">
                 {testResult.attempt.answers.map((answer, index) => {
                   const question = questions.find(q => q.id === answer.questionId);
                   return (
-                    <div key={answer.questionId} className="border rounded-lg p-4">
+                    <div key={answer.questionId} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
                       <div className="flex items-start justify-between mb-3">
-                        <h4 className="font-medium text-gray-900">
+                        <h4 className="font-medium text-gray-900 dark:text-white">
                           {t('questionNumber')} {index + 1}: {question?.questionText}
                         </h4>
                         <span className={`text-sm px-2 py-1 rounded ${
-                          answer.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          answer.isCorrect 
+                            ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' 
+                            : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'
                         }`}>
                           {answer.isCorrect ? 'Správně' : 'Nesprávně'}
                         </span>
@@ -284,23 +295,23 @@ export default function TestInterface({ progress }: { progress?: any }) {
                       
                       <div className="space-y-2 text-sm">
                         <div>
-                          <span className="font-medium text-gray-700">{t('yourAnswer')}: </span>
-                          <span className={answer.isCorrect ? 'text-green-700' : 'text-red-700'}>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">{t('yourAnswer')}: </span>
+                          <span className={answer.isCorrect ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}>
                             {answer.selectedAnswer}
                           </span>
                         </div>
                         
                         {!answer.isCorrect && (
                           <div>
-                            <span className="font-medium text-gray-700">{t('correctAnswer')}: </span>
-                            <span className="text-green-700">{answer.correctAnswer}</span>
+                            <span className="font-medium text-gray-700 dark:text-gray-300">{t('correctAnswer')}: </span>
+                            <span className="text-green-700 dark:text-green-400">{answer.correctAnswer}</span>
                           </div>
                         )}
                         
                         {answer.explanation && (
-                          <div className="bg-blue-50 p-3 rounded">
-                            <span className="font-medium text-blue-900">{t('explanation')}: </span>
-                            <span className="text-blue-800">{answer.explanation}</span>
+                          <div className="bg-blue-50 dark:bg-blue-900 p-3 rounded">
+                            <span className="font-medium text-blue-900 dark:text-blue-200">{t('explanation')}: </span>
+                            <span className="text-blue-800 dark:text-blue-300">{answer.explanation}</span>
                           </div>
                         )}
                       </div>
@@ -313,9 +324,9 @@ export default function TestInterface({ progress }: { progress?: any }) {
           
           {/* Fallback if answers array is not available */}
           {showResultsReview && !Array.isArray(testResult.attempt.answers) && (
-            <div className="bg-white border rounded-lg p-6 mb-8 max-w-4xl mx-auto">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('testResults')}</h3>
-              <p className="text-gray-600">Detaily odpovědí nejsou k dispozici pro tento pokus.</p>
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-8 max-w-4xl mx-auto">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('testResults')}</h3>
+              <p className="text-gray-600 dark:text-gray-400">Detaily odpovědí nejsou k dispozici pro tento pokus.</p>
             </div>
           )}
 
@@ -360,37 +371,37 @@ export default function TestInterface({ progress }: { progress?: any }) {
   // Pre-test screen
   if (!testStarted) {
     return (
-      <Card className="shadow-lg">
+      <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
             <Clock className="h-6 w-6 text-primary" />
-            {progress?.course?.name} - Test
+            {progress?.course?.name} - {t('test')}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-8">
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-4">Test Instructions</h3>
-              <ul className="space-y-2 text-blue-800">
-                <li>• Answer all questions to the best of your ability</li>
-                <li>• You can navigate between questions and change your answers</li>
-                <li>• Flag questions you want to review before submitting</li>
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-4">Pokyny k testu</h3>
+              <ul className="space-y-2 text-blue-800 dark:text-blue-300">
+                <li>• Odpovězte na všechny otázky podle svých nejlepších schopností</li>
+                <li>• Můžete přecházet mezi otázkami a měnit své odpovědi</li>
+                <li>• Označte si otázky, které chcete zkontrolovat před odesláním</li>
                 {progress?.course?.timeLimitMinutes && (
-                  <li>• Time limit: {progress.course.timeLimitMinutes} minutes</li>
+                  <li>• Časový limit: {progress.course.timeLimitMinutes} minut</li>
                 )}
-                <li>• Passing score: {progress?.course?.passingScore || 80}%</li>
-                <li>• Attempts allowed: {progress?.course?.maxAttempts || 3}</li>
+                <li>• Potřebné skóre k úspěšnému dokončení: {progress?.course?.passingScore || 80}%</li>
+                <li>• Povolený počet pokusů: {progress?.course?.maxAttempts || 3}</li>
               </ul>
             </div>
 
             {progress?.attempts && progress.attempts.length > 0 && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h4 className="font-semibold text-yellow-900">Previous Attempts:</h4>
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+                <h4 className="font-semibold text-yellow-900 dark:text-yellow-300">Předchozí pokusy:</h4>
                 <div className="mt-2 space-y-1">
                   {progress.attempts.map((attempt: any, index: number) => (
-                    <div key={attempt.id} className="flex justify-between text-sm text-yellow-800">
-                      <span>Attempt {attempt.attemptNumber}</span>
-                      <span>{attempt.percentage}% - {attempt.passed ? 'Passed' : 'Failed'}</span>
+                    <div key={attempt.id} className="flex justify-between text-sm text-yellow-800 dark:text-yellow-300">
+                      <span>Pokus {attempt.attemptNumber}</span>
+                      <span>{attempt.percentage}% - {attempt.passed ? 'Úspěch' : 'Neúspěch'}</span>
                     </div>
                   ))}
                 </div>
@@ -403,7 +414,7 @@ export default function TestInterface({ progress }: { progress?: any }) {
                 size="lg"
                 className="bg-primary hover:bg-primary-dark px-8 py-3"
               >
-                Start Test
+                Zahájit test
               </Button>
             </div>
           </div>
@@ -412,13 +423,12 @@ export default function TestInterface({ progress }: { progress?: any }) {
     );
   }
 
-  // Loading state
+  // Loading state with enhanced transition experience
   if (isLoading) {
     return (
-      <Card className="shadow-lg">
-        <CardContent className="p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading test questions...</p>
+      <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+        <CardContent className="p-12">
+          <LoadingScreen title="Načítání testu..." description="Příprava otázek a testovacího prostředí" />
         </CardContent>
       </Card>
     );
@@ -426,9 +436,9 @@ export default function TestInterface({ progress }: { progress?: any }) {
 
   if (questions.length === 0) {
     return (
-      <Card className="shadow-lg">
+      <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="p-8 text-center">
-          <p className="text-gray-500">No test questions available for this course.</p>
+          <p className="text-gray-500 dark:text-gray-400">No test questions available for this course.</p>
         </CardContent>
       </Card>
     );
@@ -437,199 +447,252 @@ export default function TestInterface({ progress }: { progress?: any }) {
   // Review mode
   if (showReview) {
     return (
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle>Review Your Answers</CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="space-y-4 mb-6">
-            {questions.map((question, index) => {
-              const isAnswered = answers[question.id] !== undefined;
-              const isFlagged = flaggedQuestions.has(question.id);
-              
-              return (
-                <div 
-                  key={question.id}
-                  className={`p-4 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                    !isAnswered ? 'border-red-200 bg-red-50' : 
-                    isFlagged ? 'border-yellow-200 bg-yellow-50' : 
-                    'border-gray-200'
-                  }`}
-                  onClick={() => {
-                    setCurrentQuestionIndex(index);
-                    setShowReview(false);
-                  }}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Question {index + 1}</span>
-                    <div className="flex items-center gap-2">
-                      {isFlagged && <Flag className="h-4 w-4 text-yellow-600" />}
-                      <Badge variant={isAnswered ? "default" : "destructive"}>
-                        {isAnswered ? 'Answered' : 'Not Answered'}
-                      </Badge>
+      <div className="space-y-6">
+        {/* Review header */}
+        <div className="max-w-4xl mx-auto">
+          <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <CardContent className="p-6">
+              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg p-6">
+                <h2 className="text-2xl font-bold text-emerald-900 dark:text-emerald-300 text-center mb-2">
+                  Přehled odpovědí
+                </h2>
+                <p className="text-emerald-700 dark:text-emerald-400 text-center">
+                  Zkontrolujte své odpovědi před odevzdáním testu
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Questions overview */}
+        <div className="max-w-4xl mx-auto">
+          <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {questions.map((question, index) => {
+                const isAnswered = answers[question.id] !== undefined;
+                const isFlagged = flaggedQuestions.has(question.id);
+                
+                return (
+                  <div 
+                    key={question.id}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                      !isAnswered ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30' : 
+                      isFlagged ? 'border-yellow-300 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30' : 
+                      'border-emerald-300 dark:border-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
+                    }`}
+                    onClick={() => {
+                      setCurrentQuestionIndex(index);
+                      setShowReview(false);
+                    }}
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium text-gray-900 dark:text-white">Otázka {index + 1}</span>
+                      <div className="flex items-center gap-2">
+                        {isFlagged && <Flag className="h-4 w-4 text-yellow-600" />}
+                        <Badge variant={isAnswered ? "default" : "destructive"} className={
+                          isAnswered ? "bg-emerald-100 dark:bg-emerald-800/40 text-emerald-800 dark:text-emerald-300" : "bg-red-100 dark:bg-red-800/40 text-red-800 dark:text-red-300"
+                        }>
+                          {isAnswered ? 'Odpovězeno' : 'Neodpovězeno'}
+                        </Badge>
+                      </div>
                     </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                      {question.questionText}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1 truncate">
-                    {question.questionText}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-          
-          <div className="flex justify-between">
-            <Button 
-              onClick={() => setShowReview(false)}
-              variant="outline"
-            >
-              Continue Editing
-            </Button>
-            <Button 
-              onClick={handleSubmitTest}
-              disabled={submitTestMutation.isPending || answeredCount < questions.length}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              {submitTestMutation.isPending ? 'Submitting...' : 'Submit Test'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+                );
+              })}
+            </div>
+            
+            <div className="flex justify-between">
+              <Button 
+                onClick={() => setShowReview(false)}
+                variant="outline"
+                className="border-emerald-500 text-emerald-600 hover:bg-emerald-50"
+              >
+                Pokračovat v úpravách
+              </Button>
+              <Button 
+                onClick={handleSubmitTest}
+                disabled={submitTestMutation.isPending || answeredCount < questions.length}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                {submitTestMutation.isPending ? 'Odevzdávání...' : 'Odevzdat test'}
+              </Button>
+            </div>
+          </CardContent>
+          </Card>
+        </div>
+      </div>
     );
   }
 
   // Main test interface
   return (
-    <Card className="shadow-lg">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle className="flex items-center gap-2">
-            {progress?.course?.name} - Question {currentQuestionIndex + 1} of {questions.length}
-          </CardTitle>
-          <div className="flex items-center space-x-4">
-            {timeRemaining !== null && (
-              <div className={`text-lg font-semibold ${timeRemaining < 300 ? 'text-red-600' : 'text-primary'}`}>
-                {formatTime(timeRemaining)}
-              </div>
-            )}
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent className="p-6">
-        {/* Progress */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">
-              Progress: {answeredCount}/{questions.length} answered
-            </span>
-            <span className="text-sm font-medium text-gray-700">{Math.round(progressPercentage)}% Complete</span>
-          </div>
-          <Progress value={progressPercentage} className="h-2" />
-        </div>
-
-        {/* Question */}
-        <div className="mb-8">
-          <div className="flex justify-between items-start mb-4">
-            <h4 className="text-lg font-semibold text-gray-900">Question {currentQuestionIndex + 1}</h4>
-            <Button
-              onClick={() => toggleFlag(currentQuestion.id)}
-              variant="ghost"
-              size="sm"
-              className={flaggedQuestions.has(currentQuestion.id) ? 'text-yellow-600' : 'text-gray-400'}
-            >
-              <Flag className="h-4 w-4" />
-              {flaggedQuestions.has(currentQuestion.id) ? 'Flagged' : 'Flag'}
-            </Button>
-          </div>
-          
-          <p className="text-gray-800 mb-6 text-lg leading-relaxed">
-            {currentQuestion.questionText}
-          </p>
-
-          {/* Question media */}
-          {currentQuestion.mediaUrl && (
-            <img 
-              src={currentQuestion.mediaUrl} 
-              alt="Question illustration"
-              className="w-full max-w-md mx-auto rounded-lg shadow-sm mb-6"
-            />
-          )}
-
-          {/* Answer options */}
-          <div className="space-y-3">
-            {Array.isArray(currentQuestion.options) && currentQuestion.options.map((option: string, index: number) => (
-              <label 
-                key={index}
-                className="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-              >
-                <input
-                  type={['multiple_choice', 'multiple_select'].includes(currentQuestion.questionType || '') ? 'checkbox' : 'radio'}
-                  name={`question-${currentQuestion.id}`}
-                  value={option}
-                  checked={
-                    ['multiple_choice', 'multiple_select'].includes(currentQuestion.questionType || '')
-                      ? Array.isArray(answers[currentQuestion.id]) && answers[currentQuestion.id].includes(option)
-                      : answers[currentQuestion.id] === option
-                  }
-                  onChange={(e) => {
-                    if (['multiple_choice', 'multiple_select'].includes(currentQuestion.questionType || '')) {
-                      const currentAnswers = Array.isArray(answers[currentQuestion.id]) ? answers[currentQuestion.id] : [];
-                      if (e.target.checked) {
-                        handleAnswerChange(currentQuestion.id, [...currentAnswers, option]);
-                      } else {
-                        handleAnswerChange(currentQuestion.id, currentAnswers.filter((a: string) => a !== option));
-                      }
-                    } else {
-                      handleAnswerChange(currentQuestion.id, option);
-                    }
-                  }}
-                  className="mt-1 mr-4"
-                />
-                <span className="text-gray-800 flex-1">{option}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex justify-between items-center pt-6 border-t border-gray-200">
-          <Button
-            onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
-            disabled={currentQuestionIndex === 0}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Previous
-          </Button>
-          
-          <div className="flex space-x-3">
-            <Button 
-              onClick={() => setShowReview(true)}
-              variant="outline"
-            >
-              Review Questions
-            </Button>
+    <div className="space-y-6">
+      {/* Progress Navigation - Fixed at top */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 sticky top-4 z-10">
+          <CardContent className="p-3 sm:p-4 lg:p-6">
+          {/* Progress Navigation */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-3 sm:p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg border border-emerald-200 dark:border-emerald-700">
+            {/* Progress and timer row */}
+            <div className="flex items-center gap-2 sm:gap-4 w-full sm:flex-1">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                {currentQuestionIndex + 1} z {questions.length}
+              </span>
+              <Progress value={progressPercentage} className="flex-1 h-2" />
+              {timeRemaining !== null && (
+                <div className={`text-xs sm:text-sm font-semibold px-2 sm:px-3 py-1 rounded-full border ${
+                  timeRemaining < 300 ? 'text-red-600 bg-red-50 border-red-200' : 'text-emerald-600 bg-emerald-50 border-emerald-200'
+                }`}>
+                  <Clock className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1" />
+                  {formatTime(timeRemaining)}
+                </div>
+              )}
+            </div>
             
-            {currentQuestionIndex === questions.length - 1 ? (
+            {/* Navigation buttons row */}
+            <div className="flex items-center justify-between gap-2 w-full sm:w-auto">
+              <Button
+                onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+                disabled={currentQuestionIndex === 0}
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-xs sm:text-sm px-2 sm:px-3"
+              >
+                <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">{t('previousQuestion')}</span>
+                <span className="sm:hidden">Zpět</span>
+              </Button>
+              
               <Button 
                 onClick={() => setShowReview(true)}
-                className="bg-green-600 hover:bg-green-700"
+                variant="outline"
+                size="sm"
+                className="border-emerald-500 dark:border-emerald-400 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-xs sm:text-sm px-2 sm:px-3"
               >
-                Review & Submit
+                <span className="hidden sm:inline">Přehled otázek</span>
+                <span className="sm:hidden">Přehled</span>
               </Button>
-            ) : (
-              <Button
-                onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
-                className="bg-primary hover:bg-primary-dark flex items-center gap-2"
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            )}
+              
+              {currentQuestionIndex === questions.length - 1 ? (
+                <Button 
+                  onClick={() => setShowReview(true)}
+                  size="sm"
+                  className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm px-2 sm:px-3"
+                >
+                  <span className="hidden sm:inline">Odevzdat test</span>
+                  <span className="sm:hidden">Dokončit</span>
+                  <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
+                  size="sm"
+                  className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm px-2 sm:px-3"
+                >
+                  <span className="hidden sm:inline">{t('nextQuestion')}</span>
+                  <span className="sm:hidden">Další</span>
+                  <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+        </Card>
+      </div>
+
+      {/* Main content area */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+          {/* Question header card */}
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg p-3 sm:p-4 lg:p-6 mb-4 sm:mb-6">
+            <div className="flex justify-between items-start">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-emerald-900 dark:text-emerald-300">
+                Otázka {currentQuestionIndex + 1}
+              </h2>
+              <Button
+                onClick={() => toggleFlag(currentQuestion.id)}
+                variant="ghost"
+                size="sm"
+                className={`${flaggedQuestions.has(currentQuestion.id) ? 'text-yellow-600 bg-yellow-50' : 'text-gray-400 hover:text-yellow-600 hover:bg-yellow-50'} text-xs sm:text-sm px-2 sm:px-3`}
+              >
+                <Flag className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span className="hidden sm:inline">{flaggedQuestions.has(currentQuestion.id) ? 'Označeno' : 'Označit'}</span>
+                <span className="sm:hidden">{flaggedQuestions.has(currentQuestion.id) ? '✓' : '?'}</span>
+              </Button>
+            </div>
+            <div className="text-xs sm:text-sm text-emerald-700 dark:text-emerald-400 mt-2">
+              Odpověděno: {answeredCount}/{questions.length} otázek ({Math.round(progressPercentage)}%)
+            </div>
+          </div>
+          
+          {/* Question content card */}
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6">
+            <div className="prose max-w-none dark:prose-invert">
+              <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4 sm:mb-6">
+                {currentQuestion.questionText}
+              </p>
+            </div>
+
+            {/* Question media */}
+            {currentQuestion.mediaUrl && (
+              <div className="mb-4 sm:mb-6">
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-3 sm:p-4 lg:p-6">
+                  <div className="flex justify-center">
+                    <img 
+                      src={currentQuestion.mediaUrl} 
+                      alt="Ilustrace k otázce"
+                      className="max-w-full max-h-64 sm:max-h-80 lg:max-h-96 rounded-lg shadow-md border border-gray-100 transition-transform hover:scale-105 cursor-zoom-in"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Answer options */}
+            <div className="space-y-2 sm:space-y-3">
+              {Array.isArray(currentQuestion.options) && currentQuestion.options.map((option: string, index: number) => (
+                <label 
+                  key={index}
+                  className={`flex items-start p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                    (['multiple_choice', 'multiple_select'].includes(currentQuestion.questionType || '')
+                      ? Array.isArray(answers[currentQuestion.id]) && answers[currentQuestion.id].includes(option)
+                      : answers[currentQuestion.id] === option)
+                    ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 shadow-sm' 
+                    : 'border-gray-200 dark:border-gray-600 hover:border-emerald-300 dark:hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10'
+                  }`}
+                >
+                  <input
+                    type={['multiple_choice', 'multiple_select'].includes(currentQuestion.questionType || '') ? 'checkbox' : 'radio'}
+                    name={`question-${currentQuestion.id}`}
+                    value={option}
+                    checked={
+                      ['multiple_choice', 'multiple_select'].includes(currentQuestion.questionType || '')
+                        ? Array.isArray(answers[currentQuestion.id]) && answers[currentQuestion.id].includes(option)
+                        : answers[currentQuestion.id] === option
+                    }
+                    onChange={(e) => {
+                      if (['multiple_choice', 'multiple_select'].includes(currentQuestion.questionType || '')) {
+                        const currentAnswers = Array.isArray(answers[currentQuestion.id]) ? answers[currentQuestion.id] : [];
+                        if (e.target.checked) {
+                          handleAnswerChange(currentQuestion.id, [...currentAnswers, option]);
+                        } else {
+                          handleAnswerChange(currentQuestion.id, currentAnswers.filter((a: string) => a !== option));
+                        }
+                      } else {
+                        handleAnswerChange(currentQuestion.id, option);
+                      }
+                    }}
+                    className="mt-1 mr-3 sm:mr-4 w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span className="text-gray-800 dark:text-gray-200 flex-1 text-sm sm:text-base">{option}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+      </div>
+    </div>
   );
 }

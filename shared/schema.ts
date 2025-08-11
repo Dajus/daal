@@ -40,6 +40,7 @@ export const courses = pgTable("courses", {
   passingScore: integer("passing_score").default(80),
   timeLimitMinutes: integer("time_limit_minutes"),
   maxAttempts: integer("max_attempts").default(3),
+  maxQuestionsInTest: integer("max_questions_in_test"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
@@ -53,6 +54,20 @@ export const companies = pgTable("companies", {
   address: text("address"),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow()
+});
+
+// Company Admins
+export const companyAdmins = pgTable("company_admins", {
+  id: serial("id").primaryKey(),
+  username: varchar("username", { length: 50 }).notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  companyId: integer("company_id").references(() => companies.id, { onDelete: "cascade" }).notNull(),
+  email: varchar("email", { length: 100 }),
+  isActive: boolean("is_active").default(true),
+  lastLogin: timestamp("last_login"),
+  createdBy: integer("created_by").references(() => admins.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
 });
 
 // Access codes
@@ -173,7 +188,19 @@ export const courseRelations = relations(courses, ({ many }) => ({
 }));
 
 export const companyRelations = relations(companies, ({ many }) => ({
-  accessCodes: many(accessCodes)
+  accessCodes: many(accessCodes),
+  companyAdmins: many(companyAdmins)
+}));
+
+export const companyAdminRelations = relations(companyAdmins, ({ one }) => ({
+  company: one(companies, {
+    fields: [companyAdmins.companyId],
+    references: [companies.id]
+  }),
+  createdByAdmin: one(admins, {
+    fields: [companyAdmins.createdBy],
+    references: [admins.id]
+  })
 }));
 
 export const accessCodeRelations = relations(accessCodes, ({ one, many }) => ({
@@ -228,6 +255,13 @@ export const insertCompanySchema = createInsertSchema(companies).omit({
   createdAt: true
 });
 
+export const insertCompanyAdminSchema = createInsertSchema(companyAdmins).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastLogin: true
+});
+
 export const insertAccessCodeSchema = createInsertSchema(accessCodes).omit({
   id: true,
   code: true,
@@ -270,6 +304,9 @@ export type InsertCourse = z.infer<typeof insertCourseSchema>;
 
 export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
+
+export type CompanyAdmin = typeof companyAdmins.$inferSelect;
+export type InsertCompanyAdmin = z.infer<typeof insertCompanyAdminSchema>;
 
 export type AccessCode = typeof accessCodes.$inferSelect;
 export type InsertAccessCode = z.infer<typeof insertAccessCodeSchema>;

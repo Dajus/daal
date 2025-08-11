@@ -2,6 +2,7 @@ import {
   admins, 
   courses, 
   companies, 
+  companyAdmins,
   accessCodes, 
   theorySlides, 
   testQuestions, 
@@ -15,6 +16,8 @@ import {
   type InsertCourse,
   type Company,
   type InsertCompany,
+  type CompanyAdmin,
+  type InsertCompanyAdmin,
   type AccessCode,
   type InsertAccessCode,
   type TheorySlide,
@@ -29,7 +32,7 @@ import {
   type InsertCertificate
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, count, sql, and, gte, isNotNull, isNull } from "drizzle-orm";
+import { eq, desc, count, sql, and, gte, isNotNull, isNull, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 export interface IStorage {
@@ -43,11 +46,22 @@ export interface IStorage {
   getAllCourses(): Promise<Course[]>;
   getCourse(id: number): Promise<Course | undefined>;
   createCourse(course: InsertCourse): Promise<Course>;
+  updateCourse(id: number, course: Partial<InsertCourse>): Promise<Course>;
 
   // Company operations
   getAllCompanies(): Promise<Company[]>;
   getCompany(id: number): Promise<Company | undefined>;
   createCompany(company: InsertCompany): Promise<Company>;
+
+  // Company Admin operations
+  getAllCompanyAdmins(): Promise<CompanyAdmin[]>;
+  getCompanyAdmin(id: number): Promise<CompanyAdmin | undefined>;
+  getCompanyAdminByUsername(username: string): Promise<CompanyAdmin | undefined>;
+  getCompanyAdminsByCompany(companyId: number): Promise<CompanyAdmin[]>;
+  createCompanyAdmin(companyAdmin: InsertCompanyAdmin): Promise<CompanyAdmin>;
+  updateCompanyAdminLastLogin(id: number): Promise<void>;
+  deleteCompanyAdmin(id: number): Promise<void>;
+  updateCompanyAdmin(id: number, companyAdmin: InsertCompanyAdmin): Promise<CompanyAdmin>;
 
   // Access code operations
   getAllAccessCodes(): Promise<AccessCode[]>;
@@ -102,6 +116,50 @@ export interface IStorage {
       successRate: number;
     }>;
   }>;
+  
+  getAnalyticsByCompany(companyId: number): Promise<{
+    activeCodes: number;
+    totalCompletions: number;
+    inProgress: number;
+    successRate: number;
+    employeesTrained: number;
+    coursesOffered: Array<{
+      name: string;
+      completions: number;
+      percentage: number;
+    }>;
+    popularCourses: Array<{
+      name: string;
+      completions: number;
+      percentage: number;
+    }>;
+    companyPerformance: Array<{
+      name: string;
+      employeesTrained: number;
+      successRate: number;
+    }>;
+  }>;
+  
+  getCompanyAccessCodesDetailed(companyId: number): Promise<Array<{
+    id: number;
+    code: string;
+    courseName: string;
+    maxParticipants: number | null;
+    validUntil: string;
+    isActive: boolean;
+    theoryToTest: boolean;
+    usage: number;
+    students: Array<{
+      id: number;
+      name: string;
+      email: string;
+      theoryCompletedAt: string | null;
+      testScore: number | null;
+      passed: boolean | null;
+      certificateIssued: boolean;
+      lastActivity: string;
+    }>;
+  }>>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -142,6 +200,61 @@ export class DatabaseStorage implements IStorage {
     return newCourse;
   }
 
+  async updateCourse(id: number, course: Partial<InsertCourse>): Promise<Course> {
+    const [updatedCourse] = await db.update(courses)
+      .set({ ...course, updatedAt: new Date() })
+      .where(eq(courses.id, id))
+      .returning();
+    return updatedCourse;
+  }
+
+  async deleteCourse(id: number): Promise<void> {
+    // Delete course with proper cascading order
+    // Need to delete in specific order due to foreign key constraints
+    
+    // First get all access code IDs for this course
+    const courseAccessCodes = await db.select({ id: accessCodes.id })
+      .from(accessCodes)
+      .where(eq(accessCodes.courseId, id));
+    
+    const accessCodeIds = courseAccessCodes.map(ac => ac.id);
+    
+    if (accessCodeIds.length > 0) {
+      // Get all student session IDs that use these access codes
+      const courseSessions = await db.select({ id: studentSessions.id })
+        .from(studentSessions)
+        .where(inArray(studentSessions.accessCodeId, accessCodeIds));
+      
+      const sessionIds = courseSessions.map(s => s.id);
+      
+      if (sessionIds.length > 0) {
+        // Delete certificates first (they reference test attempts)
+        await db.delete(certificates)
+          .where(inArray(certificates.studentSessionId, sessionIds));
+        
+        // Then delete test attempts
+        await db.delete(testAttempts)
+          .where(inArray(testAttempts.studentSessionId, sessionIds));
+      }
+      
+      // Delete student sessions
+      await db.delete(studentSessions)
+        .where(inArray(studentSessions.accessCodeId, accessCodeIds));
+      
+      // Delete access codes
+      await db.delete(accessCodes).where(eq(accessCodes.courseId, id));
+    }
+    
+    // Delete theory slides
+    await db.delete(theorySlides).where(eq(theorySlides.courseId, id));
+    
+    // Delete test questions
+    await db.delete(testQuestions).where(eq(testQuestions.courseId, id));
+    
+    // Finally delete the course itself
+    await db.delete(courses).where(eq(courses.id, id));
+  }
+
   // Company operations
   async getAllCompanies(): Promise<Company[]> {
     return await db.select().from(companies).where(eq(companies.isActive, true));
@@ -155,6 +268,60 @@ export class DatabaseStorage implements IStorage {
   async createCompany(company: InsertCompany): Promise<Company> {
     const [newCompany] = await db.insert(companies).values(company).returning();
     return newCompany;
+  }
+
+  // Company Admin operations
+  async getAllCompanyAdmins(): Promise<CompanyAdmin[]> {
+    return await db.select().from(companyAdmins)
+      .where(eq(companyAdmins.isActive, true))
+      .orderBy(desc(companyAdmins.createdAt));
+  }
+
+  async getCompanyAdmin(id: number): Promise<CompanyAdmin | undefined> {
+    const [companyAdmin] = await db.select().from(companyAdmins).where(eq(companyAdmins.id, id));
+    return companyAdmin || undefined;
+  }
+
+  async getCompanyAdminByUsername(username: string): Promise<CompanyAdmin | undefined> {
+    const [companyAdmin] = await db.select().from(companyAdmins)
+      .where(and(eq(companyAdmins.username, username), eq(companyAdmins.isActive, true)));
+    return companyAdmin || undefined;
+  }
+
+  async getCompanyAdminsByCompany(companyId: number): Promise<CompanyAdmin[]> {
+    return await db.select().from(companyAdmins)
+      .where(and(eq(companyAdmins.companyId, companyId), eq(companyAdmins.isActive, true)))
+      .orderBy(desc(companyAdmins.createdAt));
+  }
+
+  async createCompanyAdmin(companyAdmin: InsertCompanyAdmin): Promise<CompanyAdmin> {
+    const [newCompanyAdmin] = await db.insert(companyAdmins).values(companyAdmin).returning();
+    return newCompanyAdmin;
+  }
+
+  async updateCompanyAdminLastLogin(id: number): Promise<void> {
+    await db.update(companyAdmins)
+      .set({ lastLogin: new Date() })
+      .where(eq(companyAdmins.id, id));
+  }
+
+  async deleteCompanyAdmin(id: number): Promise<void> {
+    await db.update(companyAdmins)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(eq(companyAdmins.id, id));
+  }
+
+  async updateCompanyAdmin(id: number, companyAdmin: InsertCompanyAdmin): Promise<CompanyAdmin> {
+    // If password is empty, don't update it
+    const updateData = companyAdmin.passwordHash 
+      ? { ...companyAdmin, updatedAt: new Date() }
+      : { ...companyAdmin, passwordHash: undefined, updatedAt: new Date() };
+    
+    const [updatedCompanyAdmin] = await db.update(companyAdmins)
+      .set(updateData)
+      .where(eq(companyAdmins.id, id))
+      .returning();
+    return updatedCompanyAdmin;
   }
 
   // Access code operations
@@ -318,7 +485,6 @@ export class DatabaseStorage implements IStorage {
           testAttemptId: null, // No test attempt for theory-only
           certificateNumber: `CERT-${sessionId}-${Date.now()}`,
           verificationCode,
-          issuedAt: new Date(),
           isValid: true
         });
       }
@@ -448,6 +614,218 @@ export class DatabaseStorage implements IStorage {
       popularCourses,
       companyPerformance
     };
+  }
+
+  async getAnalyticsByCompany(companyId: number) {
+    // Get active codes count for this company
+    const [activeCodesResult] = await db.select({ count: count() })
+      .from(accessCodes)
+      .where(and(
+        eq(accessCodes.companyId, companyId),
+        eq(accessCodes.isActive, true),
+        gte(accessCodes.validUntil, new Date().toISOString().split('T')[0])
+      ));
+
+    // Get total completions for this company
+    const [completionsResult] = await db.select({ count: count() })
+      .from(certificates)
+      .innerJoin(studentSessions, eq(certificates.studentSessionId, studentSessions.id))
+      .innerJoin(accessCodes, eq(studentSessions.accessCodeId, accessCodes.id))
+      .where(and(
+        eq(accessCodes.companyId, companyId),
+        eq(certificates.isValid, true)
+      ));
+
+    // Get in progress sessions for this company
+    const [inProgressResult] = await db.select({ count: count() })
+      .from(studentSessions)
+      .innerJoin(accessCodes, eq(studentSessions.accessCodeId, accessCodes.id))
+      .where(and(
+        eq(accessCodes.companyId, companyId),
+        isNotNull(studentSessions.theoryCompletedAt),
+        sql`NOT EXISTS (
+          SELECT 1 FROM ${certificates} WHERE student_session_id = ${studentSessions.id}
+        )`
+      ));
+
+    // Get employees trained count for this company
+    const [employeesTrainedResult] = await db.select({ 
+      count: count(sql`DISTINCT ${studentSessions.studentEmail}`) 
+    })
+      .from(studentSessions)
+      .innerJoin(accessCodes, eq(studentSessions.accessCodeId, accessCodes.id))
+      .where(eq(accessCodes.companyId, companyId));
+
+    // Calculate success rate for this company
+    const [totalAttempts] = await db.select({ count: count() })
+      .from(testAttempts)
+      .innerJoin(studentSessions, eq(testAttempts.studentSessionId, studentSessions.id))
+      .innerJoin(accessCodes, eq(studentSessions.accessCodeId, accessCodes.id))
+      .where(eq(accessCodes.companyId, companyId));
+
+    const [passedAttempts] = await db.select({ count: count() })
+      .from(testAttempts)
+      .innerJoin(studentSessions, eq(testAttempts.studentSessionId, studentSessions.id))
+      .innerJoin(accessCodes, eq(studentSessions.accessCodeId, accessCodes.id))
+      .where(and(
+        eq(accessCodes.companyId, companyId),
+        eq(testAttempts.passed, true)
+      ));
+
+    const successRate = totalAttempts.count > 0 ? 
+      Math.round((passedAttempts.count / totalAttempts.count) * 100) : 0;
+
+    // Get courses offered by this company
+    const coursesOfferedData = await db
+      .select({
+        courseName: courses.name,
+        completions: count(certificates.id)
+      })
+      .from(courses)
+      .innerJoin(accessCodes, eq(courses.id, accessCodes.courseId))
+      .leftJoin(studentSessions, eq(accessCodes.id, studentSessions.accessCodeId))
+      .leftJoin(certificates, and(
+        eq(studentSessions.id, certificates.studentSessionId),
+        eq(certificates.isValid, true)
+      ))
+      .where(eq(accessCodes.companyId, companyId))
+      .groupBy(courses.id, courses.name)
+      .orderBy(desc(count(certificates.id)));
+
+    const maxCompletions = Math.max(...coursesOfferedData.map(c => c.completions), 1);
+    const coursesOffered = coursesOfferedData.map(course => ({
+      name: course.courseName,
+      completions: course.completions,
+      percentage: Math.round((course.completions / maxCompletions) * 100)
+    }));
+
+    // Get company name for performance data
+    const company = await this.getCompany(companyId);
+    
+    return {
+      activeCodes: activeCodesResult.count,
+      totalCompletions: completionsResult.count,
+      inProgress: inProgressResult.count,
+      successRate,
+      employeesTrained: employeesTrainedResult.count,
+      coursesOffered, // Keep original field name
+      popularCourses: coursesOffered, // Add for frontend compatibility
+      companyPerformance: [{
+        name: company?.name || 'Your Company',
+        employeesTrained: employeesTrainedResult.count,
+        successRate
+      }]
+    };
+  }
+
+  async getCompanyAccessCodesDetailed(companyId: number) {
+    // Get all access codes for this company with course information
+    const accessCodesData = await db
+      .select({
+        id: accessCodes.id,
+        code: accessCodes.code,
+        courseName: courses.name,
+        maxParticipants: accessCodes.maxParticipants,
+        validUntil: accessCodes.validUntil,
+        isActive: accessCodes.isActive,
+        theoryToTest: accessCodes.theoryToTest,
+        usage: sql<number>`CAST((
+          SELECT COUNT(*) FROM ${studentSessions} 
+          WHERE access_code_id = ${accessCodes.id}
+        ) AS INTEGER)`
+      })
+      .from(accessCodes)
+      .innerJoin(courses, eq(accessCodes.courseId, courses.id))
+      .where(eq(accessCodes.companyId, companyId))
+      .orderBy(desc(accessCodes.createdAt));
+
+    // For each access code, get detailed student data
+    const detailedCodes = await Promise.all(
+      accessCodesData.map(async (accessCode) => {
+        // Get basic student session data
+        const basicStudentsData = await db
+          .select({
+            sessionId: studentSessions.id,
+            name: studentSessions.studentName,
+            email: studentSessions.studentEmail,
+            theoryCompletedAt: studentSessions.theoryCompletedAt,
+            createdAt: studentSessions.createdAt,
+          })
+          .from(studentSessions)
+          .where(eq(studentSessions.accessCodeId, accessCode.id))
+          .orderBy(desc(studentSessions.createdAt));
+
+        // For each student, get their latest test attempt data separately to avoid Drizzle subquery bugs
+        const studentsData = await Promise.all(
+          basicStudentsData.map(async (student) => {
+            // Get latest test attempt for this specific session
+            const [latestTest] = await db
+              .select({
+                percentage: testAttempts.percentage,
+                passed: testAttempts.passed,
+                completedAt: testAttempts.completedAt
+              })
+              .from(testAttempts)
+              .where(eq(testAttempts.studentSessionId, student.sessionId))
+              .orderBy(desc(testAttempts.completedAt))
+              .limit(1);
+
+            // Check for certificate
+            const [certificate] = await db
+              .select({ 
+                id: certificates.id,
+                issuedAt: certificates.issuedAt
+              })
+              .from(certificates)
+              .where(and(
+                eq(certificates.studentSessionId, student.sessionId),
+                eq(certificates.isValid, true)
+              ))
+              .limit(1);
+
+            return {
+              sessionId: student.sessionId,
+              name: student.name,
+              email: student.email,
+              theoryCompletedAt: student.theoryCompletedAt,
+              testCompletedAt: latestTest?.completedAt || null,
+              certificateIssuedAt: certificate?.issuedAt || null,
+              createdAt: student.createdAt,
+              testScore: latestTest?.percentage || null,
+              passed: latestTest?.passed || null,
+              certificateIssued: !!certificate
+            };
+          })
+        );
+
+        const students = studentsData.map(student => ({
+          id: student.sessionId,
+          name: student.name,
+          email: student.email,
+          theoryCompletedAt: student.theoryCompletedAt,
+          testCompletedAt: student.testCompletedAt,
+          certificateIssuedAt: student.certificateIssuedAt,
+          testScore: student.testScore,
+          passed: student.passed,
+          certificateIssued: student.certificateIssued,
+          lastActivity: student.certificateIssuedAt || student.testCompletedAt || student.theoryCompletedAt || student.createdAt
+        }));
+
+        return {
+          id: accessCode.id,
+          code: accessCode.code,
+          courseName: accessCode.courseName,
+          maxParticipants: accessCode.maxParticipants,
+          validUntil: accessCode.validUntil,
+          isActive: accessCode.isActive ?? false,
+          theoryToTest: accessCode.theoryToTest ?? false,
+          usage: accessCode.usage,
+          students
+        };
+      })
+    );
+
+    return detailedCodes;
   }
 }
 
