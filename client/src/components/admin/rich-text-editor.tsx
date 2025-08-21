@@ -1,114 +1,124 @@
-import { useState, useRef, useCallback } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useRef, useCallback } from 'react'
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
+import { Button } from '@/components/ui/button'
+import { useToast } from '@/hooks/use-toast'
 
 interface RichTextEditorProps {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  height?: number;
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  height?: number
 }
 
-export default function RichTextEditor({ 
-  value, 
-  onChange, 
-  placeholder = "Enter content...",
-  height = 200
+export default function RichTextEditor({
+  value,
+  onChange,
+  placeholder = 'Enter content...',
+  height = 200,
 }: RichTextEditorProps) {
-  const { toast } = useToast();
-  const quillRef = useRef<ReactQuill>(null);
-  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast()
+  const quillRef = useRef<ReactQuill>(null)
+  const [uploading, setUploading] = useState(false)
 
   const handleImageUpload = useCallback(async () => {
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
+    const input = document.createElement('input')
+    input.setAttribute('type', 'file')
+    input.setAttribute('accept', 'image/*')
+    input.click()
 
     input.onchange = async () => {
-      const file = input.files?.[0];
-      if (!file) return;
+      const file = input.files?.[0]
+      if (!file) return
 
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
         toast({
-          title: "Error",
-          description: "Image size must be less than 5MB",
-          variant: "destructive"
-        });
-        return;
+          title: 'Error',
+          description: 'Image size must be less than 5MB',
+          variant: 'destructive',
+        })
+        return
       }
 
-      setUploading(true);
+      setUploading(true)
       try {
         // Create form data for upload
-        const formData = new FormData();
-        formData.append('image', file);
+        const formData = new FormData()
+        formData.append('image', file)
 
         // Upload to our server endpoint using auth helper
-        const authHeaders = { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` };
-        
+        const authHeaders = { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }
+
         const response = await fetch('/api/admin/upload-image', {
           method: 'POST',
           body: formData,
-          headers: authHeaders
-        });
+          headers: authHeaders,
+        })
 
         if (!response.ok) {
-          throw new Error('Failed to upload image');
+          throw new Error('Failed to upload image')
         }
 
-        const { imageUrl } = await response.json();
+        const { imageUrl } = await response.json()
 
         // Insert image into editor
-        const quill = quillRef.current?.getEditor();
+        const quill = quillRef.current?.getEditor()
         if (quill) {
-          const range = quill.getSelection();
-          const index = range ? range.index : quill.getLength();
-          quill.insertEmbed(index, 'image', imageUrl);
-          quill.setSelection(index + 1, 0);
+          const range = quill.getSelection()
+          const index = range ? range.index : quill.getLength()
+          quill.insertEmbed(index, 'image', imageUrl)
+          quill.setSelection(index + 1, 0)
         }
 
         toast({
-          title: "Success",
-          description: "Image uploaded successfully"
-        });
+          title: 'Success',
+          description: 'Image uploaded successfully',
+        })
       } catch (error) {
-        console.error('Upload error:', error);
+        console.error('Upload error:', error)
         toast({
-          title: "Error",
-          description: "Failed to upload image",
-          variant: "destructive"
-        });
+          title: 'Error',
+          description: 'Failed to upload image',
+          variant: 'destructive',
+        })
       } finally {
-        setUploading(false);
+        setUploading(false)
       }
-    };
-  }, [toast]);
+    }
+  }, [toast])
 
   const modules = {
     toolbar: {
       container: [
-        [{ 'header': [1, 2, 3, false] }],
+        [{ header: [1, 2, 3, false] }],
         ['bold', 'italic', 'underline', 'strike'],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'color': [] }, { 'background': [] }],
-        [{ 'align': [] }],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        [{ color: [] }, { background: [] }],
+        [{ align: [] }],
         ['link'],
-        ['clean']
+        ['clean'],
       ],
       handlers: {
-        'image': handleImageUpload
-      }
-    }
-  };
+        image: handleImageUpload,
+      },
+    },
+  }
 
   const formats = [
-    'header', 'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet', 'color', 'background', 'align',
-    'link', 'image'
-  ];
+    'header',
+    'bold',
+    'italic',
+    'underline',
+    'strike',
+    'list',
+    'bullet',
+    'color',
+    'background',
+    'align',
+    'link',
+    'image',
+  ]
 
   return (
     <div className="relative">
@@ -131,7 +141,7 @@ export default function RichTextEditor({
           </div>
         </div>
       )}
-      
+
       {/* Custom image upload button */}
       <div className="absolute bottom-14 right-4 z-20">
         <Button
@@ -146,5 +156,5 @@ export default function RichTextEditor({
         </Button>
       </div>
     </div>
-  );
+  )
 }

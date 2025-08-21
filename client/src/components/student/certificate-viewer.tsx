@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { getAuthHeaders } from "@/lib/auth";
-import { downloadCertificate } from "@/lib/pdf-generator";
-import { Download, Mail, Share2, Award } from "lucide-react";
+import { Download, Mail, Share2, Award, Eye, Shield, CheckCircle } from "lucide-react";
 import { LoadingScreen } from "@/components/ui/spinner";
+import { useState } from "react";
+import { downloadCertificate } from "@/lib/certificate-pdf-generator";
 
 interface CertificateData {
   certificate: {
@@ -26,8 +27,250 @@ interface CertificateData {
   };
 }
 
+const WebCertificatePreview = () => {
+  const certificateData = {
+    student: { name: "Jan Novák" },
+    course: { name: "Bezpečnost práce a ochrana zdraví při práci" },
+    company: { name: "DAAL Technology s.r.o." },
+    certificate: {
+      certificateNumber: "DAAL-2025-001234",
+      verificationCode: "ABC123XYZ789",
+      issuedAt: "2025-08-11"
+    }
+  };
+
+  const bestScore = { percentage: "95" };
+
+  return (
+      <div className="bg-gray-100 mb-20">
+        <div className="">
+          {/* Certifikát - responzivní verze */}
+          <div className="bg-white shadow-2xl mx-auto max-w-5xl" style={{ aspectRatio: '297/210' }}>
+
+            {/* Hlavička s gradientním pozadím */}
+            <div
+                className="relative overflow-hidden"
+                style={{
+                  background: 'linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%)',
+                  height: '38%'
+                }}
+            >
+              {/* Dekorativní prvky v pozadí */}
+              <div
+                  className="absolute border-2 rounded-full opacity-20"
+                  style={{
+                    top: '-10%',
+                    right: '-15%',
+                    width: '30%',
+                    height: '80%',
+                    borderColor: 'rgba(255,255,255,0.3)'
+                  }}
+              />
+              <div
+                  className="absolute border-2 rounded-full opacity-10"
+                  style={{
+                    bottom: '-20%',
+                    left: '-20%',
+                    width: '40%',
+                    height: '100%',
+                    borderColor: 'rgba(255,255,255,0.3)'
+                  }}
+              />
+
+              {/* Logo a název */}
+              <div className="absolute top-6 left-6 text-white z-10">
+                <div className="flex items-center gap-3">
+                  {/* Logo ikona */}
+                  <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center border-2"
+                      style={{
+                        background: 'rgba(255,255,255,0.2)',
+                        backdropFilter: 'blur(10px)',
+                        borderColor: 'rgba(255,255,255,0.3)'
+                      }}
+                  >
+                    <Shield className="w-6 h-6 text-white" />
+                  </div>
+
+                  <div>
+                    <div className="text-xl font-bold tracking-wide">DAAL</div>
+                    <div className="text-xs opacity-90 font-medium">ŠKOLICÍ PLATFORMA</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Číslo certifikátu */}
+              <div className="absolute top-6 right-6 text-white text-right z-10">
+                <div className="text-xs opacity-80 mb-1">Certifikát č.</div>
+                <div
+                    className="text-xs font-bold px-2 py-1 rounded"
+                    style={{
+                      fontFamily: 'Courier New, monospace',
+                      background: 'rgba(255,255,255,0.2)'
+                    }}
+                >
+                  {certificateData.certificate.certificateNumber}
+                </div>
+              </div>
+            </div>
+
+            {/* Hlavní obsah certifikátu */}
+            <div className="px-12 py-8 text-center relative" style={{ marginTop: '-5%' }}>
+
+              {/* Ikona úspěchu */}
+              <div className="flex justify-center mb-6">
+                <div
+                    className="relative w-16 h-16 bg-emerald-50 border-4 border-emerald-500 rounded-full flex items-center justify-center"
+                    style={{ boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)' }}
+                >
+                  <Award className="w-8 h-8 text-emerald-600" />
+
+                  {/* Checkmark badge */}
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-emerald-600 border-2 border-white rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Hlavní nadpis */}
+              <div className="mb-8">
+                <h1 className="text-4xl lg:text-5xl font-bold text-gray-800 tracking-wider mb-2">
+                  CERTIFIKÁT
+                </h1>
+
+                {/* Dekorativní čára */}
+                <div
+                    className="w-32 h-1 mx-auto rounded mb-3"
+                    style={{
+                      background: 'linear-gradient(90deg, #10b981 0%, #34d399 50%, #10b981 100%)'
+                    }}
+                />
+
+                <p className="text-lg text-emerald-600 font-semibold tracking-widest uppercase">
+                  O úspěšném dokončení školení
+                </p>
+              </div>
+
+              {/* Informace o studentovi */}
+              <div className="mb-8">
+                <p className="text-gray-600 mb-6">Tímto se potvrzuje, že</p>
+
+                {/* Jméno studenta v rámečku */}
+                <div
+                    className="border-2 border-emerald-500 rounded-xl py-4 px-6 mx-auto mb-6 max-w-md shadow-lg"
+                    style={{
+                      background: 'linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%)'
+                    }}
+                >
+                  <h3 className="text-2xl lg:text-3xl font-bold text-gray-800 uppercase tracking-wide">
+                    {certificateData.student.name}
+                  </h3>
+                </div>
+
+                <p className="text-gray-600 mb-4">úspěšně dokončil(a) školení</p>
+
+                {/* Název kurzu */}
+                <div className="bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 mx-auto max-w-2xl">
+                  <h4 className="text-xl lg:text-2xl font-bold text-emerald-700 mb-2">
+                    {certificateData.course.name}
+                  </h4>
+
+                  {certificateData.company && (
+                      <p className="text-sm text-gray-600 italic">
+                        pro společnost: <span className="font-semibold text-gray-700">{certificateData.company.name}</span>
+                      </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Skóre box */}
+              {bestScore && (
+                  <div
+                      className="border-2 border-green-300 rounded-xl py-4 px-6 mx-auto mb-8 max-w-md flex justify-center items-center gap-6"
+                      style={{
+                        background: 'linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%)'
+                      }}
+                  >
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-emerald-600">{bestScore.percentage}%</div>
+                      <div className="text-xs text-emerald-700 font-semibold">ÚSPĚŠNOST</div>
+                    </div>
+
+                    <div className="w-px h-10 bg-emerald-400" />
+
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-emerald-600">SPLNĚNO</div>
+                      <div className="text-xs text-emerald-700 font-semibold">HODNOCENÍ</div>
+                    </div>
+                  </div>
+              )}
+            </div>
+
+            {/* Spodní část s podpisem a detaily */}
+            <div className="px-12 pb-8 border-t-2 border-gray-100 pt-6">
+
+              {/* Datum a podpis */}
+              <div className="flex justify-between items-end mb-6">
+                <div className="text-left">
+                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">
+                    Datum dokončení
+                  </div>
+                  <div className="text-lg font-bold text-gray-800">
+                    {new Date(certificateData.certificate.issuedAt).toLocaleDateString('cs-CZ', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <div className="w-40 border-b-2 border-gray-300 mb-1" />
+                  <div className="text-xs text-gray-600 font-semibold">Digitálně podepsáno</div>
+                  <div className="text-xs text-gray-400">DAAL Training Platform</div>
+                </div>
+              </div>
+
+              {/* Ověřovací informace */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex justify-between items-center">
+                <div>
+                  <div className="text-xs font-semibold text-gray-700 mb-1">OVĚŘENÍ CERTIFIKÁTU</div>
+                  <div className="text-xs text-gray-600 mb-1">
+                    Ověřovací kód: <span className="font-bold font-mono text-gray-800">{certificateData.certificate.verificationCode}</span>
+                  </div>
+                  <div className="text-xs text-gray-400">Ověřte online na: www.daal.cz/verify</div>
+                </div>
+
+                {/* QR kód placeholder */}
+                <div className="w-12 h-12 bg-white border-2 border-gray-200 rounded flex items-center justify-center">
+                  <div className="grid grid-cols-3 gap-px">
+                    {[...Array(9)].map((_, i) => (
+                        <div key={i} className={`w-1 h-1 ${i % 2 === 0 ? 'bg-gray-800' : 'bg-white'} rounded-sm`} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Zápatí */}
+              <div className="text-center mt-4 pt-4 border-t border-gray-100">
+                <div className="text-xs text-gray-500">
+                  <strong className="text-gray-700">DAAL Školicí platforma</strong>
+                  <span className="mx-2 text-gray-300">|</span>
+                  Praha, Česká republika
+                  <span className="mx-2 text-gray-300">|</span>
+                  Profesionální školení bezpečnosti práce
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  );
+};
+
 const CertificateViewer = ({ progress }: { progress?: any }) => {
   const { toast } = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const { data: certificateData, isLoading, error } = useQuery<CertificateData>({
     queryKey: ['/api/student/certificate'],
@@ -45,8 +288,11 @@ const CertificateViewer = ({ progress }: { progress?: any }) => {
     }
   });
 
-  const handleDownloadPDF = () => {
+  // NOVÁ handleDownloadPDF funkce
+  const handleDownloadPDF = async () => {
     if (!certificateData) return;
+
+    setIsGenerating(true);
 
     const pdfData = {
       studentName: certificateData.student.name,
@@ -59,18 +305,114 @@ const CertificateViewer = ({ progress }: { progress?: any }) => {
     };
 
     try {
-      downloadCertificate(pdfData);
+      console.log('📋 PDF Data:', pdfData);
+      await downloadCertificate(pdfData); // NOVÁ funkce!
 
       toast({
-        title: "Certifikát stažen",
-        description: "Váš certifikát byl úspěšně stažen s podporou českých diakritických znamének"
+        title: "✅ Certifikát stažen",
+        description: "Váš certifikát s českými znaky byl úspěšně vygenerován!"
       });
     } catch (error) {
+      console.error('Chyba při generování certifikátu:', error);
       toast({
-        title: "Chyba při stahování",
+        title: "❌ Chyba při stahování",
         description: "Nepodařilo se stáhnout certifikát. Zkuste to prosím znovu.",
         variant: "destructive"
       });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handlePreviewCertificate = () => {
+    if (!certificateData) return;
+
+    const pdfData = {
+      studentName: certificateData.student.name,
+      courseName: certificateData.course.name,
+      companyName: certificateData.company?.name,
+      completionDate: new Date(certificateData.certificate.issuedAt).toLocaleDateString('cs-CZ'),
+      certificateNumber: certificateData.certificate.certificateNumber,
+      verificationCode: certificateData.certificate.verificationCode,
+      score: progress?.attempts?.[0]?.percentage ? parseInt(progress.attempts[0].percentage) : undefined
+    };
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="cs">
+      <head>
+        <meta charset="UTF-8">
+        <title>Náhled certifikátu - ${pdfData.studentName}</title>
+        <style>
+          body { 
+            margin: 20px; 
+            font-family: Arial, sans-serif; 
+            background: #f5f5f5;
+          }
+          .preview-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          }
+          h1 { color: #059669; text-align: center; }
+        </style>
+      </head>
+      <body>
+        <div class="preview-container">
+          <h1>📄 Náhled certifikátu</h1>
+          <p style="text-align: center; color: #666; margin-bottom: 20px;">
+            Takto bude vypadat váš certifikát s českými znaky při stažení
+          </p>
+          <div style="border: 4px solid #10b981; padding: 40px; border-radius: 15px; text-align: center; background: linear-gradient(to bottom, #10b981 0%, #10b981 25%, #ecfdf5 25%);">
+            
+            <div style="background: white; padding: 40px; border-radius: 10px;">
+              <div style="background: #059669; color: white; padding: 15px 30px; border-radius: 10px; display: inline-block; margin-bottom: 30px;">
+                <div style="font-size: 28px; font-weight: bold;">DAAL</div>
+                <div style="font-size: 12px;">BEZPEČNOSTNÍ ŠKOLENÍ</div>
+              </div>
+              
+              <h2 style="color: #064e3b; font-size: 48px; margin: 20px 0;">CERTIFIKÁT</h2>
+              <p style="color: #10b981; font-size: 20px;">O ÚSPĚŠNÉM DOKONČENÍ ŠKOLENÍ</p>
+              <hr style="border: 2px solid #6ee7b7; width: 200px; margin: 20px auto;">
+              
+              <p style="font-size: 16px; color: #4b5563;">Tímto se potvrzuje, že</p>
+              <h3 style="color: #064e3b; font-size: 32px; margin: 20px 0;">${pdfData.studentName.toUpperCase()}</h3>
+              <p style="font-size: 16px; color: #4b5563;">úspěšně dokončil(a) školení</p>
+              <h4 style="color: #10b981; font-size: 24px; margin: 20px 0;">${pdfData.courseName}</h4>
+              ${pdfData.companyName ? `<p style="color: #6b7280; font-style: italic;">pro společnost: ${pdfData.companyName}</p>` : ''}
+              
+              <div style="display: flex; justify-content: space-around; margin-top: 40px; gap: 20px;">
+                <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; flex: 1;">
+                  <strong style="color: #064e3b;">DATUM DOKONČENÍ</strong><br>
+                  <span style="color: #064e3b;">${pdfData.completionDate}</span>
+                </div>
+                <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; flex: 1;">
+                  <strong style="color: #064e3b;">ČÍSLO CERTIFIKÁTU</strong><br>
+                  <small style="color: #064e3b; font-family: monospace;">${pdfData.certificateNumber}</small>
+                </div>
+              </div>
+              
+              <p style="font-size: 10px; color: #6b7280; margin-top: 30px;">
+                Ověřovací kód: ${pdfData.verificationCode}<br>
+                DAAL Školicí platforma | Praha, Česká republika
+              </p>
+            </div>
+          </div>
+          <p style="text-align: center; margin-top: 20px; color: #666;">
+            Zavřete toto okno a klikněte na "Stáhnout PDF" pro získání finálního certifikátu
+          </p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const newWindow = window.open('', '_blank', 'width=1200,height=800');
+    if (newWindow) {
+      newWindow.document.write(htmlContent);
+      newWindow.document.close();
     }
   };
 
@@ -105,7 +447,6 @@ const CertificateViewer = ({ progress }: { progress?: any }) => {
       try {
         await navigator.share(shareData);
       } catch (error) {
-        // Záložní řešení - kopírování do schránky
         fallbackShare();
       }
     } else {
@@ -156,7 +497,6 @@ const CertificateViewer = ({ progress }: { progress?: any }) => {
     );
   }
 
-  // Získat nejlepší skóre pokusu, je-li dostupné
   const bestScore = progress?.attempts?.reduce((best: any, current: any) => {
     return parseFloat(current.percentage) > parseFloat(best?.percentage || '0') ? current : best;
   }, null);
@@ -199,77 +539,35 @@ const CertificateViewer = ({ progress }: { progress?: any }) => {
           </CardHeader>
           <CardContent>
             {/* Design certifikátu */}
-            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 mb-6 bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-800">
-              <div className="text-center space-y-6 py-8">
-                <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Award className="text-emerald-600 dark:text-emerald-400 text-3xl h-10 w-10" />
-                </div>
-
-                <div>
-                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Certifikát o dokončení</h2>
-                  <div className="w-24 h-1 bg-emerald-600 dark:bg-emerald-400 mx-auto"></div>
-                </div>
-
-                <p className="text-lg text-gray-700 dark:text-gray-300">Tímto se potvrzuje, že</p>
-
-                <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-                  {certificateData.student.name}
-                </p>
-
-                <p className="text-lg text-gray-700 dark:text-gray-300">úspěšně dokončil/a</p>
-
-                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                  {certificateData.course.name}
-                </p>
-
-                {certificateData.company && (
-                    <p className="text-gray-600 dark:text-gray-400 italic">{certificateData.company.name}</p>
-                )}
-
-                <div className="flex justify-center items-center space-x-12 mt-8">
-                  <div className="text-center">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Datum dokončení</p>
-                    <p className="font-semibold text-gray-900 dark:text-white">
-                      {new Date(certificateData.certificate.issuedAt).toLocaleDateString('cs-CZ')}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">ID certifikátu</p>
-                    <p className="font-mono text-sm font-semibold text-gray-900 dark:text-white">
-                      {certificateData.certificate.certificateNumber}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Zástupný symbol pro QR kód */}
-                <div className="mt-8">
-                  <div className="w-20 h-20 bg-gray-200 dark:bg-gray-700 rounded mx-auto flex items-center justify-center border border-gray-300 dark:border-gray-600">
-                    <span className="text-xs text-gray-500 dark:text-gray-400 text-center">QR kód<br/>Ověření</span>
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    Ověření: {certificateData.certificate.verificationCode}
-                  </p>
-                </div>
-
-                <div className="border-t border-gray-200 dark:border-gray-600 pt-6 mt-8">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    DAAL Training Platform - Profesionální školení bezpečnosti práce
-                  </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                    Praha, Česká republika | www.daal.cz
-                  </p>
-                </div>
-              </div>
-            </div>
+              <WebCertificatePreview />
 
             {/* Akční tlačítka */}
             <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
               <Button
-                  onClick={handleDownloadPDF}
-                  className="bg-emerald-600 dark:bg-emerald-700 text-white hover:bg-emerald-700 dark:hover:bg-emerald-800 flex items-center justify-center gap-2"
+                  onClick={handlePreviewCertificate}
+                  variant="outline"
+                  className="border-emerald-600 dark:border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 flex items-center justify-center gap-2"
               >
-                <Download className="h-4 w-4" />
-                Stáhnout PDF
+                <Eye className="h-4 w-4" />
+                Náhled certifikátu
+              </Button>
+
+              <Button
+                  onClick={handleDownloadPDF}
+                  disabled={isGenerating}
+                  className="bg-emerald-600 dark:bg-emerald-700 text-white hover:bg-emerald-700 dark:hover:bg-emerald-800 flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isGenerating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Generování...
+                    </>
+                ) : (
+                    <>
+                      <Download className="h-4 w-4" />
+                      Stáhnout PDF
+                    </>
+                )}
               </Button>
 
               <Button
@@ -278,7 +576,7 @@ const CertificateViewer = ({ progress }: { progress?: any }) => {
                   className="border-green-600 dark:border-green-500 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center justify-center gap-2"
               >
                 <Mail className="h-4 w-4" />
-                Poslat certifikát e-mailem
+                Poslat e-mailem
               </Button>
 
               <Button
@@ -290,6 +588,7 @@ const CertificateViewer = ({ progress }: { progress?: any }) => {
                 Sdílet
               </Button>
             </div>
+
 
             {/* Detaily certifikátu */}
             <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -325,7 +624,41 @@ const CertificateViewer = ({ progress }: { progress?: any }) => {
                     {certificateData.certificate.verificationCode}
                   </dd>
                 </div>
+                {bestScore && (
+                    <div>
+                      <dt className="font-medium text-gray-500 dark:text-gray-400">Dosažené skóre</dt>
+                      <dd className="text-gray-900 dark:text-white font-semibold">
+                        {bestScore.percentage}% {parseInt(bestScore.percentage) >= progress?.course?.passingScore && <span className="text-green-600">(Splněno)</span>}
+                      </dd>
+                    </div>
+                )}
               </dl>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Dodatečné informace */}
+        <Card className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/20 dark:to-blue-900/20 border-emerald-200 dark:border-emerald-700">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <Award className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-emerald-800 dark:text-emerald-300 mb-2">
+                  Gratulujeme k dokončení školení!
+                </h3>
+                <p className="text-emerald-700 dark:text-emerald-400 text-sm leading-relaxed">
+                  Úspěšně jste dokončili školení <strong>{certificateData.course.name}</strong>.
+                  Váš certifikát je platný a může být ověřen pomocí uvedeného ověřovacího kódu.
+                  Doporučujeme si certifikát uložit na bezpečné místo a v případě potřeby jej předložit zaměstnavateli nebo kontrolním orgánům.
+                </p>
+                {certificateData.company && (
+                    <p className="text-emerald-600 dark:text-emerald-500 text-sm mt-2 font-medium">
+                      📋 Školení proběhlo pro společnost: {certificateData.company.name}
+                    </p>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>

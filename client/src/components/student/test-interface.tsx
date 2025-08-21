@@ -438,7 +438,7 @@ export default function TestInterface({ progress }: { progress?: any }) {
     return (
       <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="p-8 text-center">
-          <p className="text-gray-500 dark:text-gray-400">No test questions available for this course.</p>
+          <p className="text-gray-500 dark:text-gray-400">Pro tento kurz nejsou přidány žádné otázky.</p>
         </CardContent>
       </Card>
     );
