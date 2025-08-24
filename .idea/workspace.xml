@@ -4,46 +4,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="implement loading overlays for logout and enhance UI with dark mode support">
-      <change afterPath="$PROJECT_DIR$/.prettierrc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-adr-DONE.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-bozp-aj-DONE.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-bozp-pl-DONE.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-bozp-po-DONE.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-bozp-ua-DONE.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-brc-DONE.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-hands-kpr-DONE.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-pvv-DONE.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-ref-DONE.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-waste-shipper-DONE.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/lib/certificate-pdf-generator.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/eslint.config.mjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/objectStorage.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="add Prettier configuration, implement Cloudinary integration, and enhance video upload functionality">
+      <change afterPath="$PROJECT_DIR$/client/src/contexts/ThemeContext.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/attached_assets/Pasted-Please-create-a-complete-production-ready-web-application-based-on-this-specification-Generate-all-1754418342226_1754418342227.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/attached_assets/image_1754453236697.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/attached_assets/image_1754455323742.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/attached_assets/image_1754473027466.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/attached_assets/image_1754473242264.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/attached_assets/image_1754473688308.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/admin/code-generator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/admin/code-generator.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/admin/course-editor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/admin/course-editor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/admin/rich-text-editor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/admin/rich-text-editor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/admin/slide-form-dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/admin/slide-form-dialog.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/login-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/login-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/student/certificate-viewer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/student/certificate-viewer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/student/test-interface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/student/test-interface.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/hooks/use-mobile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/hooks/use-mobile.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/hooks/use-toast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/hooks/use-toast.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/pdf-generator.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/admin/analytics.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/admin/analytics.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/admin/codes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/admin/codes.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/replit.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/admin/companies.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/admin/companies.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/admin/courses.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/admin/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/admin/dashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/landing.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/landing.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/not-found.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/not-found.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/student/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/student/dashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/student/test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/student/test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/student/theory.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/student/theory.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/db.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/db.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/objectStorage.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/objectStorage.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/storage.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/storage.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/vite.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/vite.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/shared/schema.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -171,7 +150,7 @@
       <workItem from="1755670189874" duration="223000" />
       <workItem from="1755670417065" duration="610000" />
       <workItem from="1755671030270" duration="165000" />
-      <workItem from="1755806450057" duration="528000" />
+      <workItem from="1755806450057" duration="2617000" />
     </task>
     <task id="LOCAL-00001" summary="implement loading overlays for logout and enhance UI with dark mode support">
       <option name="closed" value="true" />
@@ -181,7 +160,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754938816353</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="add Prettier configuration, implement Cloudinary integration, and enhance video upload functionality">
+      <option name="closed" value="true" />
+      <created>1755807075380</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1755807075380</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -189,7 +176,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="implement loading overlays for logout and enhance UI with dark mode support" />
-    <option name="LAST_COMMIT_MESSAGE" value="implement loading overlays for logout and enhance UI with dark mode support" />
+    <MESSAGE value="add Prettier configuration, implement Cloudinary integration, and enhance video upload functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="add Prettier configuration, implement Cloudinary integration, and enhance video upload functionality" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

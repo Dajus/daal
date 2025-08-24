@@ -1,31 +1,53 @@
-import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import TheoryViewer from "@/components/student/theory-viewer";
+import { useLocation } from 'wouter'
+import { useCallback } from 'react'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react'
+import TheoryViewer from '@/components/student/theory-viewer'
 
-export default function TheoryPage() {
-  const [, setLocation] = useLocation();
+// Page header component
+const PageHeader = ({ onBackClick }: { onBackClick: () => void }) => (
+  <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <Button
+        onClick={onBackClick}
+        variant="ghost"
+        className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Zpět na dashboard
+      </Button>
+    </div>
+  </div>
+)
+
+// Main content wrapper
+const ContentWrapper = ({ children }: { children: React.ReactNode }) => (
+  <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</div>
+)
+
+// Custom hook for navigation
+const useNavigation = () => {
+  const [, setLocation] = useLocation()
+
+  const navigateToStudentDashboard = useCallback(() => {
+    setLocation('/student')
+  }, [setLocation])
+
+  return { navigateToStudentDashboard }
+}
+
+const TheoryPage = () => {
+  const { navigateToStudentDashboard } = useNavigation()
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header with navigation */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Button 
-            onClick={() => setLocation('/student')}
-            variant="ghost"
-            className="flex items-center gap-2 text-emerald-700 hover:bg-emerald-50"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Předchozí otázka
-          </Button>
-        </div>
-      </div>
+      <PageHeader onBackClick={navigateToStudentDashboard} />
 
-      {/* Main content with constrained width */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <ContentWrapper>
         <TheoryViewer />
-      </div>
+      </ContentWrapper>
     </div>
-  );
+  )
 }
+
+export default TheoryPage
