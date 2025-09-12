@@ -1,8 +1,8 @@
 import { useLocation } from 'wouter'
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
-import TestInterface from '@/components/student/test-interface'
+import TheoryViewer from '@/components/student/TheoryViewer.tsx'
 
 // Page header component
 const PageHeader = ({ onBackClick }: { onBackClick: () => void }) => (
@@ -25,21 +25,6 @@ const ContentWrapper = ({ children }: { children: React.ReactNode }) => (
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</div>
 )
 
-// Custom hook for page transition
-const usePageTransition = (delay: number = 100) => {
-  const [isPageReady, setIsPageReady] = useState(false)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPageReady(true)
-    }, delay)
-
-    return () => clearTimeout(timer)
-  }, [delay])
-
-  return isPageReady
-}
-
 // Custom hook for navigation
 const useNavigation = () => {
   const [, setLocation] = useLocation()
@@ -51,23 +36,18 @@ const useNavigation = () => {
   return { navigateToStudentDashboard }
 }
 
-const TestPage = () => {
-  const isPageReady = usePageTransition()
+const TheoryPage = () => {
   const { navigateToStudentDashboard } = useNavigation()
 
   return (
-    <div
-      className={`min-h-screen bg-gray-50 dark:bg-gray-900 transition-opacity duration-300 ${
-        isPageReady ? 'opacity-100' : 'opacity-0'
-      }`}
-    >
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <PageHeader onBackClick={navigateToStudentDashboard} />
 
       <ContentWrapper>
-        <TestInterface />
+        <TheoryViewer />
       </ContentWrapper>
     </div>
   )
 }
 
-export default TestPage
+export default TheoryPage

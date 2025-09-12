@@ -14,7 +14,7 @@ import type { LoginResponse } from '@/types'
 interface LoginModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  type?: 'student' | 'admin'
+  type?: 'student' | 'admin' | 'select'
 }
 
 const LoginModal = ({ open, onOpenChange, type = 'select' }: LoginModalProps) => {

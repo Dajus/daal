@@ -7,7 +7,7 @@ import { LogOut, ArrowLeft } from 'lucide-react'
 import { LoadingOverlay } from '@/components/ui/spinner'
 import CodeGenerator from '@/components/admin/code-generator'
 
-export default function AdminCodesPage() {
+const AdminCodesPage = () => {
   const [, setLocation] = useLocation()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -73,3 +73,5 @@ export default function AdminCodesPage() {
     </div>
   )
 }
+
+export default AdminCodesPage

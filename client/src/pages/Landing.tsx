@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import LoginModal from '@/components/login-modal'
+import LoginModal from '@/components/LoginModal.tsx'
 import {
   Car,
   HardHat,
@@ -211,21 +211,26 @@ const HeroSection = ({ onStudentLogin }: { onStudentLogin: () => void }) => {
             dodržování nejnovějších předpisů.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              onClick={onStudentLogin}
-              className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-emerald-600 hover:to-teal-700 shadow-2xl hover:shadow-emerald-500/25 transition-all duration-300 group border-0"
-            >
-              <BookOpen className="mr-2 h-5 w-5" />
-              Začít učení
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button
-              variant="outline"
-              onClick={scrollToContact}
-              className="bg-white/10 text-white px-8 py-4 rounded-xl text-lg font-semibold backdrop-blur-md border-white/20 hover:bg-white/20 transition-all duration-300"
-            >
-              Zjistit více
-            </Button>
+            <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
+              <Button
+                onClick={onStudentLogin}
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-6 rounded-2xl text-2xl font-bold  shadow-2xl hover:shadow-emerald-500/50 transition-all duration-500 group border-0 relative overflow-hidden"
+              >
+                {/* Pulzující pozadí */}
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                <div className="relative flex items-center justify-center">
+                  <div className="flex items-center space-x-4">
+                    <BookOpen className="h-8 w-8" />
+                    <span>Přístoupit ke kurzu</span>
+                    <div className="bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-sm font-bold animate-pulse">
+                      KURZ!
+                    </div>
+                  </div>
+                  <ArrowRight className="ml-4 h-8 w-8 group-hover:translate-x-3 transition-transform duration-300" />
+                </div>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -310,15 +315,15 @@ const AboutSection = () => (
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-lg border border-emerald-200 dark:border-emerald-700">
               <Award className="text-emerald-600 dark:text-emerald-400 mr-2 h-5 w-5" />
-              <span className="text-gray-700 dark:text-gray-300 font-medium">ISO 9001 Certified</span>
+              <span className="text-gray-700 dark:text-gray-300 font-medium">Certifikát</span>
             </div>
             <div className="flex items-center bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-lg border border-emerald-200 dark:border-emerald-700">
               <Shield className="text-emerald-600 dark:text-emerald-400 mr-2 h-5 w-5" />
-              <span className="text-gray-700 dark:text-gray-300 font-medium">EU Compliant</span>
+              <span className="text-gray-700 dark:text-gray-300 font-medium">V souladu s normami EU</span>
             </div>
             <div className="flex items-center bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-lg border border-emerald-200 dark:border-emerald-700">
               <Globe className="text-emerald-600 dark:text-emerald-400 mr-2 h-5 w-5" />
-              <span className="text-gray-700 dark:text-gray-300 font-medium">Multi-language</span>
+              <span className="text-gray-700 dark:text-gray-300 font-medium">Multi jazyčnost</span>
             </div>
           </div>
         </div>

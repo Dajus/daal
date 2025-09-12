@@ -11,9 +11,9 @@ import { LoadingOverlay } from '@/components/ui/spinner'
 import { t } from '@/lib/translations'
 
 import CodeGenerator from '@/components/admin/code-generator'
-import CourseEditor from '@/components/admin/course-editor'
-import AdminAnalytics from './analytics'
-import CompaniesPage from './companies'
+import CourseEditor from '@/components/admin/CourseEditor'
+import AdminAnalytics from './Analytics.tsx'
+import CompaniesPage from './Companies.tsx'
 
 // Navigation component
 const Navigation = ({ onLogout, isLoggingOut }: { onLogout: () => void; isLoggingOut: boolean }) => (
