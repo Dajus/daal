@@ -285,7 +285,6 @@ const TheoryViewer = ({ progress }: { progress?: any }) => {
                 <Button
                   onClick={nextSlide}
                   disabled={currentSlideIndex === slides.length - 1}
-                  variant="outline"
                   size="sm"
                   className="flex items-center gap-2 w-full sm:w-auto order-3"
                 >

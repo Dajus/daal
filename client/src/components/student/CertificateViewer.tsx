@@ -266,7 +266,7 @@ const CertificateViewer = ({ progress }: { progress?: any }) => {
   }, null)
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Shrnutí výsledků */}
       {bestScore && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -341,15 +341,6 @@ const CertificateViewer = ({ progress }: { progress?: any }) => {
             >
               <Mail className="h-4 w-4" />
               Poslat e-mailem
-            </Button>
-
-            <Button
-              onClick={handleShare}
-              variant="outline"
-              className="border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 flex items-center justify-center gap-2"
-            >
-              <Share2 className="h-4 w-4" />
-              Sdílet
             </Button>
           </div>
 

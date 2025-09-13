@@ -5,37 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="add Prettier configuration, implement Cloudinary integration, and enhance video upload functionality">
-      <change afterPath="$PROJECT_DIR$/client/src/components/admin/courseEditor/EditCourseForm.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/admin/courseEditor/NewCourseForm.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/admin/courseEditor/QuestionFormDialog.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/admin/courseEditor/SortableQuestionItem.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/admin/courseEditor/SortableSlideItem.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/student/CertificateViewer.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/student/ProgressCard.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/student/certificateViewer/WebCertificatePreview.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/landing/AboutSection.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/landing/AnimatedBackground.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/landing/ContactForm.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/landing/ContactInfo.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/landing/ContactSection.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/landing/Footer.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/landing/HeroSection.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/landing/Navigation.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/landing/ServicesSection.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/landing/StatisticsSection.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/admin/course-editor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/admin/CourseEditor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/admin/rich-text-editor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/admin/RichTextEditor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/admin/slide-form-dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/admin/SlideFormDialog.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/login-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/LoginModal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/student/certificate-viewer.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/student/progress-card.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/student/test-interface.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/student/TestInterface.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/student/theory-viewer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/student/TheoryViewer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/ui/toaster.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/ui/toaster.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/lib/certificate-pdf-generator.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/lib/certificate-pdf-generator.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/admin/analytics.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/admin/Analytics.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/admin/codes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/admin/Codes.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/admin/companies.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/admin/Companies.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/admin/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/admin/Dashboard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/landing.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Landing.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/not-found.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/NotFound.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/student/certificate.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/student/Certificate.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/student/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/student/Dashboard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/student/test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/student/Test.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/student/theory.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/student/Theory.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/types/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/student/CertificateViewer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/student/CertificateViewer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/student/TheoryViewer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/student/TheoryViewer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/student/certificateViewer/WebCertificatePreview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/student/certificateViewer/WebCertificatePreview.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Landing.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Landing.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/student/Dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/student/Dashboard.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,36 +80,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/davidmilata/Development/my-dev/daal/client/src/components/admin/courseEditor&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
-    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/Users/davidmilata/Development/my-dev/daal/node_modules/prettier&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Users/davidmilata/Development/my-dev/daal/node_modules/typescript/lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/davidmilata/Development/my-dev/daal/client/src/components/landing",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.standard": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.standard": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
+    "prettierjs.PrettierConfiguration.Package": "/Users/davidmilata/Development/my-dev/daal/node_modules/prettier",
+    "settings.editor.selected.configurable": "settings.javascript.prettier",
+    "ts.external.directory.path": "/Users/davidmilata/Development/my-dev/daal/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;JSON&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "JSON"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/client/src/components/landing" />
       <recent name="$PROJECT_DIR$/client/src/components/admin/courseEditor" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/client/src/components" />
     </key>
   </component>
   <component name="RunManager">
@@ -173,7 +162,7 @@
       <workItem from="1756650714057" duration="8060000" />
       <workItem from="1757052860609" duration="1116000" />
       <workItem from="1757236532091" duration="615000" />
-      <workItem from="1757680872198" duration="512000" />
+      <workItem from="1757680872198" duration="7317000" />
     </task>
     <task id="LOCAL-00001" summary="implement loading overlays for logout and enhance UI with dark mode support">
       <option name="closed" value="true" />
@@ -199,7 +188,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756058542091</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="add Prettier configuration, implement Cloudinary integration, and enhance video upload functionality">
+      <option name="closed" value="true" />
+      <created>1757681635277</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1757681635277</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

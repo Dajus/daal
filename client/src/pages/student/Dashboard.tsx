@@ -141,17 +141,20 @@ const ContentRouter = ({ progress }: { progress: StudentProgress }) => {
   const routes = useRoutesConfig(progress)
 
   return (
-    <div className="pt-24">
-      <Switch>
-        {routes.map((route, index) => (
-          <Route key={index} path={route.path}>
-            {route.component}
+    <div className="pt-24 pb-8">
+      {/* Container pro všechen obsah */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Switch>
+          {routes.map((route, index) => (
+            <Route key={index} path={route.path}>
+              {route.component}
+            </Route>
+          ))}
+          <Route>
+            <DashboardContent progress={progress} />
           </Route>
-        ))}
-        <Route>
-          <DashboardContent progress={progress} />
-        </Route>
-      </Switch>
+        </Switch>
+      </div>
     </div>
   )
 }
