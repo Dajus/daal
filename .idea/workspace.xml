@@ -4,23 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="add Prettier configuration, implement Cloudinary integration, and enhance video upload functionality">
-      <change afterPath="$PROJECT_DIR$/client/src/components/landing/AboutSection.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/landing/AnimatedBackground.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/landing/ContactForm.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/landing/ContactInfo.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/landing/ContactSection.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/landing/Footer.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/landing/HeroSection.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/landing/Navigation.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/landing/ServicesSection.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/landing/StatisticsSection.tsx" afterDir="false" />
+    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections">
+      <change afterPath="$PROJECT_DIR$/.idea/git_toolbox_prj.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jsLinters/eslint.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/prettier.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-sanitary-personal.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-unsanitary-personal.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/ui/cookie-consent.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/ui/spinner.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/components/ui/theme-toggle.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/public/assets/index-B7CemX7R.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/public/assets/index-rQFQID9B.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/migrations/0000_clumsy_fat_cobra.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/migrations/meta/0000_snapshot.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/migrations/meta/_journal.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/student/CertificateViewer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/student/CertificateViewer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/student/TheoryViewer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/student/TheoryViewer.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/student/certificateViewer/WebCertificatePreview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/student/certificateViewer/WebCertificatePreview.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/Landing.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Landing.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/pages/student/Dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/student/Dashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/landing/ContactForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/landing/ContactForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/public/assets/html2canvas.esm-CBrSDip1.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/public/assets/index-A9odi726.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/public/assets/index-mtxXIn2q.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/public/assets/index.es-DKkQpvzO.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/public/assets/index.es-OiEp4dKJ.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/dist/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +106,7 @@
     "npm.dev.executor": "Run",
     "prettierjs.PrettierConfiguration.Package": "/Users/davidmilata/Development/my-dev/daal/node_modules/prettier",
     "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "/Users/davidmilata/Development/my-dev/daal/node_modules/typescript/lib",
+    "ts.external.directory.path": "/Users/davidmilata/Library/Application Support/JetBrains/IntelliJIdea2025.2/plugins/javascript-plugin/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -162,7 +170,8 @@
       <workItem from="1756650714057" duration="8060000" />
       <workItem from="1757052860609" duration="1116000" />
       <workItem from="1757236532091" duration="615000" />
-      <workItem from="1757680872198" duration="7317000" />
+      <workItem from="1757680872198" duration="9188000" />
+      <workItem from="1757848810186" duration="395000" />
     </task>
     <task id="LOCAL-00001" summary="implement loading overlays for logout and enhance UI with dark mode support">
       <option name="closed" value="true" />
@@ -196,7 +205,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757681635277</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections">
+      <option name="closed" value="true" />
+      <created>1757775649897</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1757775649897</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -205,7 +222,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="implement loading overlays for logout and enhance UI with dark mode support" />
     <MESSAGE value="add Prettier configuration, implement Cloudinary integration, and enhance video upload functionality" />
-    <option name="LAST_COMMIT_MESSAGE" value="add Prettier configuration, implement Cloudinary integration, and enhance video upload functionality" />
+    <MESSAGE value="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections" />
+    <option name="LAST_COMMIT_MESSAGE" value="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
