@@ -32,6 +32,7 @@ function App() {
           <div className="min-h-screen bg-background text-foreground transition-colors">
             <Toaster />
             <Router />
+            <h1>DEV</h1>
             <CookieConsent />
           </div>
         </TooltipProvider>
