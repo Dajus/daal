@@ -27,6 +27,7 @@ yalc.lock
 *.pem
 /.idea/
 /.vscode/
+dist/
 
 # debug
 npm-debug.log*

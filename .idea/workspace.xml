@@ -5,28 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections">
-      <change afterPath="$PROJECT_DIR$/.idea/git_toolbox_prj.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jsLinters/eslint.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/prettier.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-sanitary-personal.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Bez názvu/theory-unsanitary-personal.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/ui/cookie-consent.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/ui/spinner.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/components/ui/theme-toggle.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dist/public/assets/index-B7CemX7R.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dist/public/assets/index-rQFQID9B.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/migrations/0000_clumsy_fat_cobra.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/migrations/meta/0000_snapshot.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/migrations/meta/_journal.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vercel.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/components/landing/ContactForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/landing/ContactForm.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/assets/html2canvas.esm-CBrSDip1.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/assets/index-A9odi726.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/assets/index-mtxXIn2q.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/public/assets/index.es-DKkQpvzO.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/public/assets/index.es-OiEp4dKJ.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/public/assets/index.es-DKkQpvzO.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/dist/public/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
@@ -106,7 +93,7 @@
     "npm.dev.executor": "Run",
     "prettierjs.PrettierConfiguration.Package": "/Users/davidmilata/Development/my-dev/daal/node_modules/prettier",
     "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "/Users/davidmilata/Library/Application Support/JetBrains/IntelliJIdea2025.2/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "ts.external.directory.path": "/Users/davidmilata/Development/my-dev/daal/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -171,7 +158,7 @@
       <workItem from="1757052860609" duration="1116000" />
       <workItem from="1757236532091" duration="615000" />
       <workItem from="1757680872198" duration="9188000" />
-      <workItem from="1757848810186" duration="395000" />
+      <workItem from="1757848810186" duration="1134000" />
     </task>
     <task id="LOCAL-00001" summary="implement loading overlays for logout and enhance UI with dark mode support">
       <option name="closed" value="true" />
@@ -213,7 +200,15 @@
       <option name="project" value="LOCAL" />
       <updated>1757775649897</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections">
+      <option name="closed" value="true" />
+      <created>1757849367057</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1757849367057</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
