@@ -125,6 +125,13 @@ const upload = multer({
 })
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Disable cache for all API routes
+  app.use('/api', (req: Request, res: Response, next: any) => {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    res.set('Pragma', 'no-cache')
+    res.set('Expires', '0')
+    next()
+  })
   // Auth routes
   app.post('/api/auth/admin/login', async (req: Request, res: Response) => {
     try {
@@ -278,14 +285,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Create company error:', error)
       res.status(500).json({ message: 'Internal server error' })
     }
-  })
-
-  // Disable cache for company admin endpoints
-  app.use('/api/admin/company-admins', (req: Request, res: Response, next: any) => {
-    res.set('Cache-Control', 'no-cache, no-store, must-revalidate')
-    res.set('Pragma', 'no-cache')
-    res.set('Expires', '0')
-    next()
   })
 
   // Company Admin management routes (only for super admin)
