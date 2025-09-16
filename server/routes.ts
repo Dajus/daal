@@ -280,6 +280,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   })
 
+  // Disable cache for company admin endpoints
+  app.use('/api/admin/company-admins', (req: Request, res: Response, next: any) => {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    res.set('Pragma', 'no-cache')
+    res.set('Expires', '0')
+    next()
+  })
+
   // Company Admin management routes (only for super admin)
   app.get('/api/admin/company-admins', authenticateSuperAdmin, async (req: Request, res: Response) => {
     try {
