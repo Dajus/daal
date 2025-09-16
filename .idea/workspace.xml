@@ -4,14 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections">
+    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="disable cache for company admin endpoints">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/index.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/assets/html2canvas.esm-CBrSDip1.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/assets/index-A9odi726.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/assets/index-mtxXIn2q.css" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/assets/index.es-DKkQpvzO.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/dist/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/public/assets/purify.es-BFmuJLeH.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/public/fonts/roboto-regular.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/public/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/vite.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,6 +92,7 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;npm.postbuild.executor&quot;: &quot;Run&quot;,
     &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/Users/davidmilata/Development/my-dev/daal/node_modules/prettier&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
     &quot;ts.external.directory.path&quot;: &quot;/Users/davidmilata/Development/my-dev/daal/node_modules/typescript/lib&quot;,
@@ -107,7 +113,7 @@
       <recent name="$PROJECT_DIR$/client/src/components" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="npm.postbuild">
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -118,8 +124,19 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="postbuild" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="postbuild" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.postbuild" />
         <item itemvalue="npm.dev" />
       </list>
     </recent_temporary>
@@ -127,8 +144,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
-        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-IU-252.23892.409" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131" />
       </set>
     </attachedChunks>
   </component>
@@ -157,7 +174,10 @@
       <workItem from="1757848810186" duration="2498000" />
       <workItem from="1757916608284" duration="1270000" />
       <workItem from="1757932733989" duration="776000" />
-      <workItem from="1757955960208" duration="4611000" />
+      <workItem from="1757955960208" duration="6351000" />
+      <workItem from="1758012760034" duration="3834000" />
+      <workItem from="1758039953142" duration="2524000" />
+      <workItem from="1758045926059" duration="2128000" />
     </task>
     <task id="LOCAL-00001" summary="implement loading overlays for logout and enhance UI with dark mode support">
       <option name="closed" value="true" />
@@ -279,7 +299,63 @@
       <option name="project" value="LOCAL" />
       <updated>1757960699030</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections">
+      <option name="closed" value="true" />
+      <created>1757961395346</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1757961395346</updated>
+    </task>
+    <task id="LOCAL-00017" summary="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections">
+      <option name="closed" value="true" />
+      <created>1757962412333</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1757962412333</updated>
+    </task>
+    <task id="LOCAL-00018" summary="disable cache for company admin endpoints">
+      <option name="closed" value="true" />
+      <created>1758014680892</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1758014680892</updated>
+    </task>
+    <task id="LOCAL-00019" summary="disable cache for company admin endpoints">
+      <option name="closed" value="true" />
+      <created>1758015106665</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1758015106665</updated>
+    </task>
+    <task id="LOCAL-00020" summary="disable cache for company admin endpoints">
+      <option name="closed" value="true" />
+      <created>1758041218203</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1758041218203</updated>
+    </task>
+    <task id="LOCAL-00021" summary="disable cache for company admin endpoints">
+      <option name="closed" value="true" />
+      <created>1758042473827</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1758042473827</updated>
+    </task>
+    <task id="LOCAL-00022" summary="disable cache for company admin endpoints">
+      <option name="closed" value="true" />
+      <created>1758046160817</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1758046160817</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -289,7 +365,8 @@
     <MESSAGE value="implement loading overlays for logout and enhance UI with dark mode support" />
     <MESSAGE value="add Prettier configuration, implement Cloudinary integration, and enhance video upload functionality" />
     <MESSAGE value="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections" />
-    <option name="LAST_COMMIT_MESSAGE" value="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections" />
+    <MESSAGE value="disable cache for company admin endpoints" />
+    <option name="LAST_COMMIT_MESSAGE" value="disable cache for company admin endpoints" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
