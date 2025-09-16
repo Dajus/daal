@@ -281,6 +281,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   })
 
+  app.get('/api/test-endpoint', async (req: Request, res: Response) => {
+    try {
+      const dummyData = [
+        { id: 1, name: 'Test položka 1', value: 'nějaká hodnota' },
+        { id: 2, name: 'Test položka 2', value: 'další hodnota' },
+        { id: 3, name: 'Test položka 3', value: 'třetí hodnota' },
+      ]
+
+      res.json({
+        success: true,
+        message: 'Test endpoint funguje!',
+        data: dummyData,
+        timestamp: new Date().toISOString(),
+      })
+    } catch (error) {
+      console.error('Test endpoint error:', error)
+      res.status(500).json({ message: 'Internal server error' })
+    }
+  })
+
   // Company Admin management routes (only for super admin)
   app.get('/api/admin/company-admins', authenticateSuperAdmin, async (req: Request, res: Response) => {
     try {
