@@ -260,7 +260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   })
 
   //   TODO changed from authenticateAdmin
-  app.get('/api/admin/companies', authenticateSuperAdmin, async (req: Request, res: Response) => {
+  app.get('/api/admin/companies', authenticateAdmin, async (req: Request, res: Response) => {
     try {
       const companies = await storage.getAllCompanies()
       res.json(companies)
