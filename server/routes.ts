@@ -125,13 +125,6 @@ const upload = multer({
 })
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Disable cache for all API routes
-  app.use('/api', (req: Request, res: Response, next: any) => {
-    res.set('Cache-Control', 'no-cache, no-store, must-revalidate')
-    res.set('Pragma', 'no-cache')
-    res.set('Expires', '0')
-    next()
-  })
   // Auth routes
   app.post('/api/auth/admin/login', async (req: Request, res: Response) => {
     try {
