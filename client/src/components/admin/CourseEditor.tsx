@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from '@/hooks/use-toast'
 import { getAuthHeaders } from '@/lib/auth'
 import { apiRequest } from '@/lib/queryClient'
-import { Book, HelpCircle, Plus, Edit, Trash2, Clock, GripVertical } from 'lucide-react'
+import { Book, HelpCircle, Plus, Edit, Trash2 } from 'lucide-react'
 import type { Course, TheorySlide, TestQuestion } from '@/types'
 import SlideFormDialog from './SlideFormDialog'
 import {
