@@ -305,6 +305,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/admin/company-admins', authenticateSuperAdmin, async (req: Request, res: Response) => {
     try {
       const companyAdmins = await storage.getAllCompanyAdmins()
+      console.log(companyAdmins)
       res.json(companyAdmins)
     } catch (error) {
       console.error('Get company admins error:', error)
