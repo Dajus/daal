@@ -12,7 +12,7 @@ import { z } from 'zod'
 import { Trash2, Plus, Building2, Users, Edit } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { Spinner } from '@/components/ui/spinner'
-import { getAuthHeaders } from '@/lib/auth'
+import { getAuthHeaders, getAuthToken } from '@/lib/auth'
 import { t } from '@/lib/translations'
 import type { Company, CompanyAdmin } from '@shared/schema'
 
@@ -308,6 +308,7 @@ const CompaniesPage = () => {
   const [editingAdmin, setEditingAdmin] = useState<CompanyAdmin | null>(null)
   const { toast } = useToast()
   const queryClient = useQueryClient()
+  const token = getAuthToken()
 
   // Fetch companies
   const { data: companies = [], isLoading: companiesLoading } = useQuery<Company[]>({
@@ -319,6 +320,7 @@ const CompaniesPage = () => {
       if (!response.ok) throw new Error('Failed to fetch companies')
       return response.json()
     },
+    enabled: !!token,
   })
 
   // Fetch company admins
@@ -331,6 +333,7 @@ const CompaniesPage = () => {
       if (!response.ok) throw new Error('Failed to fetch company admins')
       return response.json()
     },
+    enabled: !!token,
   })
 
   // Mutations
