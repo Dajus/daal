@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="add favicon and update HTML structure for better accessibility">
+    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="update email configuration in ContactForm and adjust workspace settings">
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/components/landing/ContactForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/landing/ContactForm.tsx" afterDir="false" />
@@ -185,7 +185,7 @@
       <workItem from="1758186506325" duration="965000" />
       <workItem from="1758519461286" duration="1405000" />
       <workItem from="1758563931920" duration="217000" />
-      <workItem from="1759148703208" duration="5165000" />
+      <workItem from="1759148703208" duration="5694000" />
     </task>
     <task id="LOCAL-00001" summary="implement loading overlays for logout and enhance UI with dark mode support">
       <option name="closed" value="true" />
@@ -467,7 +467,31 @@
       <option name="project" value="LOCAL" />
       <updated>1759150481759</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="update email configuration in ContactForm and adjust workspace settings">
+      <option name="closed" value="true" />
+      <created>1759161329551</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1759161329551</updated>
+    </task>
+    <task id="LOCAL-00037" summary="update email configuration in ContactForm and adjust workspace settings">
+      <option name="closed" value="true" />
+      <created>1759161591621</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1759161591621</updated>
+    </task>
+    <task id="LOCAL-00038" summary="update email configuration in ContactForm and adjust workspace settings">
+      <option name="closed" value="true" />
+      <created>1759161702718</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1759161702718</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -481,7 +505,8 @@
     <MESSAGE value="log company admins in admin endpoint" />
     <MESSAGE value="refactor contact information layout and enhance accessibility" />
     <MESSAGE value="add favicon and update HTML structure for better accessibility" />
-    <option name="LAST_COMMIT_MESSAGE" value="add favicon and update HTML structure for better accessibility" />
+    <MESSAGE value="update email configuration in ContactForm and adjust workspace settings" />
+    <option name="LAST_COMMIT_MESSAGE" value="update email configuration in ContactForm and adjust workspace settings" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
