@@ -1,14 +1,13 @@
 import { useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card.tsx'
+import { Card, CardContent } from '@/components/ui/card'
 import { Mail, CheckCircle } from 'lucide-react'
-import { Label } from '@/components/ui/label.tsx'
-import { Input } from '@/components/ui/input.tsx'
-import { Textarea } from '@/components/ui/textarea.tsx'
-import { Button } from '@/components/ui/button.tsx'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import emailjs from '@emailjs/browser'
 
-// Environment variables pro EmailJS
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
@@ -16,12 +15,14 @@ const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
 interface FormData {
   company: string
   email: string
+  phone: string
   message: string
 }
 
 interface FormErrors {
   company?: string
   email?: string
+  phone?: string
   message?: string
 }
 
@@ -29,6 +30,7 @@ const ContactForm = () => {
   const [formData, setFormData] = useState<FormData>({
     company: '',
     email: '',
+    phone: '',
     message: '',
   })
   const [errors, setErrors] = useState<FormErrors>({})
@@ -40,7 +42,6 @@ const ContactForm = () => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
 
-    // Clear error when user starts typing
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }))
     }
@@ -57,6 +58,12 @@ const ContactForm = () => {
       newErrors.email = 'Email je povinný'
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Zadejte platný email'
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Telefon je povinný'
+    } else if (!/^[\d\s+()-]{9,}$/.test(formData.phone)) {
+      newErrors.phone = 'Zadejte platné telefonní číslo'
     }
 
     if (!formData.message.trim()) {
@@ -77,7 +84,6 @@ const ContactForm = () => {
     setIsSubmitting(true)
 
     try {
-      // Odešlete email přes EmailJS
       if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) {
         await emailjs.send(
           EMAILJS_SERVICE_ID,
@@ -85,8 +91,9 @@ const ContactForm = () => {
           {
             from_company: formData.company,
             from_email: formData.email,
+            from_phone: formData.phone,
             message: formData.message,
-            to_email: 'david121milata@gmail.com', // Změňte na váš email
+            to_email: 'david121milata@gmail.com',
           },
           EMAILJS_PUBLIC_KEY,
         )
@@ -101,12 +108,12 @@ const ContactForm = () => {
         description: 'Děkujeme za vaši zprávu! Kontaktujeme vás do 24 hodin.',
       })
 
-      // Reset form after 5 seconds
       setTimeout(() => {
         setIsSubmitted(false)
         setFormData({
           company: '',
           email: '',
+          phone: '',
           message: '',
         })
       }, 5000)
@@ -154,24 +161,46 @@ const ContactForm = () => {
               {errors.company && <p className="text-red-500 text-sm mt-1">{errors.company}</p>}
             </div>
 
-            <div>
-              <Label htmlFor="email" className="text-gray-700 dark:text-gray-300 font-semibold">
-                E-mailová adresa *
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="kontakt@vase-spolecnost.cz"
-                className={`mt-2 h-12 border-2 ${
-                  errors.email
-                    ? 'border-red-300 focus:border-red-500'
-                    : 'border-gray-300 dark:border-gray-600 focus:border-emerald-500 dark:focus:border-emerald-400'
-                } focus:ring-0 rounded-lg font-medium`}
-              />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div>
+                <Label htmlFor="email" className="text-gray-700 dark:text-gray-300 font-semibold">
+                  E-mailová adresa *
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="kontakt@vase-spolecnost.cz"
+                  className={`mt-2 h-12 border-2 ${
+                    errors.email
+                      ? 'border-red-300 focus:border-red-500'
+                      : 'border-gray-300 dark:border-gray-600 focus:border-emerald-500 dark:focus:border-emerald-400'
+                  } focus:ring-0 rounded-lg font-medium`}
+                />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="phone" className="text-gray-700 dark:text-gray-300 font-semibold">
+                  Telefon *
+                </Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="+420 123 456 789"
+                  className={`mt-2 h-12 border-2 ${
+                    errors.phone
+                      ? 'border-red-300 focus:border-red-500'
+                      : 'border-gray-300 dark:border-gray-600 focus:border-emerald-500 dark:focus:border-emerald-400'
+                  } focus:ring-0 rounded-lg font-medium`}
+                />
+                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+              </div>
             </div>
 
             <div>

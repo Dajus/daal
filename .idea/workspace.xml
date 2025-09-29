@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="update email configuration in ContactForm and adjust workspace settings">
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="update email configuration in ContactForm to use Vite environment variables">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/components/landing/ContactForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/landing/ContactForm.tsx" afterDir="false" />
     </list>
@@ -185,7 +184,7 @@
       <workItem from="1758186506325" duration="965000" />
       <workItem from="1758519461286" duration="1405000" />
       <workItem from="1758563931920" duration="217000" />
-      <workItem from="1759148703208" duration="5694000" />
+      <workItem from="1759148703208" duration="7168000" />
     </task>
     <task id="LOCAL-00001" summary="implement loading overlays for logout and enhance UI with dark mode support">
       <option name="closed" value="true" />
@@ -491,7 +490,31 @@
       <option name="project" value="LOCAL" />
       <updated>1759161702718</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="update email configuration in ContactForm to use Vite environment variables">
+      <option name="closed" value="true" />
+      <created>1759161857031</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1759161857031</updated>
+    </task>
+    <task id="LOCAL-00040" summary="update email configuration in ContactForm to use Vite environment variables">
+      <option name="closed" value="true" />
+      <created>1759162373443</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1759162373443</updated>
+    </task>
+    <task id="LOCAL-00041" summary="update email configuration in ContactForm to use Vite environment variables">
+      <option name="closed" value="true" />
+      <created>1759162567673</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1759162567673</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -506,7 +529,8 @@
     <MESSAGE value="refactor contact information layout and enhance accessibility" />
     <MESSAGE value="add favicon and update HTML structure for better accessibility" />
     <MESSAGE value="update email configuration in ContactForm and adjust workspace settings" />
-    <option name="LAST_COMMIT_MESSAGE" value="update email configuration in ContactForm and adjust workspace settings" />
+    <MESSAGE value="update email configuration in ContactForm to use Vite environment variables" />
+    <option name="LAST_COMMIT_MESSAGE" value="update email configuration in ContactForm to use Vite environment variables" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
