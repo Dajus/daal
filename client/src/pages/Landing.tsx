@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import LoginModal from '@/components/LoginModal.tsx'
 import Navigation from '@/components/landing/Navigation.tsx'
 import { StatisticsSection } from '@/components/landing/StatisticsSection.tsx'
@@ -9,7 +9,6 @@ import AnimatedBackground from '@/components/landing/AnimatedBackground.tsx'
 import { ServicesSection } from '@/components/landing/ServicesSection.tsx'
 import HeroSection from '@/components/landing/HeroSection.tsx'
 
-// Custom hook for modal management
 const useModalManagement = () => {
   const [studentLoginModalOpen, setStudentLoginModalOpen] = useState(false)
   const [adminLoginModalOpen, setAdminLoginModalOpen] = useState(false)
@@ -48,7 +47,7 @@ const Landing = () => {
 
       <Navigation onStudentLogin={openStudentLogin} />
       <HeroSection onStudentLogin={openStudentLogin} />
-      <ServicesSection />
+      <ServicesSection onStudentLogin={openStudentLogin} />
       <StatisticsSection />
       <AboutSection />
       <ContactSection />

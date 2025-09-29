@@ -47,8 +47,11 @@ const courses: Course[] = [
   },
 ]
 
-const CourseCard = ({ course }: { course: Course }) => (
-  <Card className="border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-800">
+const CourseCard = ({ course, onStudentLogin }: { course: Course; onStudentLogin: () => void }) => (
+  <Card
+    className="cursor-pointer border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-gray-800"
+    onClick={onStudentLogin}
+  >
     <CardContent className="p-6">
       <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center mb-4">
         <course.icon className="text-emerald-600 dark:text-emerald-400 h-6 w-6" />
@@ -62,7 +65,7 @@ const CourseCard = ({ course }: { course: Course }) => (
   </Card>
 )
 
-export const ServicesSection = () => (
+export const ServicesSection = ({ onStudentLogin }: { onStudentLogin: () => void }) => (
   <section id="services" className="py-24 bg-white dark:bg-gray-900 relative z-10">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-16">
@@ -73,7 +76,7 @@ export const ServicesSection = () => (
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {courses.map((course, index) => (
-          <CourseCard key={index} course={course} />
+          <CourseCard key={index} course={course} onStudentLogin={onStudentLogin} />
         ))}
       </div>
     </div>

@@ -4,8 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="disable cache for company admin endpoints">
+    <list default="true" id="9fd8ce8f-f7fe-4a62-b2a1-ce787f5885b2" name="Changes" comment="log company admins in admin endpoint">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/landing/ContactInfo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/landing/ContactInfo.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/landing/HeroSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/landing/HeroSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/landing/ServicesSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/landing/ServicesSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/pages/Landing.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/pages/Landing.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/index.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/assets/html2canvas.esm-CBrSDip1.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/assets/index-A9odi726.js" beforeDir="false" />
@@ -14,7 +18,6 @@
       <change beforePath="$PROJECT_DIR$/dist/public/assets/purify.es-BFmuJLeH.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/fonts/roboto-regular.ttf" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/public/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/routes.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,6 +94,7 @@
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;npm.dev.executor&quot;: &quot;Run&quot;,
     &quot;npm.postbuild.executor&quot;: &quot;Run&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
     &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/Users/davidmilata/Development/my-dev/daal/node_modules/prettier&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
     &quot;ts.external.directory.path&quot;: &quot;/Users/davidmilata/Development/my-dev/daal/node_modules/typescript/lib&quot;,
@@ -111,7 +115,7 @@
       <recent name="$PROJECT_DIR$/client/src/components" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.postbuild">
+  <component name="RunManager" selected="npm.start">
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -132,18 +136,29 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.postbuild" />
+        <item itemvalue="npm.start" />
         <item itemvalue="npm.dev" />
+        <item itemvalue="npm.postbuild" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
-        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26199.169" />
+        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-IU-252.26199.169" />
       </set>
     </attachedChunks>
   </component>
@@ -175,7 +190,12 @@
       <workItem from="1757955960208" duration="6351000" />
       <workItem from="1758012760034" duration="3834000" />
       <workItem from="1758039953142" duration="2524000" />
-      <workItem from="1758045926059" duration="3663000" />
+      <workItem from="1758045926059" duration="5181000" />
+      <workItem from="1758095993451" duration="11067000" />
+      <workItem from="1758186506325" duration="965000" />
+      <workItem from="1758519461286" duration="1405000" />
+      <workItem from="1758563931920" duration="217000" />
+      <workItem from="1759148703208" duration="1201000" />
     </task>
     <task id="LOCAL-00001" summary="implement loading overlays for logout and enhance UI with dark mode support">
       <option name="closed" value="true" />
@@ -393,7 +413,55 @@
       <option name="project" value="LOCAL" />
       <updated>1758050982032</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="disable cache for company admin endpoints">
+      <option name="closed" value="true" />
+      <created>1758051660935</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1758051660935</updated>
+    </task>
+    <task id="LOCAL-00029" summary="disable cache for company admin endpoints">
+      <option name="closed" value="true" />
+      <created>1758175303633</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1758175303633</updated>
+    </task>
+    <task id="LOCAL-00030" summary="log company admins in admin endpoint">
+      <option name="closed" value="true" />
+      <created>1758176442896</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1758176442896</updated>
+    </task>
+    <task id="LOCAL-00031" summary="log company admins in admin endpoint">
+      <option name="closed" value="true" />
+      <created>1758177105547</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1758177105547</updated>
+    </task>
+    <task id="LOCAL-00032" summary="log company admins in admin endpoint">
+      <option name="closed" value="true" />
+      <created>1758179233161</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1758179233161</updated>
+    </task>
+    <task id="LOCAL-00033" summary="log company admins in admin endpoint">
+      <option name="closed" value="true" />
+      <created>1758187264125</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1758187264125</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -404,7 +472,8 @@
     <MESSAGE value="add Prettier configuration, implement Cloudinary integration, and enhance video upload functionality" />
     <MESSAGE value="add landing sections including About, Contact, Services, and Statistics; enhance Certificate and Hero sections" />
     <MESSAGE value="disable cache for company admin endpoints" />
-    <option name="LAST_COMMIT_MESSAGE" value="disable cache for company admin endpoints" />
+    <MESSAGE value="log company admins in admin endpoint" />
+    <option name="LAST_COMMIT_MESSAGE" value="log company admins in admin endpoint" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
