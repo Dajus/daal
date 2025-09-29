@@ -86,7 +86,7 @@ const ContactForm = () => {
             from_company: formData.company,
             from_email: formData.email,
             message: formData.message,
-            to_email: 'info@daal.cz', // Změňte na váš email
+            to_email: 'david121milata@gmail.com', // Změňte na váš email
           },
           EMAILJS_PUBLIC_KEY,
         )
