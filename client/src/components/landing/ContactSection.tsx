@@ -7,7 +7,7 @@ const ContactSection = () => (
       <div className="text-center mb-8 sm:mb-12 lg:mb-16">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Kontaktujte nás</h2>
         <p className="text-xl text-gray-600 dark:text-gray-400">
-          Jste připraveni začít s bezpečnostním školením na pracovišti?
+          Chcete řešit problematiku BOZP, PO, ADR a nebo se na něco zeptat? Napište nám a my vám rádi pomůžeme!
         </p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">

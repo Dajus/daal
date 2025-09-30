@@ -14,12 +14,12 @@ const AboutSection = () => (
         <div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">O společnosti DAAL</h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-            S více než 15letými zkušenostmi v oblasti školení bezpečnosti práce se DAAL stal důvěryhodným partnerem pro
-            společnosti po celé Evropě. Specializujeme se na komplexní bezpečnostní vzdělávání, které kombinuje
-            teoretické znalosti s praktickou aplikací.
+            S více než 20letými zkušenostmi v oblasti školení bezpečnosti práce se DAAL stal důvěryhodným partnerem pro
+            společnosti po celé ČR. Poskytujeme odborné poradenství v oblastech bezpečnost práce(BOZP), požární ochrana,
+            hygiena práce a poradenství v oblasti ADR.
           </p>
           <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-            Naši certifikovaní instruktoři a moderní e-learningová platforma zajišťují, že vaši zaměstnanci získají
+            Naši certifikovaní instruktoři a moderní e-learningová platforma zajišťují, že Vaši zaměstnanci získají
             vysoce kvalitní školení při zachování flexibility a pohodlí.
           </p>
           <div className="flex flex-wrap gap-4">

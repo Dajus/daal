@@ -20,9 +20,10 @@ const HeroSection = ({ onStudentLogin }: { onStudentLogin: () => void }) => {
             </div>
           </div>
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-            Bezpečnost práce je <br />
+            Kvalitní BOZP, PO a ADR poradenství
+            <br />
             <span className="bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent animate-pulse">
-              naší prioritou
+              pro každou firmu
             </span>
           </h1>
           <p className="text-xl text-white/80 mb-12 max-w-3xl mx-auto leading-relaxed">

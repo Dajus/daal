@@ -4,9 +4,9 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-  { value: '2,500+', label: 'Absolventů' },
-  { value: '13', label: 'Typů kurzů' },
-  { value: '15+', label: 'Let zkušeností' },
+  { value: '150,000+', label: 'Absolventů' },
+  { value: '8', label: 'Typů kurzů' },
+  { value: '20+', label: 'Let zkušeností' },
   { value: '98%', label: 'Úspěšnost' },
 ]
 
