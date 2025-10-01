@@ -161,7 +161,7 @@ const WebCertificatePreview = () => {
             <div className="text-sm text-gray-500 flex justify-center items-center gap-4">
               <span className="font-semibold text-gray-700">DAAL Školicí platforma</span>
               <span className="text-gray-300">|</span>
-              <span>Praha, Česká republika</span>
+              <span>Třinec, Česká republika</span>
               <span className="text-gray-300">|</span>
               <span>Profesionální školení bezpečnosti práce</span>
             </div>

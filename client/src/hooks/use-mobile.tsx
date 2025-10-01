@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 
 const MOBILE_BREAKPOINT = 768
 
@@ -8,10 +8,6 @@ export const useIsMobile = (): boolean => {
     if (typeof window === 'undefined') return false
     return window.innerWidth < MOBILE_BREAKPOINT
   })
-
-  const handleResize = useCallback(() => {
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-  }, [])
 
   useEffect(() => {
     // Early return for SSR

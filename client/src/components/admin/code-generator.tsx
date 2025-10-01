@@ -29,9 +29,9 @@ export const CodeGenerator = () => {
     courseId: '',
     companyId: '',
     unlimitedParticipants: false,
-    maxParticipants: 5,
+    codeCount: 5,
     theoryToTest: true,
-    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
   })
 
   // Fetch courses
@@ -112,18 +112,17 @@ export const CodeGenerator = () => {
           (code: AccessCode) =>
             ({
               ...code,
-              generatedAt: new Date().toISOString(), // Mark when this batch was generated
+              generatedAt: new Date().toISOString(),
             }) as GeneratedAccessCode,
         ),
         ...prev,
       ])
 
-      // Reset form
       setFormData({
         courseId: '',
         companyId: '',
         unlimitedParticipants: false,
-        maxParticipants: 5,
+        codeCount: 3,
         theoryToTest: true,
         validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       })
@@ -153,7 +152,7 @@ export const CodeGenerator = () => {
       courseId: parseInt(formData.courseId),
       companyId: parseInt(formData.companyId),
       unlimitedParticipants: formData.unlimitedParticipants,
-      maxParticipants: formData.unlimitedParticipants ? null : formData.maxParticipants,
+      maxParticipants: formData.unlimitedParticipants ? null : formData.codeCount,
       theoryToTest: formData.theoryToTest,
       validUntil: formData.validUntil,
     })
@@ -213,10 +212,9 @@ export const CodeGenerator = () => {
   const groupedGeneratedCodes = justGeneratedCodes.reduce((groups: any[], code) => {
     const codeTime = new Date(code.generatedAt || code.createdAt || 0).getTime()
 
-    // Find existing group within 1 minute
     const existingGroup = groups.find((group) => {
       const groupTime = new Date(group.timestamp).getTime()
-      return Math.abs(codeTime - groupTime) < 60000 // 1 minute threshold
+      return Math.abs(codeTime - groupTime) < 60000
     })
 
     if (existingGroup) {
@@ -309,15 +307,20 @@ export const CodeGenerator = () => {
                   />
                 </div>
                 {!formData.unlimitedParticipants && (
-                  <Input
-                    placeholder="Počet účastníků"
-                    type="number"
-                    min="1"
-                    value={formData.maxParticipants || ''}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, maxParticipants: parseInt(e.target.value) || 0 }))
-                    }
-                  />
+                  <div className="space-y-1">
+                    <Label htmlFor="codeCount" className="text-xs text-gray-600 dark:text-gray-400">
+                      Počet kódů k vygenerování (každý pro jedno použití)
+                    </Label>
+                    <Input
+                      id="codeCount"
+                      placeholder="Počet kódů"
+                      type="number"
+                      min="1"
+                      max="100"
+                      value={formData.codeCount || ''}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, codeCount: parseInt(e.target.value) || 1 }))}
+                    />
+                  </div>
                 )}
               </div>
 
@@ -390,7 +393,6 @@ export const CodeGenerator = () => {
 
                   return (
                     <div key={groupIndex} className="space-y-3">
-                      {/* Group separator with timestamp */}
                       {groupIndex > 0 && (
                         <div className="relative">
                           <div className="absolute inset-0 flex items-center">
@@ -399,14 +401,12 @@ export const CodeGenerator = () => {
                         </div>
                       )}
 
-                      {/* Timestamp header for group */}
                       <div className="flex items-center justify-between">
                         <div className="text-xs font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-1 rounded-md">
                           {timeDisplay} • {group.codes.length} kód{group.codes.length > 1 ? 'y' : ''}
                         </div>
                       </div>
 
-                      {/* Codes in this group */}
                       <div className="space-y-2">
                         {group.codes.map((code: any) => {
                           const course = courses.find((c) => c.id === code.courseId)
@@ -443,9 +443,6 @@ export const CodeGenerator = () => {
                                   <Badge variant={code.theoryToTest ? 'default' : 'secondary'} className="text-xs">
                                     {code.theoryToTest ? 'Teorie + Test' : 'Pouze teorie'}
                                   </Badge>
-                                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                                    {code.usageCount}/{code.unlimitedParticipants ? '∞' : code.maxParticipants}
-                                  </span>
                                 </div>
                               </div>
                             </div>

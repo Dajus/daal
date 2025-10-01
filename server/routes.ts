@@ -3,15 +3,9 @@ import { createServer, type Server } from 'http'
 import { storage } from './storage'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { z } from 'zod'
 import multer from 'multer'
-import path from 'path'
 import {
-  insertAdminSchema,
   insertAccessCodeSchema,
-  insertStudentSessionSchema,
-  insertTestAttemptSchema,
-  insertCertificateSchema,
   insertTheorySlideSchema,
   insertTestQuestionSchema,
   insertCourseSchema,
@@ -86,23 +80,8 @@ const authenticateSuperAdmin = async (req: any, res: Response, next: any) => {
 
 // Generate access code with course prefix
 function generateCourseCode(courseName: string): string {
-  const prefixes: Record<string, string> = {
-    'Školení řidičů řídících služební vozidlo zaměstnavatele': 'DRIV',
-    'Školení BOZP a PO': 'BOZP',
-    'Theory test': 'THEO',
-    'Školení zaměstnanců a OSVČ pro provádění práce ve výškách (PVV)': 'HEIG',
-    'Hygiena a první pomoc': 'HYGI',
-    'Nakládání s odpady': 'WAST',
-    'Školení pro zdravotnické pracovníky - BRC': 'MEDB',
-    'Školení pro nezdravotnické pracovníky - BRC': 'NONM',
-    'Školení přepravy odpadu - BRC': 'TRAN',
-    'Health and Safety (H&S) and Fire Protection (FP) training': 'HSFT',
-    'Szkolenia BHP i PPOŻ': 'PLHS',
-    'навчання з охорони праці (OHS) та протипожежного захисту (FP)': 'UAHS',
-    'Přeprava nebezpečných věcí v praxi - Dohoda ADR': 'HADR',
-  }
-
-  const prefix = prefixes[courseName] || 'COUR'
+  console.log(courseName)
+  const prefix = courseName || 'COUR'
   const timestamp = Date.now().toString(36)
   const random = Math.random().toString(36).substring(2, 6)
 
@@ -209,11 +188,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'Access code has expired' })
       }
 
-      // Check usage limits - count active sessions instead of total usage
+      // Check usage limits
       if (!code.unlimitedParticipants && code.maxParticipants) {
-        const activeSessionsCount = await storage.getActiveSessionsCountForCode(code.id)
-        if (activeSessionsCount >= code.maxParticipants) {
-          return res.status(401).json({ message: 'Maximum participants currently active for this code' })
+        // Pro jednorázové kódy (maxParticipants = 1)
+        if (code.maxParticipants === 1) {
+          // Zkontroluj, jestli už existuje session pro tento kód
+          const existingSession = await storage.getStudentSessionByNameEmailAndCode(studentName, studentEmail, code.id)
+
+          if (!existingSession) {
+            // Pokud neexistuje session pro tento user, zkontroluj jestli kód už není použitý někým jiným
+            const activeSessionsCount = await storage.getActiveSessionsCountForCode(code.id)
+            if (activeSessionsCount >= 1) {
+              return res.status(401).json({ message: 'Tento kód byl již použit jinou osobou' })
+            }
+          }
+          // Pokud existuje session pro tohoto usera, pokračuj (opakované přihlášení je OK)
+        } else {
+          // Pro vícenásobné kódy (maxParticipants > 1) - použij původní logiku
+          const activeSessionsCount = await storage.getActiveSessionsCountForCode(code.id)
+          if (activeSessionsCount >= code.maxParticipants) {
+            return res.status(401).json({ message: 'Maximální počet účastníků pro tento kód byl dosažen' })
+          }
         }
       }
 
@@ -423,16 +418,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Course not found' })
       }
 
-      // Generate multiple codes if specified
-      const codeCount = data.maxParticipants && !data.unlimitedParticipants ? data.maxParticipants : 1
+      const numberOfCodesToGenerate = data.unlimitedParticipants ? 1 : data.maxParticipants || 1
       const codes = []
 
-      for (let i = 0; i < Math.min(codeCount, 100); i++) {
-        // Limit to 100 codes max
-        const code = generateCourseCode(course.name)
+      for (let i = 0; i < Math.min(numberOfCodesToGenerate, 100); i++) {
+        const code = generateCourseCode(course.abbreviation || course.name)
         const accessCode = await storage.createAccessCode({
-          ...data,
+          courseId: data.courseId,
+          companyId: data.companyId,
           code,
+          maxParticipants: data.unlimitedParticipants ? null : 1,
+          unlimitedParticipants: data.unlimitedParticipants,
+          theoryToTest: data.theoryToTest,
+          validUntil: data.validUntil,
+          isActive: data.isActive ?? true,
           createdBy: req.admin.id,
         } as any)
         codes.push(accessCode)
@@ -668,6 +667,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: 'Invalid token' })
     }
   }
+
+  // Email certificate endpoint
+  app.post('/api/email/send-certificate', authenticateStudent, async (req: any, res: Response) => {
+    try {
+      const { pdfBase64, certificateData } = req.body
+
+      if (!pdfBase64 || !certificateData) {
+        return res.status(400).json({ message: 'Missing required data' })
+      }
+
+      // Import email service
+      const { emailService } = await import('./emailService')
+
+      // Convert Base64 to Buffer
+      const pdfBuffer = Buffer.from(pdfBase64, 'base64')
+
+      // Send email
+      await emailService.sendCertificateEmail(
+        {
+          recipientEmail: req.session.studentEmail,
+          recipientName: req.session.studentName,
+          courseName: certificateData.courseName,
+          certificateNumber: certificateData.certificateNumber,
+          verificationCode: certificateData.verificationCode,
+          completionDate: certificateData.completionDate,
+          companyName: certificateData.companyName,
+          score: certificateData.score,
+        },
+        pdfBuffer,
+      )
+
+      res.json({ success: true, message: 'Email sent successfully' })
+    } catch (error) {
+      console.error('Send certificate email error:', error)
+      res.status(500).json({ message: 'Failed to send email' })
+    }
+  })
 
   app.get('/api/student/progress', authenticateStudent, async (req: any, res: Response) => {
     try {
