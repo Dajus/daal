@@ -8,10 +8,12 @@ import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
 import { getAuthHeaders } from '@/lib/auth'
 import { apiRequest } from '@/lib/queryClient'
-import { Clock, ChevronLeft, ChevronRight, Flag, CheckCircle, AlertTriangle } from 'lucide-react'
-import type { TestQuestion } from '@shared/schema'
+import { Clock, ChevronLeft, ChevronRight, Flag, CheckCircle, AlertTriangle, Mail, Download } from 'lucide-react'
 import { t } from '@/lib/translations'
 import { LoadingScreen } from '@/components/ui/spinner'
+import { downloadCertificate, generateCertificateBlob } from '@/lib/certificate-pdf-generator'
+
+import type { TestQuestion } from '@shared/schema'
 
 interface TestResult {
   attempt: {
@@ -45,6 +47,8 @@ const TestInterface = ({ progress }: { progress?: any }) => {
   const [testResult, setTestResult] = useState<TestResult | null>(null)
   const [startTime, setStartTime] = useState<number>(0)
   const [showResultsReview, setShowResultsReview] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
 
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -62,6 +66,18 @@ const TestInterface = ({ progress }: { progress?: any }) => {
     enabled: testStarted,
   })
 
+  const { data: certificateData } = useQuery({
+    queryKey: ['/api/student/certificate'],
+    queryFn: async () => {
+      const response = await fetch('/api/student/certificate', {
+        headers: getAuthHeaders(),
+      })
+      if (!response.ok) return null
+      return response.json()
+    },
+    enabled: testResult?.attempt.passed === true,
+  })
+
   const submitTestMutation = useMutation({
     mutationFn: async (testData: { answers: Record<number, any>; timeTakenSeconds: number }) => {
       const response = await apiRequest('/api/student/test/submit', {
@@ -74,6 +90,7 @@ const TestInterface = ({ progress }: { progress?: any }) => {
     onSuccess: (result) => {
       setTestResult(result)
       queryClient.invalidateQueries({ queryKey: ['/api/student/progress'] })
+      queryClient.invalidateQueries({ queryKey: ['/api/student/certificate'] })
 
       if (result.attempt.passed) {
         toast({
@@ -96,6 +113,63 @@ const TestInterface = ({ progress }: { progress?: any }) => {
       })
     },
   })
+
+  useEffect(() => {
+    const sendCertificateEmail = async () => {
+      if (!testResult?.attempt.passed || !certificateData || emailSent || isSendingEmail) {
+        return
+      }
+
+      setIsSendingEmail(true)
+
+      try {
+        const pdfData = {
+          studentName: certificateData.student.name,
+          courseName: certificateData.course.name,
+          companyName: certificateData.company?.name,
+          completionDate: new Date(certificateData.certificate.issuedAt).toLocaleDateString('cs-CZ'),
+          abbreviation: certificateData.course.abbreviation,
+          certificateNumber: certificateData.certificate.certificateNumber,
+          verificationCode: certificateData.certificate.verificationCode,
+          score: testResult.attempt.percentage ? parseInt(testResult.attempt.percentage) : undefined,
+        }
+
+        const pdfBlob = await generateCertificateBlob(pdfData)
+
+        const reader = new FileReader()
+        reader.readAsDataURL(pdfBlob)
+
+        const base64PDF = await new Promise<string>((resolve) => {
+          reader.onloadend = () => {
+            const result = reader.result as string
+            resolve(result.split(',')[1])
+          }
+        })
+
+        const response = await fetch('/api/email/send-certificate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeaders(),
+          },
+          body: JSON.stringify({
+            pdfBase64: base64PDF,
+            certificateData: pdfData,
+          }),
+        })
+
+        if (!response.ok) throw new Error('Failed to send email')
+
+        setEmailSent(true)
+      } catch (error) {
+        console.error('Chyba při automatickém odesílání emailu:', error)
+      } finally {
+        setIsSendingEmail(false)
+      }
+    }
+
+    sendCertificateEmail()
+  }, [testResult, certificateData, emailSent, isSendingEmail])
 
   // Timer effect
   useEffect(() => {
@@ -152,6 +226,41 @@ const TestInterface = ({ progress }: { progress?: any }) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+  const [isGenerating, setIsGenerating] = useState(false)
+
+  const handleDownloadPDF = async () => {
+    if (!certificateData) return
+
+    setIsGenerating(true)
+    const pdfData = {
+      studentName: certificateData.student.name,
+      courseName: certificateData.course.name,
+      companyName: certificateData.company?.name,
+      abbreviation: certificateData.course?.abbreviation,
+      completionDate: new Date(certificateData.certificate.issuedAt).toLocaleDateString('cs-CZ'),
+      certificateNumber: certificateData.certificate.certificateNumber,
+      verificationCode: certificateData.certificate.verificationCode,
+      score: progress?.attempts?.[0]?.percentage ? parseInt(progress.attempts[0].percentage) : undefined,
+    }
+
+    try {
+      await downloadCertificate(pdfData)
+
+      toast({
+        title: 'Certifikát stažen',
+        description: 'Váš certifikát s českými znaky byl úspěšně vygenerován!',
+      })
+    } catch (error) {
+      console.error('Chyba při generování certifikátu:', error)
+      toast({
+        title: 'Chyba při stahování',
+        description: 'Nepodařilo se stáhnout certifikát. Zkuste to prosím znovu.',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   const currentQuestion = questions[currentQuestionIndex]
@@ -286,22 +395,40 @@ const TestInterface = ({ progress }: { progress?: any }) => {
             </div>
           </div>
 
-          {/* Review Answers Button */}
-          <div className="flex justify-center mb-6">
-            <Button
-              onClick={() => setShowResultsReview(!showResultsReview)}
-              variant="outline"
-              className="border-emerald-500 text-emerald-600 hover:bg-emerald-50"
-            >
-              {showResultsReview ? 'Skrýt detaily' : t('reviewAnswers')}
-            </Button>
-          </div>
+          {testResult.attempt.passed && certificateData && (
+            <Card className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/20 dark:to-blue-900/20 border-emerald-200 dark:border-emerald-700">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-center gap-4">
+                  <div className="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Mail className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-emerald-800 dark:text-emerald-300">
+                    <p className="text-sm">
+                      {isSendingEmail ? (
+                        <span className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                          Odesílání certifikátu na email...
+                        </span>
+                      ) : emailSent ? (
+                        <span>
+                          Na email <strong>{certificateData.student.email}</strong> jsme Vám odeslali certifikát o
+                          úspěšném absolvování kurzu
+                        </span>
+                      ) : (
+                        <span>Příprava certifikátu k odeslání...</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Results Review Section */}
           {showResultsReview && Array.isArray(testResult.attempt.answers) && (
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-8 max-w-4xl mx-auto">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {t('testResults')} - {t('reviewAnswers')}
+                Výsledky testu - Zkontrolovat odpovědi
               </h3>
               <div className="space-y-4">
                 {testResult.attempt.answers.map((answer, index) => {
@@ -328,7 +455,7 @@ const TestInterface = ({ progress }: { progress?: any }) => {
 
                       <div className="space-y-2 text-sm">
                         <div>
-                          <span className="font-medium text-gray-700 dark:text-gray-300">{t('yourAnswer')}: </span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">Vaše odpovědi: </span>
                           <span
                             className={
                               answer.isCorrect ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
@@ -359,28 +486,48 @@ const TestInterface = ({ progress }: { progress?: any }) => {
             </div>
           )}
 
-          {/* Fallback if answers array is not available */}
           {showResultsReview && !Array.isArray(testResult.attempt.answers) && (
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-8 max-w-4xl mx-auto">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('testResults')}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Výsledky testu</h3>
               <p className="text-gray-600 dark:text-gray-400">Detaily odpovědí nejsou k dispozici pro tento pokus.</p>
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+          <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4 mt-6">
             <Button onClick={() => setLocation('/student')} className="bg-emerald-600 hover:bg-emerald-700 text-white">
               {t('backToDashboard')}
             </Button>
 
             {testResult.attempt.passed && testResult.certificate && (
               <Button
-                onClick={() => setLocation('/student/certificate')}
-                variant="outline"
-                className="border-primary text-primary hover:bg-primary-light"
+                onClick={handleDownloadPDF}
+                disabled={isGenerating}
+                className="bg-emerald-600 dark:bg-emerald-700 text-white hover:bg-emerald-700 dark:hover:bg-emerald-800 flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                {t('viewCertificate')}
+                {isGenerating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Generování...
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4" />
+                    Stáhnout PDF
+                  </>
+                )}
               </Button>
             )}
+
+            {/* Review Answers Button */}
+            <div className="flex justify-center mb-6">
+              <Button
+                onClick={() => setShowResultsReview(!showResultsReview)}
+                variant="outline"
+                className="border-emerald-500 text-emerald-600 hover:bg-emerald-50"
+              >
+                {showResultsReview ? 'Skrýt detaily' : 'Vaše odpovědi'}
+              </Button>
+            </div>
 
             {!testResult.attempt.passed && testResult.attemptsRemaining > 0 && (
               <Button
@@ -476,7 +623,6 @@ const TestInterface = ({ progress }: { progress?: any }) => {
     )
   }
 
-  // Review mode
   if (showReview) {
     return (
       <div className="space-y-6">
@@ -565,7 +711,6 @@ const TestInterface = ({ progress }: { progress?: any }) => {
     )
   }
 
-  // Main test interface
   return (
     <div className="space-y-6">
       {/* Progress Navigation - Fixed at top */}

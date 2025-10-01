@@ -45,7 +45,7 @@ const Footer = ({ onAdminLogin }: { onAdminLogin: () => void }) => (
             </li>
             <li className="flex items-center hover:text-white transition-colors">
               <MapPin className="mr-2 h-4 w-4" />
-              Praha, Česká republika
+              Třinec, Česká republika
             </li>
             <li className="flex items-center hover:text-white transition-colors">
               <Globe className="mr-2 h-4 w-4" />

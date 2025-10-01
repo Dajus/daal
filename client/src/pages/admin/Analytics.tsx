@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { getAuthHeaders, getUserInfo } from '@/lib/auth'
-import { Key, GraduationCap, Clock, TrendingUp, Users, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
+import { Key, GraduationCap, Clock, TrendingUp, Users } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import StatCards from '@/components/admin/analytics/StatCards.tsx'
 
 interface AnalyticsData {
   activeCodes: number
@@ -125,23 +126,8 @@ const AdminAnalytics = () => {
 
   return (
     <div className="space-y-8">
-      {/* Přehled statistik */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {statCards.map((stat, index) => (
-          <Card key={index} className="border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center">
-                <div className={`w-12 h-12 ${stat.bgColor} rounded-lg flex items-center justify-center`}>
-                  <stat.icon className={`${stat.color} h-6 w-6`} />
-                </div>
-                <div className="ml-4">
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{stat.title}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <StatCards statCards={statCards} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -218,7 +204,6 @@ const AdminAnalytics = () => {
               ) : (
                 <div className="space-y-4">
                   {(() => {
-                    // Seskupení přístupových kódů podle názvu kurzu
                     const groupedCodes = (detailedCodes || []).reduce(
                       (groups, accessCode) => {
                         const courseName = accessCode.courseName
@@ -257,131 +242,134 @@ const AdminAnalytics = () => {
                             </AccordionTrigger>
                             <AccordionContent className="px-3 sm:px-4 pb-3 sm:pb-4 pt-2">
                               <div className="space-y-4">
-                                {codes.map((accessCode, index) => (
-                                  <Accordion
-                                    key={index}
-                                    type="multiple"
-                                    className="border border-gray-200 dark:border-gray-600 rounded-lg"
-                                  >
-                                    <AccordionItem value={`access-code-${accessCode.id}`} className="border-none">
-                                      <AccordionTrigger className="hover:no-underline pl-3 sm:pl-6 pr-2 sm:pr-3 py-2 bg-gray-50 dark:bg-gray-700/50 rounded-t-lg">
-                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full text-left gap-2">
-                                          <div className="flex items-center gap-3">
+                                {codes.map((accessCode, index) => {
+                                  if (accessCode.maxParticipants === 1) {
+                                    const student = accessCode.students[0]
+                                    console.log(accessCode.students)
+                                    return (
+                                      <div
+                                        key={index}
+                                        className="border border-gray-200 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-700/50"
+                                      >
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                          <div className="flex items-center gap-3 flex-wrap">
                                             <code className="bg-gray-200 dark:bg-gray-800 px-2 py-1 rounded font-mono text-xs">
                                               {accessCode.code}
                                             </code>
-                                            <Badge
-                                              variant={accessCode.isActive ? 'default' : 'secondary'}
-                                              className="text-xs py-0"
-                                            >
-                                              {accessCode.isActive ? 'Aktivní' : 'Neaktivní'}
-                                            </Badge>
-                                          </div>
-                                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-gray-600 dark:text-gray-400">
-                                            <span>
-                                              Využití: {accessCode.usage}
-                                              {accessCode.maxParticipants && ` / ${accessCode.maxParticipants}`}
-                                            </span>
-                                            <span>
-                                              Platný do: {new Date(accessCode.validUntil).toLocaleDateString('cs-CZ')}
-                                            </span>
-                                            {accessCode.theoryToTest && (
-                                              <span className="text-blue-600 dark:text-blue-400">
-                                                ✓ Automatický přechod
+                                            {student ? (
+                                              <>
+                                                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                                  {student.name}
+                                                </span>
+                                                {student.testCompletedAt && (
+                                                  <Badge
+                                                    variant={student.passed ? 'default' : 'destructive'}
+                                                    className="text-xs"
+                                                  >
+                                                    {student.passed ? '✓ Splněno' : '✗ Nesplněno'}
+                                                  </Badge>
+                                                )}
+                                                {student.certificateIssued && (
+                                                  <Badge variant="outline" className="text-xs">
+                                                    Certifikát vydán
+                                                  </Badge>
+                                                )}
+                                              </>
+                                            ) : (
+                                              <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                Kód zatím nebyl použit
                                               </span>
                                             )}
                                           </div>
+                                          <div className="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400">
+                                            <span>
+                                              Platný do: {new Date(accessCode.validUntil).toLocaleDateString('cs-CZ')}
+                                            </span>
+                                          </div>
                                         </div>
-                                      </AccordionTrigger>
-                                      <AccordionContent className="px-3 pb-3 pt-2">
-                                        {/* Seznam studentů */}
-                                        {accessCode.students.length > 0 ? (
-                                          <div className="space-y-2">
-                                            <h5 className="text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-600 pb-1">
-                                              Účastníci ({accessCode.students.length})
-                                            </h5>
-                                            <div className="grid gap-2">
-                                              {accessCode.students.map((student, studentIndex) => (
-                                                <div
-                                                  key={studentIndex}
-                                                  className="bg-gray-50 dark:bg-gray-700/50 rounded p-2"
-                                                >
-                                                  <div className="flex items-center justify-between">
-                                                    <div className="flex-1 min-w-0">
-                                                      <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                                        {student.name}
-                                                      </div>
-                                                      <div className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                                                        {student.email}
-                                                      </div>
-                                                    </div>
-                                                    <div className="flex flex-col gap-1 text-right ml-2">
-                                                      {/* Stav teorie */}
-                                                      <div className="flex items-center gap-1">
-                                                        {student.theoryCompletedAt ? (
-                                                          <CheckCircle className="h-3 w-3 text-green-500" />
-                                                        ) : (
-                                                          <AlertCircle className="h-3 w-3 text-yellow-500" />
-                                                        )}
-                                                        <span className="text-xs">Teorie</span>
-                                                      </div>
+                                      </div>
+                                    )
+                                  }
 
-                                                      {/* Stav testu */}
-                                                      {student.testScore !== null &&
-                                                        student.testScore !== undefined && (
-                                                          <div className="flex items-center gap-1">
-                                                            <div className="relative group">
-                                                              {student.passed ? (
-                                                                <CheckCircle className="h-3 w-3 text-green-500 cursor-help" />
-                                                              ) : (
-                                                                <XCircle className="h-3 w-3 text-red-500 cursor-help" />
-                                                              )}
-                                                              {student.testCompletedAt && (
-                                                                <div className="absolute -top-1 right-full mr-1 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                                                  {new Date(student.testCompletedAt).toLocaleDateString(
-                                                                    'cs-CZ',
-                                                                    {
-                                                                      day: '2-digit',
-                                                                      month: '2-digit',
-                                                                      year: '2-digit',
-                                                                    },
-                                                                  )}{' '}
-                                                                  {new Date(student.testCompletedAt).toLocaleTimeString(
-                                                                    'cs-CZ',
-                                                                    {
-                                                                      hour: '2-digit',
-                                                                      minute: '2-digit',
-                                                                    },
-                                                                  )}
-                                                                </div>
-                                                              )}
-                                                            </div>
-                                                            <span className="text-xs">Test {student.testScore}%</span>
-                                                          </div>
-                                                        )}
-
-                                                      {/* Stav certifikátu */}
-                                                      {student.certificateIssued && (
-                                                        <div className="flex items-center gap-1">
-                                                          <CheckCircle className="h-3 w-3 text-green-500" />
-                                                          <span className="text-xs">Certifikát</span>
-                                                        </div>
-                                                      )}
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                              ))}
+                                  return (
+                                    <Accordion
+                                      key={index}
+                                      type="multiple"
+                                      className="border border-gray-200 dark:border-gray-600 rounded-lg"
+                                    >
+                                      <AccordionItem value={`access-code-${accessCode.id}`} className="border-none">
+                                        <AccordionTrigger className="hover:no-underline pl-3 pr-2 sm:pr-3 py-2 bg-gray-50 dark:bg-gray-700/50 rounded-t-lg">
+                                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full text-left gap-2">
+                                            <div className="flex items-center gap-3">
+                                              <code className="bg-gray-200 dark:bg-gray-800 px-2 py-1 rounded font-mono text-xs">
+                                                {accessCode.code}
+                                              </code>
+                                            </div>
+                                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-gray-600 dark:text-gray-400">
+                                              <span>
+                                                Využití: {accessCode.usage}
+                                                {accessCode.maxParticipants && ` / ${accessCode.maxParticipants}`}
+                                              </span>
+                                              <span>
+                                                Platný do: {new Date(accessCode.validUntil).toLocaleDateString('cs-CZ')}
+                                              </span>
                                             </div>
                                           </div>
-                                        ) : (
-                                          <div className="text-center py-2 text-gray-500 dark:text-gray-400 text-sm">
-                                            Kód zatím nebyl použit
-                                          </div>
-                                        )}
-                                      </AccordionContent>
-                                    </AccordionItem>
-                                  </Accordion>
-                                ))}
+                                        </AccordionTrigger>
+                                        <AccordionContent className="px-3 pb-3 pt-2">
+                                          {/* Seznam studentů */}
+                                          {accessCode.students.length > 0 ? (
+                                            <div className="space-y-2">
+                                              <h5 className="text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-600 pb-1">
+                                                Účastníci ({accessCode.students.length})
+                                              </h5>
+                                              <div className="grid gap-2">
+                                                {accessCode.students.map((student, studentIndex) => (
+                                                  <div
+                                                    key={studentIndex}
+                                                    className="bg-gray-50 dark:bg-gray-700/50 rounded p-2"
+                                                  >
+                                                    <div className="flex items-center">
+                                                      <div className=" min-w-0">
+                                                        <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                                          {student.name}
+                                                        </div>
+                                                        <div className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                                                          {student.email}
+                                                        </div>
+                                                      </div>
+
+                                                      <div className="flex flex-wrap gap-1 ml-4">
+                                                        {student.testCompletedAt && (
+                                                          <Badge
+                                                            variant={student.passed ? 'default' : 'destructive'}
+                                                            className="text-xs"
+                                                          >
+                                                            {student.passed ? '✓ Splněno' : '✗ Nesplněno'}
+                                                          </Badge>
+                                                        )}
+
+                                                        {student.certificateIssued && (
+                                                          <Badge variant="outline" className="text-xs">
+                                                            Certifikát vydán
+                                                          </Badge>
+                                                        )}
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <div className="text-center py-2 text-gray-500 dark:text-gray-400 text-sm">
+                                              Kód zatím nebyl použit
+                                            </div>
+                                          )}
+                                        </AccordionContent>
+                                      </AccordionItem>
+                                    </Accordion>
+                                  )
+                                })}
                               </div>
                             </AccordionContent>
                           </AccordionItem>

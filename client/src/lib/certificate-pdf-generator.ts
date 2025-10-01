@@ -9,11 +9,75 @@ export interface CertificateData {
   certificateNumber: string
   verificationCode: string
   score?: number
+  abbreviation?: string
 }
 
-export const generateCertificateHTML2Canvas = async (data: CertificateData): Promise<void> => {
-  // HTML template podle webového náhledu
-  const certificateHTML = `
+const getLegislativeTextByAbbreviation = (abbreviation: string | undefined, companyName?: string): string => {
+  if (!abbreviation) return ''
+
+  const currentYear = new Date().getFullYear()
+  const company = companyName || '[název společnosti]'
+
+  switch (abbreviation.toUpperCase()) {
+    case 'BOZP':
+      return `Nedílnou součástí tohoto osvědčení o absolvování školení je Osnova školení č.1 pro rok ${currentYear} 
+      pro zaměstnance a vedoucí zaměstnance z právních a ostatních předpisů k zajištění bezpečnosti a ochrany zdraví
+       při práci ve společnosti ${company} dle § 103, odst. 2 zákoníku práce 262/2006 Sb. ze dne 1.1.${currentYear} 
+       a Tematický plán a časový rozvrh školení vedoucích zaměstnanců a zaměstnanců z požární ochrany.`
+
+    case 'REF':
+      return `Nedílnou součástí tohoto osvědčení o absolvování školení je Osnova školení č. 2 - ${currentYear} - Školení 
+      řidičů vozidel zaměstnavatele z právních a ostatních předpisů k zajištění bezpečnosti práce a ochrany zdraví při 
+      práci ve společnosti ${company} dle § 103, odst.2 a § 349, odst. 1 zákona č. 262/2006 Sb., Zákoníku práce, v 
+      platném znění ze dne 1.1.${currentYear}`
+
+    case 'PVV':
+      return `o absolvování školení a zkoušky z problematiky bezpečnosti a ochrany zdraví při práci ve smyslu § 103 odst. 2 zákona č. 262/2006
+      Sb. Zákoník práce, v platném znění, se zaměřením pro provádění práce ve výškách dle Nařízení vlády č. 362/2005 Sb., o bližších
+      požadavcích na bezpečnost a ochranu zdraví při práci na pracovišti s nebezpečím pádu z výšky nebo do hloubky, v platném znění
+      a Nařízení vlády č. 591/2006 Sb. o bližších a minimálních požadavcích na bezpečnost a ochranu zdraví při práci na staveništích, v
+      platném znění. Nedílnou součástí tohoto osvědčení o absolvování školení PVV je Osnova školení pro rok ${currentYear}. Školení
+      zaměstnanců provádějící práce ve výškách z právních a ostatních předpisů k zajištění bezpečnosti a ochrany zdraví při práci při
+      provádění práce ve výškách ve společnosti: ${company}`
+
+    case 'BOZPAJ':
+      return `An integral part of this training completion certificate is Training Outline No. 1 for the year ${currentYear}
+       for employees and managerial staff regarding legal and other regulations ensuring safety and health protection 
+       at work within ${company}according to § 103, para. 2 of the Labor Code 262/2006 Coll. dated 1.1.${currentYear}
+       and the Thematic Plan and Schedule for training of managerial staff and employees in fire protection.`
+
+    case 'BOZPPL':
+      return `Integralną częścią niniejszego certyfikatu ukończenia szkolenia jest Program Szkolenia nr 1 na rok ${currentYear}
+       dla pracowników i kadry kierowniczej dotyczący przepisów prawnych i innych regulacji zapewniających
+        bezpieczeństwo i ochronę zdrowia w pracy w ramach ${company} zgodnie z § 103, ust. 2 Kodeksu pracy
+         262/2006 Sb. z dnia 1.1.${currentYear} oraz Plan Tematyczny i Harmonogram szkoleń dla kadry kierowniczej
+          i pracowników w zakresie ochrony przeciwpożarowej.`
+
+    case 'BOZPUA':
+      return `Невід'ємною частиною цього сертифікату про завершення навчання є Програма навчання № 1 на рік ${currentYear} 
+      для працівників і керівного складу щодо правових та інших норм, які забезпечують безпеку і охорону здоров'я на
+       роботі в рамках ${company} відповідно до § 103, п. 2 Трудового кодексу 262/2006 Зб. від 1.1.${currentYear} та
+        Тематичний план і Графік навчання керівного складу і працівників з питань пожежної безпеки.`
+
+    case 'ADR':
+      return `Školení osob podílející se na přepravě a manipulaci nebezpečných věcí v silniční dopravě /tzv. malá ADR/ 
+      předepsané v části 1, podle kapitoly 8.2.3 dle Evropské dohody o mezinárodní silniční přepravě nebezpečných věcí.`
+
+    case 'TEST':
+      return `Nedílnou součástí tohoto osvědčení o absolvování školení je Osnova školení č.1 pro rok ${currentYear} 
+      pro zaměstnance a vedoucí zaměstnance z právních a ostatních předpisů k zajištění bezpečnosti a ochrany zdraví
+       při práci ve společnosti ${company} dle § 103, odst. 2 zákoníku práce 262/2006 Sb. ze dne 1.1.${currentYear} 
+       a Tematický plán a časový rozvrh školení vedoucích zaměstnanců a zaměstnanců z požární ochrany.`
+
+    default:
+      return ''
+  }
+}
+
+const generateCertificateHTML = (data: CertificateData): string => {
+  const legislativeText = getLegislativeTextByAbbreviation(data.abbreviation, data.companyName)
+
+  return `
     <div id="certificate" style="
       width: 297mm; 
       height: 210mm; 
@@ -26,14 +90,12 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
       overflow: hidden;
     ">
       
-      <!-- Hlavička s gradientním pozadím (38% výšky) -->
       <div style="
         background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
         height: 40mm;
         position: relative;
         overflow: hidden;
       ">
-        <!-- Dekorativní kruhy v pozadí -->
         <div style="
           position: absolute;
           top: -20mm;
@@ -53,7 +115,7 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
           border-radius: 50%;
         "></div>
         
-        <!-- Logo a název v levém horním rohu -->
+        <!-- Logo a název -->
         <div style="
           position: absolute;
           top: 20mm;
@@ -62,7 +124,6 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
           z-index: 10;
         ">
           <div style="display: flex; align-items: center; gap: 12px;">
-            <!-- Logo ikona (Shield placeholder) -->
             <div style="
               width: 48px;
               height: 48px;
@@ -98,7 +159,7 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
           </div>
         </div>
 
-        <!-- Číslo certifikátu v pravém horním rohu -->
+        <!-- Číslo certifikátu -->
         <div style="
           position: absolute;
           top: 20mm;
@@ -124,7 +185,7 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
         </div>
       </div>
 
-      <!-- Hlavní obsah certifikátu -->
+      <!-- Hlavní obsah -->
       <div style="
         padding: 25mm 20mm 0 20mm;
         text-align: center;
@@ -146,14 +207,11 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
           position: relative;
           box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
         ">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-  <!-- Shield -->
-  <path d="M12 2L4 6V12C4 17 7 21 12 22C17 21 20 17 20 12V6L12 2Z" fill="#10b981"/>
-  <!-- Checkmark -->
-  <path d="M9 12L11 14L15 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L4 6V12C4 17 7 21 12 22C17 21 20 17 20 12V6L12 2Z" fill="#10b981"/>
+            <path d="M9 12L11 14L15 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           
-          <!-- Checkmark badge -->
           <div style="
             position: absolute;
             top: -6px;
@@ -167,18 +225,16 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
             align-items: center;
             justify-content: center;
           ">
-            <!-- SVG Checkmark -->
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
               <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
         </div>
 
-        <!-- Hlavní nadpis -->
+        <!-- Nadpis -->
         <div style="margin-bottom: 0;">
           <h1 style="
             font-size: 20px;
-            /*font-size: 48px;*/
             font-weight: bold;
             color: #1f2937;
             margin: 0 0 20px 0;
@@ -186,7 +242,6 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
             line-height: 1;
           ">CERTIFIKÁT</h1>
           
-          <!-- Dekorativní čára -->
           <div style="
             position: relative;
             bottom: -14px;
@@ -213,9 +268,9 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
             font-size: 16px;
             color: #6b7280;
             margin: 0 0 12mm 0;
-          ">Tímto se potvrzuje, že</p>
+          ">Tímto se potvrzuje, že úspěšně dokončil(a) školení</p>
           
-          <!-- Jméno studenta v rámečku -->
+          <!-- Jméno studenta -->
           <div style="
             background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
             border: 2px solid #10b981;
@@ -227,18 +282,18 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
             position: relative;
           ">
             <div style="
-                position: absolute;
-                top: 50%;
-                left: 0;
-                transform: translateX(-50%) translateY(-50%);
-                width: 100vw;
-                height: 5px;
-                background: #10b981;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-                z-index: -1;
+              position: absolute;
+              top: 50%;
+              left: 0;
+              transform: translateX(-50%) translateY(-50%);
+              width: 100vw;
+              height: 5px;
+              background: #10b981;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+              z-index: -1;
             "></div>
             
             <h3 style="
@@ -252,13 +307,7 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
             ">${data.studentName}</h3>
           </div>
 
-          <p style="
-            font-size: 16px;
-            color: #6b7280;
-            margin: 0 0 10mm 0;
-          ">úspěšně dokončil(a) školení</p>
-
-          <!-- Název kurzu -->
+          <!-- Název kurzu nebo legislativní text -->
           <div style="
             background: #f9fafb;
             border: 1px solid #e5e7eb;
@@ -267,6 +316,25 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
             margin: 0 auto;
             width: 50%;
           ">
+            ${
+              legislativeText
+                ? `
+            <!-- Pouze legislativní text -->
+            <div style="
+              padding: 12px 16px;
+              text-align: left;
+            ">
+              <p style="
+                font-size: 14px;
+                color: #065f46;
+                line-height: 1.6;
+                margin: 0;
+                text-align: justify;
+              ">${legislativeText}</p>
+            </div>
+            `
+                : `
+            <!-- Název kurzu a společnost -->
             <h4 style="
               font-size: 22px;
               font-weight: bold;
@@ -287,11 +355,12 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
             `
                 : ''
             }
+            `
+            }
           </div>
         </div>
       </div>
 
-      <!-- Spodní část s podpisem a detaily -->
       <div style="
         position: absolute;
         bottom: 12mm;
@@ -300,7 +369,6 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
         padding-top: 10mm;
       ">
         
-        <!-- Datum a podpis -->
         <div style="
           display: flex;
           justify-content: space-between;
@@ -341,7 +409,6 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
           </div>
         </div>
 
-        <!-- Zápatí -->
         <div style="
           text-align: center;
           margin-top: 6mm;
@@ -355,7 +422,7 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
           ">
             <strong style="color: #374151;">DAAL Školicí platforma</strong>
             <span style="margin: 0 6px; color: #d1d5db;">|</span>
-            Praha, Česká republika
+            Třinec, Česká republika
             <span style="margin: 0 6px; color: #d1d5db;">|</span>
             Profesionální školení bezpečnosti práce
           </div>
@@ -363,10 +430,11 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
       </div>
     </div>
   `
+}
 
-  // Vytvoření dočasného elementu pro renderování
+const prepareCertificateElement = (html: string): HTMLElement => {
   const tempDiv = document.createElement('div')
-  tempDiv.innerHTML = certificateHTML
+  tempDiv.innerHTML = html
   tempDiv.style.position = 'fixed'
   tempDiv.style.top = '0'
   tempDiv.style.left = '0'
@@ -375,26 +443,33 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
   tempDiv.style.overflow = 'hidden'
 
   document.body.appendChild(tempDiv)
+  return tempDiv.querySelector('#certificate') as HTMLElement
+}
 
-  const certificateElement = tempDiv.querySelector('#certificate') as HTMLElement
+const cleanupElement = (element: HTMLElement) => {
+  const parent = element.parentElement
+  if (parent && parent.parentElement) {
+    parent.parentElement.removeChild(parent)
+  }
+}
+
+export const generateCertificateHTML2Canvas = async (data: CertificateData): Promise<void> => {
+  const certificateHTML = generateCertificateHTML(data)
+  const certificateElement = prepareCertificateElement(certificateHTML)
 
   try {
-    console.log('📸 Vytváření canvas s vysokým rozlišením...')
-
-    // html2canvas s optimalizovaným nastavením pro nejlepší kvalitu
     const canvas = await html2canvas(certificateElement, {
-      scale: 3, // Velmi vysoké rozlišení pro sharp text
+      scale: 3,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
-      width: 1123, // A4 landscape šířka při 96 DPI
-      height: 794, // A4 landscape výška při 96 DPI
+      width: 1123,
+      height: 794,
       scrollX: 0,
       scrollY: 0,
       logging: false,
       removeContainer: true,
       onclone: (clonedDoc) => {
-        // Zajistíme správné fonty a CSS v klonu
         const clonedElement = clonedDoc.querySelector('#certificate')
         if (clonedElement) {
           ;(clonedElement as HTMLElement).style.fontFamily = 'Arial, Helvetica, sans-serif'
@@ -402,22 +477,17 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
       },
     })
 
-    console.log('📄 Vytváření PDF s maximální kvalitou...')
-
-    // Vytvoření PDF s nejvyšší kvalitou
     const pdf = new jsPDF({
       orientation: 'landscape',
       unit: 'mm',
       format: 'a4',
-      compress: false, // Bez komprese pro nejlepší kvalitu
+      compress: false,
       precision: 16,
     })
 
-    // Přidání obrázku do PDF s maximální kvalitou
-    const imgData = canvas.toDataURL('image/png', 1.0) // PNG místo JPEG pro lepší kvalitu textu
+    const imgData = canvas.toDataURL('image/png', 1.0)
     pdf.addImage(imgData, 'PNG', 0, 0, 297, 210)
 
-    // Generování názvu souboru
     const cleanName = data.studentName
       .replace(/\s+/g, '-')
       .replace(/[^a-zA-Z0-9\-áčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]/g, '')
@@ -425,18 +495,50 @@ export const generateCertificateHTML2Canvas = async (data: CertificateData): Pro
 
     const fileName = `certifikat-${cleanName}-${data.certificateNumber.slice(-6)}.pdf`
     pdf.save(fileName)
-
-    console.log('✅ Moderní PDF certifikát úspěšně vygenerován!')
   } catch (error) {
     console.error('❌ Chyba při generování PDF:', error)
     throw error
   } finally {
-    // Vyčištění DOM
-    document.body.removeChild(tempDiv)
+    cleanupElement(certificateElement)
   }
 }
 
-// Hlavní export funkce (zachovává kompatibilitu)
 export const downloadCertificate = async (data: CertificateData): Promise<void> => {
   await generateCertificateHTML2Canvas(data)
+}
+
+export const generateCertificateBlob = async (data: CertificateData): Promise<Blob> => {
+  const certificateHTML = generateCertificateHTML(data)
+  const certificateElement = prepareCertificateElement(certificateHTML)
+  try {
+    const canvas = await html2canvas(certificateElement, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      width: 1123,
+      height: 794,
+      scrollX: 0,
+      scrollY: 0,
+      logging: false,
+    })
+
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4',
+      compress: true,
+      precision: 10,
+    })
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.92)
+    pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST')
+
+    return pdf.output('blob')
+  } catch (error) {
+    console.error('Chyba při generování PDF Blob:', error)
+    throw error
+  } finally {
+    cleanupElement(certificateElement)
+  }
 }

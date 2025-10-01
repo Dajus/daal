@@ -97,7 +97,6 @@ const ContactForm = () => {
           },
           EMAILJS_PUBLIC_KEY,
         )
-        console.log('Email sent successfully via EmailJS')
       } else {
         throw new Error('EmailJS není správně nakonfigurován')
       }

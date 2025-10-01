@@ -8,11 +8,12 @@ import { useToast } from '@/hooks/use-toast'
 import { getAuthHeaders } from '@/lib/auth'
 import { apiRequest } from '@/lib/queryClient'
 import { ChevronLeft, ChevronRight, Bookmark, StickyNote, Clock, CheckCircle, X, BookOpen } from 'lucide-react'
-import type { TheorySlide } from '@/types'
 import { t } from '@/lib/translations'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { LoadingScreen, Spinner } from '@/components/ui/spinner'
+
+import type { TheorySlide } from '@/types'
 
 const TheoryViewer = ({ progress }: { progress?: any }) => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
@@ -402,7 +403,6 @@ const TheoryViewer = ({ progress }: { progress?: any }) => {
         </div>
       )}
 
-      {/* Loading Transition Overlay with enhanced duration */}
       {isTransitioning && (
         <div className="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex items-center justify-center">
           <LoadingScreen title="Příprava testu..." description="Načítání otázek a testovacího prostředí" size="xl" />
